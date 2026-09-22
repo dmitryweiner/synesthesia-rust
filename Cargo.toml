@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["syn-core"]
+members = ["syn-core", "syn-audio", "syn-app"]
 
 [workspace.package]
 version = "0.1.0"

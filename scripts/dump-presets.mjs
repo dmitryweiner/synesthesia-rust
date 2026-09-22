@@ -21,6 +21,7 @@ const dump = await page.evaluate(async () => {
   const visual = await import('/src/schema/visual.ts');
   const state = await import('/src/state/schema.ts');
   const gen = await import('/src/dsp/generator.ts');
+  const filters = await import('/src/audio/filters.ts');
   return {
     presets: PRESETS.map((p) => ({ name: p.name, state: p.state })),
     schema: {
@@ -32,6 +33,7 @@ const dump = await page.evaluate(async () => {
       chorusModes: audio.CHORUS_MODES,
       phaserStages: audio.PHASER_STAGES,
       defaultFx: audio.DEFAULT_FX,
+      vowels: filters.VOWELS,
       fxOnKeys: audio.FX_ON_KEYS,
       fxModParams: audio.FX_MOD_PARAMS,
       fxParamRanges: audio.FX_PARAM_RANGES,

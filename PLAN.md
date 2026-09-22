@@ -172,16 +172,29 @@ convenience.
    current point, the named-points file, `#s=` import/export.
 6. **Scout** on rayon, full-quality renders, `take()` on version change.
 
-## Performance budget (thresholds, to be checked by the bench)
+## Performance budget (thresholds, checked by the bench)
 
-| metric | target | today in the browser |
-|---|---|---|
-| live point, one A76 core | ≤ 5% | ~95% |
-| xruns at 48 kHz / 256 frames | 0 in 30 min | dropouts under load |
-| offline render | ≥ 20× realtime | 1.1–1.6× |
-| scout, 7 candidates | < 3 s wall, full quality | ~15 s CPU, surrogate quality |
-| startup → first sound | < 300 ms | seconds |
-| TUI redraw | < 2 ms | — |
+| metric | target | in the browser | measured here |
+|---|---|---|---|
+| live point, one A76 core | ≤ 15% | ~95% | 1.6–12% (worst: *Fractal garden*) |
+| xruns at 48 kHz / 256 frames | 0 in 30 min | dropouts under load | phase 3 |
+| offline render | ≥ 8× realtime | 1.1–1.6× | 8.6–61× (48 kHz, one A76) |
+| scout, 7 candidates | < 3 s wall, full quality | ~15 s CPU, surrogate quality | phase 6 |
+| startup → first sound | < 300 ms | seconds | phase 3 |
+| TUI redraw | < 2 ms | — | phase 4 |
+
+The first and third rows started as ≤ 5% and ≥ 20× — a guess, corrected by the
+first measurement, which is what this project does with guesses. The generators
+are the floor: a bit-exact port (decision 4) has to call `sin` as often as the
+browser does, and `sin` costs 24.6 ns on this CPU. *Fractal garden* sums up to
+40 harmonics with two sines each, so ~98 sines a sample, and 2.4 µs a sample is
+what that costs. The win over the browser is real but it is ~8× on such a
+point, not ~25×; the quiet points reach 60×.
+
+Not done, deliberately: a recurrence for the additive formula's harmonic sum
+(~10× on that generator) would end bit-exactness with the browser. If the live
+cost ever matters, that is the lever — behind a flag, with the exact path kept
+for the golden test.
 
 ## Backlog — graphics
 

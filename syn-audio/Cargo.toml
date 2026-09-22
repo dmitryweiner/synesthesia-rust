@@ -1,0 +1,13 @@
+[package]
+name = "syn-audio"
+description = "Sound output and the realtime loop."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+syn-core = { path = "../syn-core" }
+serde_json = "1"
+
+[lints]
+workspace = true

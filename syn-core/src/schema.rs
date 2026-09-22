@@ -9,6 +9,7 @@ use std::sync::OnceLock;
 use serde::Deserialize;
 
 use crate::modmatrix::{LfoDef, ParamRanges};
+use crate::state::CardState;
 
 const SCHEMA_JSON: &str = include_str!("../../assets/schema.json");
 
@@ -23,6 +24,25 @@ pub struct SliderDef {
     /// Perceptually logarithmic (frequency-like): mutate and modulate in octaves.
     #[serde(default)]
     pub exp: bool,
+}
+
+/// A visual card (the image side). Carried through the point and mutated by
+/// evolution even though nothing renders it yet — PLAN.md decision 2.
+/// Vowel formants (F1, F2, F3 in Hz) and their relative amplitudes, in the
+/// order A E I O U — the Vowel slider morphs between them.
+#[derive(Clone, Copy, Debug, Deserialize)]
+pub struct Vowel {
+    pub f: [f64; 3],
+    pub a: [f64; 3],
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct CardDef {
+    pub id: String,
+    pub title: String,
+    pub tag: String,
+    pub desc: String,
+    pub sliders: Vec<SliderDef>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -55,6 +75,10 @@ pub struct Schema {
     pub coupling_keys: Vec<String>,
     pub coupling_ranges: BTreeMap<String, [f64; 2]>,
     pub coupling_floor: f64,
+    pub cards: Vec<CardDef>,
+    pub vowels: Vec<Vowel>,
+    pub default_coupling: BTreeMap<String, f64>,
+    pub default_state: serde_json::Value,
 }
 
 /// The parsed schema (parsed on first use, then shared).
@@ -96,6 +120,55 @@ pub fn formula_ranges(id: &str) -> ParamRanges {
 pub fn formula_exp_params(id: &str) -> Vec<String> {
     formula_def(id)
         .map(|def| def.sliders.iter().filter(|s| s.exp).map(|s| s.k.clone()).collect())
+        .unwrap_or_default()
+}
+
+/// Visual cards at their defaults — which cards start on is taken from the
+/// dumped default point, not guessed.
+pub fn default_cards() -> BTreeMap<String, CardState> {
+    let on_by_default = |id: &str| -> bool {
+        schema()
+            .default_state
+            .pointer(&format!("/visual/cards/{id}/on"))
+            .and_then(serde_json::Value::as_bool)
+            .unwrap_or(false)
+    };
+    schema()
+        .cards
+        .iter()
+        .map(|c| {
+            let params = c.sliders.iter().map(|s| (s.k.clone(), s.value)).collect();
+            (c.id.clone(), CardState { on: on_by_default(&c.id), params })
+        })
+        .collect()
+}
+
+/// Formants at slider position `v` (0..1), interpolated between the vowels.
+pub fn vowel_formants(v: f64) -> Vowel {
+    let vowels = &schema().vowels;
+    let pos = v.clamp(0.0, 1.0) * (vowels.len() - 1) as f64;
+    let i0 = (pos.floor() as usize).min(vowels.len() - 2);
+    let fr = pos - i0 as f64;
+    let (a, b) = (&vowels[i0], &vowels[i0 + 1]);
+    let lerp = |x: f64, y: f64| x + (y - x) * fr;
+    Vowel {
+        f: [lerp(a.f[0], b.f[0]), lerp(a.f[1], b.f[1]), lerp(a.f[2], b.f[2])],
+        a: [lerp(a.a[0], b.a[0]), lerp(a.a[1], b.a[1]), lerp(a.a[2], b.a[2])],
+    }
+}
+
+pub fn default_coupling() -> BTreeMap<String, f64> {
+    schema().default_coupling.clone()
+}
+
+pub fn card_def(id: &str) -> Option<&'static CardDef> {
+    schema().cards.iter().find(|c| c.id == id)
+}
+
+/// Slider ranges of one visual card.
+pub fn card_ranges(id: &str) -> ParamRanges {
+    card_def(id)
+        .map(|def| def.sliders.iter().map(|s| (s.k.clone(), [s.min, s.max])).collect())
         .unwrap_or_default()
 }
 

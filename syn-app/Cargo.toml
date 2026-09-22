@@ -1,0 +1,18 @@
+[package]
+name = "syn-app"
+description = "The console application: CLI, storage, wiring."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "synesthesia"
+path = "src/main.rs"
+
+[dependencies]
+syn-core = { path = "../syn-core" }
+syn-audio = { path = "../syn-audio" }
+serde_json = "1"
+
+[lints]
+workspace = true

@@ -87,6 +87,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "syn-app"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "syn-audio",
+ "syn-core",
+]
+
+[[package]]
+name = "syn-audio"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "syn-core",
+]
+
+[[package]]
 name = "syn-core"
 version = "0.1.0"
 dependencies = [

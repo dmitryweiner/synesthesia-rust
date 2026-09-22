@@ -1,0 +1,1596 @@
+{
+ "blockSize": 128,
+ "seed": 12345,
+ "rng": "mulberry32",
+ "takes": [
+  {
+   "id": "fm",
+   "take": "a",
+   "file": "fm.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.15,
+    "fc": 220,
+    "fm": 2,
+    "I": 3
+   },
+   "mod": null
+  },
+  {
+   "id": "fm",
+   "take": "b",
+   "file": "fm.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.15,
+    "fc": 220,
+    "fm": 2,
+    "I": 3
+   },
+   "mod": null
+  },
+  {
+   "id": "fm",
+   "take": "c",
+   "file": "fm.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.15,
+    "fc": 220,
+    "fm": 2,
+    "I": 3
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "fm",
+      "param": "fc",
+      "depth": 0.6,
+      "exp": true
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "fc": [
+      20,
+      2000
+     ],
+     "fm": [
+      0.1,
+      60
+     ],
+     "I": [
+      0,
+      20
+     ]
+    }
+   }
+  },
+  {
+   "id": "logistic",
+   "take": "a",
+   "file": "logistic.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.12,
+    "base": 110,
+    "depth": 330,
+    "r": 3.86,
+    "lfoHz": 40
+   },
+   "mod": null
+  },
+  {
+   "id": "logistic",
+   "take": "b",
+   "file": "logistic.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.12,
+    "base": 110,
+    "depth": 330,
+    "r": 3.86,
+    "lfoHz": 60
+   },
+   "mod": null
+  },
+  {
+   "id": "logistic",
+   "take": "c",
+   "file": "logistic.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.12,
+    "base": 110,
+    "depth": 330,
+    "r": 3.86,
+    "lfoHz": 40
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "logistic",
+      "param": "base",
+      "depth": 0.6,
+      "exp": true
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "base": [
+      20,
+      800
+     ],
+     "depth": [
+      0,
+      1200
+     ],
+     "r": [
+      2.8,
+      4
+     ],
+     "lfoHz": [
+      1,
+      400
+     ]
+    }
+   }
+  },
+  {
+   "id": "gliss",
+   "take": "a",
+   "file": "gliss.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.1,
+    "f0": 55,
+    "k": 0.15
+   },
+   "mod": null
+  },
+  {
+   "id": "gliss",
+   "take": "b",
+   "file": "gliss.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.1,
+    "f0": 55,
+    "k": 0.15
+   },
+   "mod": null
+  },
+  {
+   "id": "gliss",
+   "take": "c",
+   "file": "gliss.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.1,
+    "f0": 55,
+    "k": 0.15
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "gliss",
+      "param": "f0",
+      "depth": 0.6,
+      "exp": true
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "f0": [
+      10,
+      400
+     ],
+     "k": [
+      -2,
+      2
+     ]
+    }
+   }
+  },
+  {
+   "id": "additive",
+   "take": "a",
+   "file": "additive.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.12,
+    "fund": 110,
+    "N": 12,
+    "move": 0.35
+   },
+   "mod": null
+  },
+  {
+   "id": "additive",
+   "take": "b",
+   "file": "additive.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.12,
+    "fund": 110,
+    "N": 12,
+    "move": 0.35
+   },
+   "mod": null
+  },
+  {
+   "id": "additive",
+   "take": "c",
+   "file": "additive.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.12,
+    "fund": 110,
+    "N": 12,
+    "move": 0.35
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "additive",
+      "param": "fund",
+      "depth": 0.6,
+      "exp": true
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "fund": [
+      20,
+      500
+     ],
+     "N": [
+      1,
+      40
+     ],
+     "move": [
+      0.01,
+      5
+     ]
+    }
+   }
+  },
+  {
+   "id": "pm",
+   "take": "a",
+   "file": "pm.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.12,
+    "f": 220,
+    "f2pm": 3
+   },
+   "mod": null
+  },
+  {
+   "id": "pm",
+   "take": "b",
+   "file": "pm.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.12,
+    "f": 220,
+    "f2pm": 3
+   },
+   "mod": null
+  },
+  {
+   "id": "pm",
+   "take": "c",
+   "file": "pm.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.12,
+    "f": 220,
+    "f2pm": 3
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "pm",
+      "param": "f",
+      "depth": 0.6,
+      "exp": true
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "f": [
+      20,
+      2000
+     ],
+     "f2pm": [
+      0.1,
+      40
+     ]
+    }
+   }
+  },
+  {
+   "id": "beats",
+   "take": "a",
+   "file": "beats.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.12,
+    "fbeat": 220,
+    "df": 0.8
+   },
+   "mod": null
+  },
+  {
+   "id": "beats",
+   "take": "b",
+   "file": "beats.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.12,
+    "fbeat": 220,
+    "df": 0.8
+   },
+   "mod": null
+  },
+  {
+   "id": "beats",
+   "take": "c",
+   "file": "beats.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.12,
+    "fbeat": 220,
+    "df": 0.8
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "beats",
+      "param": "fbeat",
+      "depth": 0.6,
+      "exp": true
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "fbeat": [
+      20,
+      2000
+     ],
+     "df": [
+      0,
+      20
+     ]
+    }
+   }
+  },
+  {
+   "id": "dist",
+   "take": "a",
+   "file": "dist.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.1,
+    "fd": 110,
+    "alpha": 3
+   },
+   "mod": null
+  },
+  {
+   "id": "dist",
+   "take": "b",
+   "file": "dist.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.1,
+    "fd": 110,
+    "alpha": 3
+   },
+   "mod": null
+  },
+  {
+   "id": "dist",
+   "take": "c",
+   "file": "dist.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.1,
+    "fd": 110,
+    "alpha": 3
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "dist",
+      "param": "fd",
+      "depth": 0.6,
+      "exp": true
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "fd": [
+      20,
+      2000
+     ],
+     "alpha": [
+      0,
+      10
+     ]
+    }
+   }
+  },
+  {
+   "id": "quasi",
+   "take": "a",
+   "file": "quasi.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.1,
+    "fq": 120,
+    "Aq": 220,
+    "wq": 0.8
+   },
+   "mod": null
+  },
+  {
+   "id": "quasi",
+   "take": "b",
+   "file": "quasi.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.1,
+    "fq": 120,
+    "Aq": 220,
+    "wq": 0.8
+   },
+   "mod": null
+  },
+  {
+   "id": "quasi",
+   "take": "c",
+   "file": "quasi.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.1,
+    "fq": 120,
+    "Aq": 220,
+    "wq": 0.8
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "quasi",
+      "param": "fq",
+      "depth": 0.6,
+      "exp": true
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "fq": [
+      20,
+      500
+     ],
+     "Aq": [
+      0,
+      1200
+     ],
+     "wq": [
+      0.05,
+      6
+     ]
+    }
+   }
+  },
+  {
+   "id": "lorenz",
+   "take": "a",
+   "file": "lorenz.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.1,
+    "sigma": 10,
+    "rho": 28,
+    "beta": 2.6667,
+    "lBase": 120,
+    "lFreqScale": 40,
+    "lAmp": 0.25
+   },
+   "mod": null
+  },
+  {
+   "id": "lorenz",
+   "take": "b",
+   "file": "lorenz.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.1,
+    "sigma": 10,
+    "rho": 28,
+    "beta": 2.6667,
+    "lBase": 120,
+    "lFreqScale": 40,
+    "lAmp": 0.25
+   },
+   "mod": null
+  },
+  {
+   "id": "lorenz",
+   "take": "c",
+   "file": "lorenz.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.1,
+    "sigma": 10,
+    "rho": 28,
+    "beta": 2.6667,
+    "lBase": 120,
+    "lFreqScale": 40,
+    "lAmp": 0.25
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "lorenz",
+      "param": "sigma",
+      "depth": 0.6,
+      "exp": false
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "sigma": [
+      0,
+      30
+     ],
+     "rho": [
+      0,
+      60
+     ],
+     "beta": [
+      0.1,
+      10
+     ],
+     "lBase": [
+      20,
+      400
+     ],
+     "lFreqScale": [
+      0,
+      200
+     ],
+     "lAmp": [
+      0,
+      1
+     ]
+    }
+   }
+  },
+  {
+   "id": "karplus",
+   "take": "a",
+   "file": "karplus.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.14,
+    "ksFreq": 110,
+    "ksDamp": 0.985,
+    "ksBright": 0.5
+   },
+   "mod": null
+  },
+  {
+   "id": "karplus",
+   "take": "b",
+   "file": "karplus.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.14,
+    "ksFreq": 110,
+    "ksDamp": 0.985,
+    "ksBright": 0.5
+   },
+   "mod": null
+  },
+  {
+   "id": "karplus",
+   "take": "c",
+   "file": "karplus.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.14,
+    "ksFreq": 110,
+    "ksDamp": 0.985,
+    "ksBright": 0.5
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "karplus",
+      "param": "ksFreq",
+      "depth": 0.6,
+      "exp": true
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "ksFreq": [
+      40,
+      880
+     ],
+     "ksDamp": [
+      0.9,
+      0.9999
+     ],
+     "ksBright": [
+      0,
+      1
+     ]
+    }
+   }
+  },
+  {
+   "id": "noiselp",
+   "take": "a",
+   "file": "noiselp.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.1,
+    "nCut": 800
+   },
+   "mod": null
+  },
+  {
+   "id": "noiselp",
+   "take": "b",
+   "file": "noiselp.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.1,
+    "nCut": 800
+   },
+   "mod": null
+  },
+  {
+   "id": "noiselp",
+   "take": "c",
+   "file": "noiselp.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.1,
+    "nCut": 800
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "noiselp",
+      "param": "nCut",
+      "depth": 0.6,
+      "exp": true
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "nCut": [
+      20,
+      18000
+     ]
+    }
+   }
+  },
+  {
+   "id": "pinknoise",
+   "take": "a",
+   "file": "pinknoise.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.12,
+    "pinkBright": 0.3
+   },
+   "mod": null
+  },
+  {
+   "id": "pinknoise",
+   "take": "b",
+   "file": "pinknoise.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.12,
+    "pinkBright": 0.3
+   },
+   "mod": null
+  },
+  {
+   "id": "pinknoise",
+   "take": "c",
+   "file": "pinknoise.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.12,
+    "pinkBright": 0.3
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "pinknoise",
+      "param": "pinkBright",
+      "depth": 0.6,
+      "exp": false
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "pinkBright": [
+      0,
+      1
+     ]
+    }
+   }
+  },
+  {
+   "id": "brownnoise",
+   "take": "a",
+   "file": "brownnoise.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.15,
+    "brownStep": 0.02
+   },
+   "mod": null
+  },
+  {
+   "id": "brownnoise",
+   "take": "b",
+   "file": "brownnoise.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.15,
+    "brownStep": 0.02
+   },
+   "mod": null
+  },
+  {
+   "id": "brownnoise",
+   "take": "c",
+   "file": "brownnoise.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.15,
+    "brownStep": 0.02
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "brownnoise",
+      "param": "brownStep",
+      "depth": 0.6,
+      "exp": true
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "brownStep": [
+      0.001,
+      0.1
+     ]
+    }
+   }
+  },
+  {
+   "id": "velvetnoise",
+   "take": "a",
+   "file": "velvetnoise.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.1,
+    "velvetDensity": 2000
+   },
+   "mod": null
+  },
+  {
+   "id": "velvetnoise",
+   "take": "b",
+   "file": "velvetnoise.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.1,
+    "velvetDensity": 500
+   },
+   "mod": null
+  },
+  {
+   "id": "velvetnoise",
+   "take": "c",
+   "file": "velvetnoise.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.1,
+    "velvetDensity": 2000
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "velvetnoise",
+      "param": "velvetDensity",
+      "depth": 0.6,
+      "exp": true
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "velvetDensity": [
+      100,
+      10000
+     ]
+    }
+   }
+  },
+  {
+   "id": "rossler",
+   "take": "a",
+   "file": "rossler.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.1,
+    "rossA": 0.2,
+    "rossB": 0.2,
+    "rossC": 5.7,
+    "rossBase": 120,
+    "rossFreqScale": 30,
+    "rossAmp": 0.25
+   },
+   "mod": null
+  },
+  {
+   "id": "rossler",
+   "take": "b",
+   "file": "rossler.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.1,
+    "rossA": 0.2,
+    "rossB": 0.2,
+    "rossC": 5.7,
+    "rossBase": 120,
+    "rossFreqScale": 30,
+    "rossAmp": 0.25
+   },
+   "mod": null
+  },
+  {
+   "id": "rossler",
+   "take": "c",
+   "file": "rossler.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.1,
+    "rossA": 0.2,
+    "rossB": 0.2,
+    "rossC": 5.7,
+    "rossBase": 120,
+    "rossFreqScale": 30,
+    "rossAmp": 0.25
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "rossler",
+      "param": "rossA",
+      "depth": 0.6,
+      "exp": false
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "rossA": [
+      0.01,
+      0.5
+     ],
+     "rossB": [
+      0.01,
+      0.5
+     ],
+     "rossC": [
+      2,
+      12
+     ],
+     "rossBase": [
+      20,
+      400
+     ],
+     "rossFreqScale": [
+      0,
+      100
+     ],
+     "rossAmp": [
+      0,
+      1
+     ]
+    }
+   }
+  },
+  {
+   "id": "shepard",
+   "take": "a",
+   "file": "shepard.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.12,
+    "shepBase": 55,
+    "shepSpeed": 0.1,
+    "shepOctaves": 6
+   },
+   "mod": null
+  },
+  {
+   "id": "shepard",
+   "take": "b",
+   "file": "shepard.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.12,
+    "shepBase": 55,
+    "shepSpeed": 0.5,
+    "shepOctaves": 6
+   },
+   "mod": null
+  },
+  {
+   "id": "shepard",
+   "take": "c",
+   "file": "shepard.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.12,
+    "shepBase": 55,
+    "shepSpeed": 0.1,
+    "shepOctaves": 6
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "shepard",
+      "param": "shepBase",
+      "depth": 0.6,
+      "exp": true
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "shepBase": [
+      20,
+      200
+     ],
+     "shepSpeed": [
+      -0.5,
+      0.5
+     ],
+     "shepOctaves": [
+      3,
+      10
+     ]
+    }
+   }
+  },
+  {
+   "id": "bytebeat",
+   "take": "a",
+   "file": "bytebeat.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.1,
+    "bbRecipe": 1,
+    "bbRate": 8000
+   },
+   "mod": null
+  },
+  {
+   "id": "bytebeat",
+   "take": "b",
+   "file": "bytebeat.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.1,
+    "bbRecipe": 1,
+    "bbRate": 4000
+   },
+   "mod": null
+  },
+  {
+   "id": "bytebeat",
+   "take": "c",
+   "file": "bytebeat.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.1,
+    "bbRecipe": 1,
+    "bbRate": 8000
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "bytebeat",
+      "param": "bbRecipe",
+      "depth": 0.6,
+      "exp": false
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "bbRecipe": [
+      1,
+      5
+     ],
+     "bbRate": [
+      1000,
+      16000
+     ]
+    }
+   }
+  },
+  {
+   "id": "bell",
+   "take": "a",
+   "file": "bell.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.15,
+    "bellF0": 320,
+    "bellRatio": 1.4,
+    "bellIndex": 4,
+    "bellDecay": 3,
+    "bellPeriod": 6
+   },
+   "mod": null
+  },
+  {
+   "id": "bell",
+   "take": "b",
+   "file": "bell.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.15,
+    "bellF0": 320,
+    "bellRatio": 1.4,
+    "bellIndex": 4,
+    "bellDecay": 3,
+    "bellPeriod": 0.7
+   },
+   "mod": null
+  },
+  {
+   "id": "bell",
+   "take": "c",
+   "file": "bell.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.15,
+    "bellF0": 320,
+    "bellRatio": 1.4,
+    "bellIndex": 4,
+    "bellDecay": 3,
+    "bellPeriod": 6
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "bell",
+      "param": "bellF0",
+      "depth": 0.6,
+      "exp": true
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "bellF0": [
+      100,
+      1000
+     ],
+     "bellRatio": [
+      1,
+      3
+     ],
+     "bellIndex": [
+      0,
+      10
+     ],
+     "bellDecay": [
+      0.5,
+      8
+     ],
+     "bellPeriod": [
+      1,
+      20
+     ]
+    }
+   }
+  },
+  {
+   "id": "ocean",
+   "take": "a",
+   "file": "ocean.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.25,
+    "oceanRate": 0.12,
+    "oceanCut": 600,
+    "oceanDepth": 0.7
+   },
+   "mod": null
+  },
+  {
+   "id": "ocean",
+   "take": "b",
+   "file": "ocean.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.25,
+    "oceanRate": 0.12,
+    "oceanCut": 600,
+    "oceanDepth": 0.7
+   },
+   "mod": null
+  },
+  {
+   "id": "ocean",
+   "take": "c",
+   "file": "ocean.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.25,
+    "oceanRate": 0.12,
+    "oceanCut": 600,
+    "oceanDepth": 0.7
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "ocean",
+      "param": "oceanRate",
+      "depth": 0.6,
+      "exp": true
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "oceanRate": [
+      0.03,
+      0.5
+     ],
+     "oceanCut": [
+      100,
+      2000
+     ],
+     "oceanDepth": [
+      0,
+      1
+     ]
+    }
+   }
+  },
+  {
+   "id": "risset",
+   "take": "a",
+   "file": "risset.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.4,
+    "rissF0": 480,
+    "rissDecay": 5,
+    "rissPeriod": 6
+   },
+   "mod": null
+  },
+  {
+   "id": "risset",
+   "take": "b",
+   "file": "risset.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.4,
+    "rissF0": 480,
+    "rissDecay": 5,
+    "rissPeriod": 0.7
+   },
+   "mod": null
+  },
+  {
+   "id": "risset",
+   "take": "c",
+   "file": "risset.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.4,
+    "rissF0": 480,
+    "rissDecay": 5,
+    "rissPeriod": 6
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "risset",
+      "param": "rissF0",
+      "depth": 0.6,
+      "exp": true
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "rissF0": [
+      100,
+      1200
+     ],
+     "rissDecay": [
+      0.5,
+      12
+     ],
+     "rissPeriod": [
+      1,
+      20
+     ]
+    }
+   }
+  },
+  {
+   "id": "rain",
+   "take": "a",
+   "file": "rain.a.f32",
+   "sr": 48000,
+   "n": 8192,
+   "params": {
+    "gain": 0.35,
+    "rainDensity": 4,
+    "rainPitch": 900,
+    "rainBed": 0.15
+   },
+   "mod": null
+  },
+  {
+   "id": "rain",
+   "take": "b",
+   "file": "rain.b.f32",
+   "sr": 8000,
+   "n": 16000,
+   "params": {
+    "gain": 0.35,
+    "rainDensity": 20,
+    "rainPitch": 900,
+    "rainBed": 0.15
+   },
+   "mod": null
+  },
+  {
+   "id": "rain",
+   "take": "c",
+   "file": "rain.c.f32",
+   "sr": 48000,
+   "n": 4096,
+   "params": {
+    "gain": 0.35,
+    "rainDensity": 4,
+    "rainPitch": 900,
+    "rainBed": 0.15
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "triangle",
+      "rate": 3,
+      "phase": 0.25
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "rain",
+      "param": "rainDensity",
+      "depth": 0.6,
+      "exp": true
+     }
+    ],
+    "ranges": {
+     "gain": [
+      0,
+      1
+     ],
+     "rainDensity": [
+      0.5,
+      20
+     ],
+     "rainPitch": [
+      200,
+      3000
+     ],
+     "rainBed": [
+      0,
+      1
+     ]
+    }
+   }
+  }
+ ]
+}

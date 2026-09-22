@@ -1,0 +1,4230 @@
+[
+ {
+  "name": "Fractal garden",
+  "state": {
+   "v": 1,
+   "audio": {
+    "masterGain": 0.72,
+    "fx": {
+     "filterOn": true,
+     "filterType": "comb",
+     "filterFreq": 220,
+     "filterQ": 0.7,
+     "filterGain": 0,
+     "filterVowel": 0,
+     "filterCombFb": 0.7,
+     "chorusOn": true,
+     "chorusMode": "chorus",
+     "chorusRate": 0.07,
+     "chorusDepth": 7,
+     "chorusMix": 0.25,
+     "chorusFb": 0.25,
+     "reverbOn": true,
+     "reverbDecay": 5.5,
+     "reverbMix": 0.25,
+     "limiterOn": true,
+     "limiterThr": -12,
+     "limiterRel": 0.15,
+     "delayOn": true,
+     "delayTime": 0.66,
+     "delayFb": 0.5,
+     "delayMix": 0.3,
+     "phaserOn": true,
+     "phaserRate": 0.25,
+     "phaserDepth": 0.7,
+     "phaserStages": 8,
+     "phaserFb": 0.5,
+     "phaserMix": 0.45
+    },
+    "formulas": {
+     "additive": {
+      "enabled": true,
+      "params": {
+       "gain": 0.45,
+       "fund": 55,
+       "N": 24,
+       "move": 0.25
+      }
+     },
+     "lorenz": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "sigma": 10,
+       "rho": 28,
+       "beta": 2.6667,
+       "lBase": 120,
+       "lFreqScale": 40,
+       "lAmp": 0.25
+      }
+     },
+     "rossler": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "rossA": 0.2,
+       "rossB": 0.2,
+       "rossC": 5.7,
+       "rossBase": 120,
+       "rossFreqScale": 30,
+       "rossAmp": 0.25
+      }
+     },
+     "gliss": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "f0": 55,
+       "k": 0.15
+      }
+     },
+     "shepard": {
+      "enabled": true,
+      "params": {
+       "gain": 0.1,
+       "shepBase": 55,
+       "shepSpeed": 0.05,
+       "shepOctaves": 8
+      }
+     },
+     "bell": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "bellF0": 320,
+       "bellRatio": 1.4,
+       "bellIndex": 4,
+       "bellDecay": 3,
+       "bellPeriod": 6
+      }
+     },
+     "risset": {
+      "enabled": false,
+      "params": {
+       "gain": 0.4,
+       "rissF0": 480,
+       "rissDecay": 5,
+       "rissPeriod": 6
+      }
+     },
+     "fm": {
+      "enabled": true,
+      "params": {
+       "gain": 0.15,
+       "fc": 880,
+       "fm": 55,
+       "I": 5
+      }
+     },
+     "beats": {
+      "enabled": true,
+      "params": {
+       "gain": 0.28,
+       "fbeat": 55,
+       "df": 0.6
+      }
+     },
+     "pm": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "f": 220,
+       "f2pm": 3
+      }
+     },
+     "quasi": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fq": 120,
+       "Aq": 220,
+       "wq": 0.8
+      }
+     },
+     "logistic": {
+      "enabled": true,
+      "params": {
+       "gain": 0.12,
+       "base": 330,
+       "depth": 500,
+       "r": 3.68,
+       "lfoHz": 16
+      }
+     },
+     "dist": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fd": 110,
+       "alpha": 3
+      }
+     },
+     "karplus": {
+      "enabled": false,
+      "params": {
+       "gain": 0.14,
+       "ksFreq": 110,
+       "ksDamp": 0.985,
+       "ksBright": 0.5
+      }
+     },
+     "bytebeat": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "bbRecipe": 1,
+       "bbRate": 8000
+      }
+     },
+     "ocean": {
+      "enabled": false,
+      "params": {
+       "gain": 0.25,
+       "oceanRate": 0.12,
+       "oceanCut": 600,
+       "oceanDepth": 0.7
+      }
+     },
+     "rain": {
+      "enabled": false,
+      "params": {
+       "gain": 0.35,
+       "rainDensity": 4,
+       "rainPitch": 900,
+       "rainBed": 0.15
+      }
+     },
+     "noiselp": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "nCut": 800
+      }
+     },
+     "pinknoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "pinkBright": 0.3
+      }
+     },
+     "brownnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "brownStep": 0.02
+      }
+     },
+     "velvetnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "velvetDensity": 2000
+      }
+     }
+    }
+   },
+   "visual": {
+    "cards": {
+     "reaction": {
+      "on": true,
+      "params": {
+       "feed": 0.041,
+       "kill": 0.061,
+       "diffU": 0.2097,
+       "diffV": 0.105,
+       "speed": 16
+      }
+     },
+     "fieldVariation": {
+      "on": true,
+      "params": {
+       "feedVarAmount": 0.006,
+       "feedVarScale": 4,
+       "feedVarWarp": 0.9,
+       "killVarAmount": 0.003,
+       "killVarScale": 5,
+       "killVarWarp": 0.8
+      }
+     },
+     "flow": {
+      "on": true,
+      "params": {
+       "curlStrength": 0.006,
+       "curlScale": 3,
+       "driftX": 0,
+       "driftY": 0,
+       "advectAmount": 0.18,
+       "evolveRate": 0.005
+      }
+     },
+     "palette": {
+      "on": true,
+      "params": {
+       "shift": 0,
+       "contrast": 1.15,
+       "bands": 1,
+       "relief": 1,
+       "lightAngle": 2,
+       "gloss": 0.3,
+       "paletteId": 0
+      }
+     }
+    }
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "sine",
+      "rate": 0.023,
+      "phase": 0
+     },
+     {
+      "shape": "triangle",
+      "rate": 0.013,
+      "phase": 0.25
+     },
+     {
+      "shape": "sine",
+      "rate": 0.089,
+      "phase": 0
+     },
+     {
+      "shape": "random",
+      "rate": 0.031,
+      "phase": 0
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "fx",
+      "param": "filterFreq",
+      "depth": 0.3,
+      "exp": true
+     },
+     {
+      "src": 0,
+      "target": "fx",
+      "param": "reverbMix",
+      "depth": 0.25
+     },
+     {
+      "src": 1,
+      "target": "logistic",
+      "param": "r",
+      "depth": 0.15
+     },
+     {
+      "src": 1,
+      "target": "logistic",
+      "param": "lfoHz",
+      "depth": 0.2,
+      "exp": true
+     },
+     {
+      "src": 1,
+      "target": "shepard",
+      "param": "gain",
+      "depth": 0.1
+     },
+     {
+      "src": 2,
+      "target": "fm",
+      "param": "I",
+      "depth": 0.35
+     },
+     {
+      "src": 2,
+      "target": "fx",
+      "param": "chorusDepth",
+      "depth": 0.3
+     },
+     {
+      "src": 3,
+      "target": "logistic",
+      "param": "base",
+      "depth": 0.1,
+      "exp": true
+     },
+     {
+      "src": 3,
+      "target": "shepard",
+      "param": "shepSpeed",
+      "depth": 0.12
+     },
+     {
+      "src": 3,
+      "target": "fx",
+      "param": "delayFb",
+      "depth": 0.2
+     },
+     {
+      "src": 1,
+      "target": "reaction",
+      "param": "feed",
+      "depth": 0.22
+     },
+     {
+      "src": 2,
+      "target": "flow",
+      "param": "curlStrength",
+      "depth": 0.3
+     }
+    ]
+   },
+   "coupling": {
+    "loudToFlow": 0,
+    "loudToCurl": 0,
+    "loudToGloss": 0.5,
+    "brightToShift": 0.4,
+    "onsetToLight": 0.3,
+    "loudToPulse": 0.7,
+    "onsetToFlash": 0.4,
+    "onsetToSeed": 0.5,
+    "spectrumToTint": 0.6
+   },
+   "presetName": "Fractal garden"
+  }
+ },
+ {
+  "name": "Stillness ink",
+  "state": {
+   "v": 1,
+   "audio": {
+    "masterGain": 0.75,
+    "fx": {
+     "filterOn": true,
+     "filterType": "lowpass",
+     "filterFreq": 2000,
+     "filterQ": 6.3,
+     "filterGain": 0,
+     "filterVowel": 0,
+     "filterCombFb": 0.5,
+     "chorusOn": true,
+     "chorusMode": "chorus",
+     "chorusRate": 0.01,
+     "chorusDepth": 8.4,
+     "chorusMix": 0.35,
+     "chorusFb": 0.95,
+     "reverbOn": true,
+     "reverbDecay": 3.2,
+     "reverbMix": 0.5,
+     "limiterOn": true,
+     "limiterThr": -12,
+     "limiterRel": 0.15,
+     "delayOn": true,
+     "delayTime": 0.63,
+     "delayFb": 0.62,
+     "delayMix": 0.3,
+     "phaserOn": true,
+     "phaserRate": 0.47,
+     "phaserDepth": 0.59,
+     "phaserStages": 4,
+     "phaserFb": 0.62,
+     "phaserMix": 0.22
+    },
+    "formulas": {
+     "additive": {
+      "enabled": true,
+      "params": {
+       "gain": 0.474,
+       "fund": 57,
+       "N": 12,
+       "move": 0.35
+      }
+     },
+     "lorenz": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "sigma": 10,
+       "rho": 28,
+       "beta": 2.6667,
+       "lBase": 120,
+       "lFreqScale": 40,
+       "lAmp": 0.25
+      }
+     },
+     "rossler": {
+      "enabled": true,
+      "params": {
+       "gain": 0.169,
+       "rossA": 0.181,
+       "rossB": 0.238,
+       "rossC": 6.42,
+       "rossBase": 345,
+       "rossFreqScale": 38.4,
+       "rossAmp": 0.25
+      }
+     },
+     "gliss": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "f0": 55,
+       "k": 0.15
+      }
+     },
+     "shepard": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "shepBase": 55,
+       "shepSpeed": 0.1,
+       "shepOctaves": 6
+      }
+     },
+     "bell": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "bellF0": 320,
+       "bellRatio": 1.4,
+       "bellIndex": 4,
+       "bellDecay": 3,
+       "bellPeriod": 6
+      }
+     },
+     "risset": {
+      "enabled": false,
+      "params": {
+       "gain": 0.4,
+       "rissF0": 480,
+       "rissDecay": 5,
+       "rissPeriod": 6
+      }
+     },
+     "fm": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "fc": 220,
+       "fm": 2,
+       "I": 3
+      }
+     },
+     "beats": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "fbeat": 220,
+       "df": 0.8
+      }
+     },
+     "pm": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "f": 220,
+       "f2pm": 3
+      }
+     },
+     "quasi": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fq": 120,
+       "Aq": 220,
+       "wq": 0.8
+      }
+     },
+     "logistic": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "base": 110,
+       "depth": 330,
+       "r": 3.86,
+       "lfoHz": 40
+      }
+     },
+     "dist": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fd": 110,
+       "alpha": 3
+      }
+     },
+     "karplus": {
+      "enabled": false,
+      "params": {
+       "gain": 0.14,
+       "ksFreq": 110,
+       "ksDamp": 0.985,
+       "ksBright": 0.5
+      }
+     },
+     "bytebeat": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "bbRecipe": 1,
+       "bbRate": 8000
+      }
+     },
+     "ocean": {
+      "enabled": false,
+      "params": {
+       "gain": 0.25,
+       "oceanRate": 0.12,
+       "oceanCut": 600,
+       "oceanDepth": 0.7
+      }
+     },
+     "rain": {
+      "enabled": false,
+      "params": {
+       "gain": 0.35,
+       "rainDensity": 4,
+       "rainPitch": 900,
+       "rainBed": 0.15
+      }
+     },
+     "noiselp": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "nCut": 800
+      }
+     },
+     "pinknoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "pinkBright": 0.3
+      }
+     },
+     "brownnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "brownStep": 0.02
+      }
+     },
+     "velvetnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "velvetDensity": 2000
+      }
+     }
+    }
+   },
+   "visual": {
+    "cards": {
+     "reaction": {
+      "on": true,
+      "params": {
+       "feed": 0.03,
+       "kill": 0.057,
+       "diffU": 0.2097,
+       "diffV": 0.105,
+       "speed": 10
+      }
+     },
+     "fieldVariation": {
+      "on": true,
+      "params": {
+       "feedVarAmount": 0.015,
+       "feedVarScale": 3,
+       "feedVarWarp": 1.6,
+       "killVarAmount": 0.008,
+       "killVarScale": 4,
+       "killVarWarp": 1.4
+      }
+     },
+     "flow": {
+      "on": true,
+      "params": {
+       "curlStrength": 0.004,
+       "curlScale": 3,
+       "driftX": 0,
+       "driftY": 0,
+       "advectAmount": 0.2,
+       "evolveRate": 0.006
+      }
+     },
+     "palette": {
+      "on": true,
+      "params": {
+       "shift": 0,
+       "contrast": 1.2,
+       "bands": 2,
+       "relief": 0.8,
+       "lightAngle": 2,
+       "gloss": 0.3,
+       "paletteId": 3
+      }
+     }
+    }
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "saw",
+      "rate": 0.01,
+      "phase": 0
+     },
+     {
+      "shape": "sine",
+      "rate": 0.03,
+      "phase": 0
+     },
+     {
+      "shape": "sine",
+      "rate": 0.05,
+      "phase": 0
+     },
+     {
+      "shape": "sine",
+      "rate": 0.05,
+      "phase": 0
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "palette",
+      "param": "lightAngle",
+      "depth": 0.5
+     },
+     {
+      "src": 1,
+      "target": "palette",
+      "param": "gloss",
+      "depth": 0.2
+     }
+    ]
+   },
+   "coupling": {
+    "loudToFlow": 0,
+    "loudToCurl": 0,
+    "loudToGloss": 0.4,
+    "brightToShift": 0.3,
+    "onsetToLight": 0,
+    "loudToPulse": 0.8,
+    "onsetToFlash": 0.2,
+    "onsetToSeed": 0.3,
+    "spectrumToTint": 0.7
+   },
+   "presetName": "Stillness ink"
+  }
+ },
+ {
+  "name": "Whale coral",
+  "state": {
+   "v": 1,
+   "audio": {
+    "masterGain": 0.75,
+    "fx": {
+     "filterOn": true,
+     "filterType": "lowpass",
+     "filterFreq": 1400,
+     "filterQ": 0.8,
+     "filterGain": 0,
+     "filterVowel": 0,
+     "filterCombFb": 0.5,
+     "chorusOn": false,
+     "chorusMode": "chorus",
+     "chorusRate": 0.35,
+     "chorusDepth": 6,
+     "chorusMix": 0.35,
+     "chorusFb": 0.15,
+     "reverbOn": true,
+     "reverbDecay": 3.6,
+     "reverbMix": 0.42,
+     "limiterOn": true,
+     "limiterThr": -12,
+     "limiterRel": 0.15,
+     "delayOn": false,
+     "delayTime": 0.35,
+     "delayFb": 0.4,
+     "delayMix": 0.3,
+     "phaserOn": false,
+     "phaserRate": 0.5,
+     "phaserDepth": 0.7,
+     "phaserStages": 4,
+     "phaserFb": 0.3,
+     "phaserMix": 0.5
+    },
+    "formulas": {
+     "additive": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "fund": 110,
+       "N": 12,
+       "move": 0.35
+      }
+     },
+     "lorenz": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "sigma": 10,
+       "rho": 28,
+       "beta": 2.6667,
+       "lBase": 120,
+       "lFreqScale": 40,
+       "lAmp": 0.25
+      }
+     },
+     "rossler": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "rossA": 0.2,
+       "rossB": 0.2,
+       "rossC": 5.7,
+       "rossBase": 120,
+       "rossFreqScale": 30,
+       "rossAmp": 0.25
+      }
+     },
+     "gliss": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "f0": 55,
+       "k": 0.15
+      }
+     },
+     "shepard": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "shepBase": 55,
+       "shepSpeed": 0.1,
+       "shepOctaves": 6
+      }
+     },
+     "bell": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "bellF0": 320,
+       "bellRatio": 1.4,
+       "bellIndex": 4,
+       "bellDecay": 3,
+       "bellPeriod": 6
+      }
+     },
+     "risset": {
+      "enabled": false,
+      "params": {
+       "gain": 0.4,
+       "rissF0": 480,
+       "rissDecay": 5,
+       "rissPeriod": 6
+      }
+     },
+     "fm": {
+      "enabled": true,
+      "params": {
+       "gain": 0.18,
+       "fc": 220,
+       "fm": 2,
+       "I": 4
+      }
+     },
+     "beats": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "fbeat": 220,
+       "df": 0.8
+      }
+     },
+     "pm": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "f": 220,
+       "f2pm": 3
+      }
+     },
+     "quasi": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fq": 120,
+       "Aq": 220,
+       "wq": 0.8
+      }
+     },
+     "logistic": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "base": 110,
+       "depth": 330,
+       "r": 3.86,
+       "lfoHz": 40
+      }
+     },
+     "dist": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fd": 110,
+       "alpha": 3
+      }
+     },
+     "karplus": {
+      "enabled": false,
+      "params": {
+       "gain": 0.14,
+       "ksFreq": 110,
+       "ksDamp": 0.985,
+       "ksBright": 0.5
+      }
+     },
+     "bytebeat": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "bbRecipe": 1,
+       "bbRate": 8000
+      }
+     },
+     "ocean": {
+      "enabled": false,
+      "params": {
+       "gain": 0.25,
+       "oceanRate": 0.12,
+       "oceanCut": 600,
+       "oceanDepth": 0.7
+      }
+     },
+     "rain": {
+      "enabled": false,
+      "params": {
+       "gain": 0.35,
+       "rainDensity": 4,
+       "rainPitch": 900,
+       "rainBed": 0.15
+      }
+     },
+     "noiselp": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "nCut": 800
+      }
+     },
+     "pinknoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "pinkBright": 0.3
+      }
+     },
+     "brownnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "brownStep": 0.02
+      }
+     },
+     "velvetnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "velvetDensity": 2000
+      }
+     }
+    }
+   },
+   "visual": {
+    "cards": {
+     "reaction": {
+      "on": true,
+      "params": {
+       "feed": 0.0545,
+       "kill": 0.062,
+       "diffU": 0.2097,
+       "diffV": 0.105,
+       "speed": 10
+      }
+     },
+     "fieldVariation": {
+      "on": true,
+      "params": {
+       "feedVarAmount": 0.008,
+       "feedVarScale": 5,
+       "feedVarWarp": 0.8,
+       "killVarAmount": 0.004,
+       "killVarScale": 6,
+       "killVarWarp": 0.8
+      }
+     },
+     "flow": {
+      "on": true,
+      "params": {
+       "curlStrength": 0.006,
+       "curlScale": 4,
+       "driftX": 0,
+       "driftY": 0,
+       "advectAmount": 0.25,
+       "evolveRate": 0.01
+      }
+     },
+     "palette": {
+      "on": true,
+      "params": {
+       "shift": 0,
+       "contrast": 1.1,
+       "bands": 1,
+       "relief": 0.8,
+       "lightAngle": 2,
+       "gloss": 0.3,
+       "paletteId": 1
+      }
+     }
+    }
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "sine",
+      "rate": 0.05,
+      "phase": 0
+     },
+     {
+      "shape": "sine",
+      "rate": 0.13,
+      "phase": 0.25
+     },
+     {
+      "shape": "triangle",
+      "rate": 0.08,
+      "phase": 0
+     },
+     {
+      "shape": "sine",
+      "rate": 0.05,
+      "phase": 0
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "fm",
+      "param": "fc",
+      "depth": 0.15,
+      "exp": true
+     },
+     {
+      "src": 1,
+      "target": "fm",
+      "param": "I",
+      "depth": 0.6
+     },
+     {
+      "src": 0,
+      "target": "palette",
+      "param": "shift",
+      "depth": 0.2
+     },
+     {
+      "src": 2,
+      "target": "palette",
+      "param": "lightAngle",
+      "depth": 0.3
+     }
+    ]
+   },
+   "coupling": {
+    "loudToFlow": 0.6,
+    "loudToCurl": 0,
+    "loudToGloss": 0.4,
+    "brightToShift": 0.5,
+    "onsetToLight": 0,
+    "loudToPulse": 0.7,
+    "onsetToFlash": 0.3,
+    "onsetToSeed": 0.4,
+    "spectrumToTint": 0.8
+   },
+   "presetName": "Whale coral"
+  }
+ },
+ {
+  "name": "Molten Polivoks",
+  "state": {
+   "v": 1,
+   "audio": {
+    "masterGain": 0.72,
+    "fx": {
+     "filterOn": true,
+     "filterType": "lowpass",
+     "filterFreq": 300,
+     "filterQ": 8,
+     "filterGain": 0,
+     "filterVowel": 0,
+     "filterCombFb": 0.5,
+     "chorusOn": true,
+     "chorusMode": "chorus",
+     "chorusRate": 0.05,
+     "chorusDepth": 12,
+     "chorusMix": 0.5,
+     "chorusFb": 0.35,
+     "reverbOn": true,
+     "reverbDecay": 6.5,
+     "reverbMix": 0.4,
+     "limiterOn": true,
+     "limiterThr": -12,
+     "limiterRel": 0.15,
+     "delayOn": true,
+     "delayTime": 1.3,
+     "delayFb": 0.5,
+     "delayMix": 0.35,
+     "phaserOn": false,
+     "phaserRate": 0.5,
+     "phaserDepth": 0.7,
+     "phaserStages": 4,
+     "phaserFb": 0.3,
+     "phaserMix": 0.5
+    },
+    "formulas": {
+     "additive": {
+      "enabled": true,
+      "params": {
+       "gain": 0.5,
+       "fund": 55,
+       "N": 30,
+       "move": 0.12
+      }
+     },
+     "lorenz": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "sigma": 10,
+       "rho": 28,
+       "beta": 2.6667,
+       "lBase": 120,
+       "lFreqScale": 40,
+       "lAmp": 0.25
+      }
+     },
+     "rossler": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "rossA": 0.2,
+       "rossB": 0.2,
+       "rossC": 5.7,
+       "rossBase": 120,
+       "rossFreqScale": 30,
+       "rossAmp": 0.25
+      }
+     },
+     "gliss": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "f0": 55,
+       "k": 0.15
+      }
+     },
+     "shepard": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "shepBase": 55,
+       "shepSpeed": 0.1,
+       "shepOctaves": 6
+      }
+     },
+     "bell": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "bellF0": 320,
+       "bellRatio": 1.4,
+       "bellIndex": 4,
+       "bellDecay": 3,
+       "bellPeriod": 6
+      }
+     },
+     "risset": {
+      "enabled": false,
+      "params": {
+       "gain": 0.4,
+       "rissF0": 480,
+       "rissDecay": 5,
+       "rissPeriod": 6
+      }
+     },
+     "fm": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "fc": 220,
+       "fm": 2,
+       "I": 3
+      }
+     },
+     "beats": {
+      "enabled": true,
+      "params": {
+       "gain": 0.3,
+       "fbeat": 55,
+       "df": 0.7
+      }
+     },
+     "pm": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "f": 220,
+       "f2pm": 3
+      }
+     },
+     "quasi": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fq": 120,
+       "Aq": 220,
+       "wq": 0.8
+      }
+     },
+     "logistic": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "base": 110,
+       "depth": 330,
+       "r": 3.86,
+       "lfoHz": 40
+      }
+     },
+     "dist": {
+      "enabled": true,
+      "params": {
+       "gain": 0.14,
+       "fd": 110,
+       "alpha": 4
+      }
+     },
+     "karplus": {
+      "enabled": false,
+      "params": {
+       "gain": 0.14,
+       "ksFreq": 110,
+       "ksDamp": 0.985,
+       "ksBright": 0.5
+      }
+     },
+     "bytebeat": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "bbRecipe": 1,
+       "bbRate": 8000
+      }
+     },
+     "ocean": {
+      "enabled": false,
+      "params": {
+       "gain": 0.25,
+       "oceanRate": 0.12,
+       "oceanCut": 600,
+       "oceanDepth": 0.7
+      }
+     },
+     "rain": {
+      "enabled": false,
+      "params": {
+       "gain": 0.35,
+       "rainDensity": 4,
+       "rainPitch": 900,
+       "rainBed": 0.15
+      }
+     },
+     "noiselp": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "nCut": 800
+      }
+     },
+     "pinknoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "pinkBright": 0.3
+      }
+     },
+     "brownnoise": {
+      "enabled": true,
+      "params": {
+       "gain": 0.05,
+       "brownStep": 0.008
+      }
+     },
+     "velvetnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "velvetDensity": 2000
+      }
+     }
+    }
+   },
+   "visual": {
+    "cards": {
+     "reaction": {
+      "on": true,
+      "params": {
+       "feed": 0.032,
+       "kill": 0.058,
+       "diffU": 0.2097,
+       "diffV": 0.105,
+       "speed": 20
+      }
+     },
+     "fieldVariation": {
+      "on": true,
+      "params": {
+       "feedVarAmount": 0.018,
+       "feedVarScale": 3,
+       "feedVarWarp": 1.5,
+       "killVarAmount": 0.009,
+       "killVarScale": 4,
+       "killVarWarp": 1.2
+      }
+     },
+     "flow": {
+      "on": true,
+      "params": {
+       "curlStrength": 0.012,
+       "curlScale": 2,
+       "driftX": 0,
+       "driftY": 0,
+       "advectAmount": 0.3,
+       "evolveRate": 0.006
+      }
+     },
+     "palette": {
+      "on": true,
+      "params": {
+       "shift": 0.05,
+       "contrast": 1.15,
+       "bands": 1,
+       "relief": 1.3,
+       "lightAngle": 3.1415,
+       "gloss": 0.55,
+       "paletteId": 1
+      }
+     }
+    }
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "sine",
+      "rate": 0.019,
+      "phase": 0
+     },
+     {
+      "shape": "triangle",
+      "rate": 0.031,
+      "phase": 0.5
+     },
+     {
+      "shape": "sine",
+      "rate": 0.047,
+      "phase": 0.25
+     },
+     {
+      "shape": "random",
+      "rate": 0.029,
+      "phase": 0
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "fx",
+      "param": "filterFreq",
+      "depth": 0.32,
+      "exp": true
+     },
+     {
+      "src": 1,
+      "target": "fx",
+      "param": "filterQ",
+      "depth": 0.5
+     },
+     {
+      "src": 1,
+      "target": "beats",
+      "param": "df",
+      "depth": 0.05
+     },
+     {
+      "src": 2,
+      "target": "fx",
+      "param": "chorusDepth",
+      "depth": 0.4
+     },
+     {
+      "src": 2,
+      "target": "fx",
+      "param": "reverbMix",
+      "depth": 0.35
+     },
+     {
+      "src": 2,
+      "target": "dist",
+      "param": "fd",
+      "depth": 0.05,
+      "exp": true
+     },
+     {
+      "src": 3,
+      "target": "dist",
+      "param": "alpha",
+      "depth": 0.3
+     },
+     {
+      "src": 3,
+      "target": "additive",
+      "param": "move",
+      "depth": 0.08
+     },
+     {
+      "src": 3,
+      "target": "fx",
+      "param": "delayFb",
+      "depth": 0.2
+     },
+     {
+      "src": 0,
+      "target": "flow",
+      "param": "driftX",
+      "depth": 0.25
+     },
+     {
+      "src": 2,
+      "target": "flow",
+      "param": "driftY",
+      "depth": 0.25
+     },
+     {
+      "src": 1,
+      "target": "palette",
+      "param": "lightAngle",
+      "depth": 0.5
+     }
+    ]
+   },
+   "coupling": {
+    "loudToFlow": 0,
+    "loudToCurl": 0.5,
+    "loudToGloss": 0.6,
+    "brightToShift": 0,
+    "onsetToLight": 0,
+    "loudToPulse": 0.8,
+    "onsetToFlash": 0.3,
+    "onsetToSeed": 0.3,
+    "spectrumToTint": 0.9
+   },
+   "presetName": "Molten Polivoks"
+  }
+ },
+ {
+  "name": "Aurora",
+  "state": {
+   "v": 1,
+   "audio": {
+    "masterGain": 0.75,
+    "fx": {
+     "filterOn": true,
+     "filterType": "lowpass",
+     "filterFreq": 1800,
+     "filterQ": 0.7,
+     "filterGain": 0,
+     "filterVowel": 0,
+     "filterCombFb": 0.5,
+     "chorusOn": true,
+     "chorusMode": "chorus",
+     "chorusRate": 0.08,
+     "chorusDepth": 8,
+     "chorusMix": 0.4,
+     "chorusFb": 0.3,
+     "reverbOn": true,
+     "reverbDecay": 4.5,
+     "reverbMix": 0.48,
+     "limiterOn": true,
+     "limiterThr": -12,
+     "limiterRel": 0.15,
+     "delayOn": false,
+     "delayTime": 0.35,
+     "delayFb": 0.4,
+     "delayMix": 0.3,
+     "phaserOn": false,
+     "phaserRate": 0.5,
+     "phaserDepth": 0.7,
+     "phaserStages": 4,
+     "phaserFb": 0.3,
+     "phaserMix": 0.5
+    },
+    "formulas": {
+     "additive": {
+      "enabled": true,
+      "params": {
+       "gain": 0.75,
+       "fund": 82,
+       "N": 16,
+       "move": 0.3
+      }
+     },
+     "lorenz": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "sigma": 10,
+       "rho": 28,
+       "beta": 2.6667,
+       "lBase": 120,
+       "lFreqScale": 40,
+       "lAmp": 0.25
+      }
+     },
+     "rossler": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "rossA": 0.2,
+       "rossB": 0.2,
+       "rossC": 5.7,
+       "rossBase": 120,
+       "rossFreqScale": 30,
+       "rossAmp": 0.25
+      }
+     },
+     "gliss": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "f0": 55,
+       "k": 0.15
+      }
+     },
+     "shepard": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "shepBase": 55,
+       "shepSpeed": 0.1,
+       "shepOctaves": 6
+      }
+     },
+     "bell": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "bellF0": 320,
+       "bellRatio": 1.4,
+       "bellIndex": 4,
+       "bellDecay": 3,
+       "bellPeriod": 6
+      }
+     },
+     "risset": {
+      "enabled": false,
+      "params": {
+       "gain": 0.4,
+       "rissF0": 480,
+       "rissDecay": 5,
+       "rissPeriod": 6
+      }
+     },
+     "fm": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "fc": 220,
+       "fm": 2,
+       "I": 3
+      }
+     },
+     "beats": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "fbeat": 220,
+       "df": 0.8
+      }
+     },
+     "pm": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "f": 220,
+       "f2pm": 3
+      }
+     },
+     "quasi": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fq": 120,
+       "Aq": 220,
+       "wq": 0.8
+      }
+     },
+     "logistic": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "base": 110,
+       "depth": 330,
+       "r": 3.86,
+       "lfoHz": 40
+      }
+     },
+     "dist": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fd": 110,
+       "alpha": 3
+      }
+     },
+     "karplus": {
+      "enabled": false,
+      "params": {
+       "gain": 0.14,
+       "ksFreq": 110,
+       "ksDamp": 0.985,
+       "ksBright": 0.5
+      }
+     },
+     "bytebeat": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "bbRecipe": 1,
+       "bbRate": 8000
+      }
+     },
+     "ocean": {
+      "enabled": false,
+      "params": {
+       "gain": 0.25,
+       "oceanRate": 0.12,
+       "oceanCut": 600,
+       "oceanDepth": 0.7
+      }
+     },
+     "rain": {
+      "enabled": false,
+      "params": {
+       "gain": 0.35,
+       "rainDensity": 4,
+       "rainPitch": 900,
+       "rainBed": 0.15
+      }
+     },
+     "noiselp": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "nCut": 800
+      }
+     },
+     "pinknoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "pinkBright": 0.3
+      }
+     },
+     "brownnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "brownStep": 0.02
+      }
+     },
+     "velvetnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "velvetDensity": 2000
+      }
+     }
+    }
+   },
+   "visual": {
+    "cards": {
+     "reaction": {
+      "on": true,
+      "params": {
+       "feed": 0.029,
+       "kill": 0.057,
+       "diffU": 0.2097,
+       "diffV": 0.105,
+       "speed": 12
+      }
+     },
+     "fieldVariation": {
+      "on": true,
+      "params": {
+       "feedVarAmount": 0.012,
+       "feedVarScale": 3,
+       "feedVarWarp": 1.4,
+       "killVarAmount": 0.006,
+       "killVarScale": 4,
+       "killVarWarp": 1.2
+      }
+     },
+     "flow": {
+      "on": true,
+      "params": {
+       "curlStrength": 0.007,
+       "curlScale": 4.5,
+       "driftX": 0,
+       "driftY": 0,
+       "advectAmount": 0.22,
+       "evolveRate": 0.014
+      }
+     },
+     "palette": {
+      "on": true,
+      "params": {
+       "shift": 0.5,
+       "contrast": 1.3,
+       "bands": 3,
+       "relief": 1,
+       "lightAngle": 3.1415,
+       "gloss": 0.45,
+       "paletteId": 2
+      }
+     }
+    }
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "sine",
+      "rate": 0.04,
+      "phase": 0
+     },
+     {
+      "shape": "sine",
+      "rate": 0.11,
+      "phase": 0.3
+     },
+     {
+      "shape": "triangle",
+      "rate": 0.07,
+      "phase": 0
+     },
+     {
+      "shape": "saw",
+      "rate": 0.012,
+      "phase": 0
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "additive",
+      "param": "fund",
+      "depth": 0.12,
+      "exp": true
+     },
+     {
+      "src": 1,
+      "target": "additive",
+      "param": "move",
+      "depth": 0.5
+     },
+     {
+      "src": 2,
+      "target": "additive",
+      "param": "N",
+      "depth": 0.3
+     },
+     {
+      "src": 3,
+      "target": "palette",
+      "param": "shift",
+      "depth": 0.5
+     },
+     {
+      "src": 0,
+      "target": "palette",
+      "param": "lightAngle",
+      "depth": 0.5
+     },
+     {
+      "src": 2,
+      "target": "palette",
+      "param": "gloss",
+      "depth": 0.25
+     },
+     {
+      "src": 1,
+      "target": "flow",
+      "param": "curlStrength",
+      "depth": 0.2
+     }
+    ]
+   },
+   "coupling": {
+    "loudToFlow": 0,
+    "loudToCurl": 0,
+    "loudToGloss": 0.4,
+    "brightToShift": 0.4,
+    "onsetToLight": 0,
+    "loudToPulse": 0.6,
+    "onsetToFlash": 0.2,
+    "onsetToSeed": 0.3,
+    "spectrumToTint": 0.8
+   },
+   "presetName": "Aurora"
+  }
+ },
+ {
+  "name": "Silver maze",
+  "state": {
+   "v": 1,
+   "audio": {
+    "masterGain": 0.72,
+    "fx": {
+     "filterOn": true,
+     "filterType": "peaking",
+     "filterFreq": 1400,
+     "filterQ": 2,
+     "filterGain": 6,
+     "filterVowel": 0,
+     "filterCombFb": 0.5,
+     "chorusOn": true,
+     "chorusMode": "chorus",
+     "chorusRate": 0.08,
+     "chorusDepth": 6,
+     "chorusMix": 0.35,
+     "chorusFb": 0.25,
+     "reverbOn": true,
+     "reverbDecay": 5,
+     "reverbMix": 0.45,
+     "limiterOn": true,
+     "limiterThr": -12,
+     "limiterRel": 0.15,
+     "delayOn": true,
+     "delayTime": 0.55,
+     "delayFb": 0.35,
+     "delayMix": 0.25,
+     "phaserOn": true,
+     "phaserRate": 0.18,
+     "phaserDepth": 0.55,
+     "phaserStages": 6,
+     "phaserFb": 0.3,
+     "phaserMix": 0.35
+    },
+    "formulas": {
+     "additive": {
+      "enabled": true,
+      "params": {
+       "gain": 0.58,
+       "fund": 110,
+       "N": 22,
+       "move": 0.3
+      }
+     },
+     "lorenz": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "sigma": 10,
+       "rho": 28,
+       "beta": 2.6667,
+       "lBase": 120,
+       "lFreqScale": 40,
+       "lAmp": 0.25
+      }
+     },
+     "rossler": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "rossA": 0.2,
+       "rossB": 0.2,
+       "rossC": 5.7,
+       "rossBase": 120,
+       "rossFreqScale": 30,
+       "rossAmp": 0.25
+      }
+     },
+     "gliss": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "f0": 55,
+       "k": 0.15
+      }
+     },
+     "shepard": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "shepBase": 55,
+       "shepSpeed": 0.1,
+       "shepOctaves": 6
+      }
+     },
+     "bell": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "bellF0": 320,
+       "bellRatio": 1.4,
+       "bellIndex": 4,
+       "bellDecay": 3,
+       "bellPeriod": 6
+      }
+     },
+     "risset": {
+      "enabled": false,
+      "params": {
+       "gain": 0.4,
+       "rissF0": 480,
+       "rissDecay": 5,
+       "rissPeriod": 6
+      }
+     },
+     "fm": {
+      "enabled": true,
+      "params": {
+       "gain": 0.16,
+       "fc": 880,
+       "fm": 55,
+       "I": 4
+      }
+     },
+     "beats": {
+      "enabled": true,
+      "params": {
+       "gain": 0.3,
+       "fbeat": 110,
+       "df": 0.8
+      }
+     },
+     "pm": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "f": 220,
+       "f2pm": 3
+      }
+     },
+     "quasi": {
+      "enabled": true,
+      "params": {
+       "gain": 0.12,
+       "fq": 440,
+       "Aq": 60,
+       "wq": 0.4
+      }
+     },
+     "logistic": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "base": 110,
+       "depth": 330,
+       "r": 3.86,
+       "lfoHz": 40
+      }
+     },
+     "dist": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fd": 110,
+       "alpha": 3
+      }
+     },
+     "karplus": {
+      "enabled": false,
+      "params": {
+       "gain": 0.14,
+       "ksFreq": 110,
+       "ksDamp": 0.985,
+       "ksBright": 0.5
+      }
+     },
+     "bytebeat": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "bbRecipe": 1,
+       "bbRate": 8000
+      }
+     },
+     "ocean": {
+      "enabled": false,
+      "params": {
+       "gain": 0.25,
+       "oceanRate": 0.12,
+       "oceanCut": 600,
+       "oceanDepth": 0.7
+      }
+     },
+     "rain": {
+      "enabled": false,
+      "params": {
+       "gain": 0.35,
+       "rainDensity": 4,
+       "rainPitch": 900,
+       "rainBed": 0.15
+      }
+     },
+     "noiselp": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "nCut": 800
+      }
+     },
+     "pinknoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "pinkBright": 0.3
+      }
+     },
+     "brownnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "brownStep": 0.02
+      }
+     },
+     "velvetnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "velvetDensity": 2000
+      }
+     }
+    }
+   },
+   "visual": {
+    "cards": {
+     "reaction": {
+      "on": true,
+      "params": {
+       "feed": 0.029,
+       "kill": 0.057,
+       "diffU": 0.2097,
+       "diffV": 0.105,
+       "speed": 10
+      }
+     },
+     "fieldVariation": {
+      "on": false,
+      "params": {
+       "feedVarAmount": 0.015,
+       "feedVarScale": 4,
+       "feedVarWarp": 1,
+       "killVarAmount": 0.008,
+       "killVarScale": 5,
+       "killVarWarp": 1
+      }
+     },
+     "flow": {
+      "on": false,
+      "params": {
+       "curlStrength": 0.01,
+       "curlScale": 3,
+       "driftX": 0,
+       "driftY": 0,
+       "advectAmount": 0.35,
+       "evolveRate": 0.01
+      }
+     },
+     "palette": {
+      "on": true,
+      "params": {
+       "shift": 0,
+       "contrast": 1,
+       "bands": 2,
+       "relief": 0.8,
+       "lightAngle": 2,
+       "gloss": 0.3,
+       "paletteId": 3
+      }
+     }
+    }
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "sine",
+      "rate": 0.021,
+      "phase": 0
+     },
+     {
+      "shape": "triangle",
+      "rate": 0.037,
+      "phase": 0.5
+     },
+     {
+      "shape": "sine",
+      "rate": 0.053,
+      "phase": 0.25
+     },
+     {
+      "shape": "random",
+      "rate": 0.033,
+      "phase": 0
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "fx",
+      "param": "filterFreq",
+      "depth": 0.35,
+      "exp": true
+     },
+     {
+      "src": 0,
+      "target": "fx",
+      "param": "reverbMix",
+      "depth": 0.25
+     },
+     {
+      "src": 1,
+      "target": "fm",
+      "param": "I",
+      "depth": 0.3
+     },
+     {
+      "src": 1,
+      "target": "quasi",
+      "param": "Aq",
+      "depth": 0.05
+     },
+     {
+      "src": 2,
+      "target": "fx",
+      "param": "phaserRate",
+      "depth": 0.4,
+      "exp": true
+     },
+     {
+      "src": 2,
+      "target": "fx",
+      "param": "chorusDepth",
+      "depth": 0.3
+     },
+     {
+      "src": 3,
+      "target": "quasi",
+      "param": "wq",
+      "depth": 0.1
+     },
+     {
+      "src": 3,
+      "target": "fx",
+      "param": "delayFb",
+      "depth": 0.15
+     },
+     {
+      "src": 0,
+      "target": "palette",
+      "param": "shift",
+      "depth": 0.15
+     },
+     {
+      "src": 1,
+      "target": "reaction",
+      "param": "kill",
+      "depth": 0.05
+     }
+    ]
+   },
+   "coupling": {
+    "loudToFlow": 0,
+    "loudToCurl": 0,
+    "loudToGloss": 0.5,
+    "brightToShift": 0,
+    "onsetToLight": 0.4,
+    "loudToPulse": 0.6,
+    "onsetToFlash": 0.5,
+    "onsetToSeed": 0.4,
+    "spectrumToTint": 0.6
+   },
+   "presetName": "Silver maze"
+  }
+ },
+ {
+  "name": "Space breccia",
+  "state": {
+   "v": 1,
+   "audio": {
+    "masterGain": 0.72,
+    "fx": {
+     "filterOn": true,
+     "filterType": "lowpass",
+     "filterFreq": 420,
+     "filterQ": 5,
+     "filterGain": 0,
+     "filterVowel": 0,
+     "filterCombFb": 0.5,
+     "chorusOn": true,
+     "chorusMode": "chorus",
+     "chorusRate": 0.12,
+     "chorusDepth": 9,
+     "chorusMix": 0.4,
+     "chorusFb": 0.3,
+     "reverbOn": true,
+     "reverbDecay": 6.5,
+     "reverbMix": 0.45,
+     "limiterOn": true,
+     "limiterThr": -12,
+     "limiterRel": 0.15,
+     "delayOn": true,
+     "delayTime": 0.6,
+     "delayFb": 0.45,
+     "delayMix": 0.4,
+     "phaserOn": true,
+     "phaserRate": 0.3,
+     "phaserDepth": 0.75,
+     "phaserStages": 8,
+     "phaserFb": 0.55,
+     "phaserMix": 0.55
+    },
+    "formulas": {
+     "additive": {
+      "enabled": true,
+      "params": {
+       "gain": 0.55,
+       "fund": 44,
+       "N": 24,
+       "move": 0.6
+      }
+     },
+     "lorenz": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "sigma": 10,
+       "rho": 28,
+       "beta": 2.6667,
+       "lBase": 120,
+       "lFreqScale": 40,
+       "lAmp": 0.25
+      }
+     },
+     "rossler": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "rossA": 0.2,
+       "rossB": 0.2,
+       "rossC": 5.7,
+       "rossBase": 120,
+       "rossFreqScale": 30,
+       "rossAmp": 0.25
+      }
+     },
+     "gliss": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "f0": 55,
+       "k": 0.15
+      }
+     },
+     "shepard": {
+      "enabled": true,
+      "params": {
+       "gain": 0.22,
+       "shepBase": 40,
+       "shepSpeed": 0.06,
+       "shepOctaves": 7
+      }
+     },
+     "bell": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "bellF0": 320,
+       "bellRatio": 1.4,
+       "bellIndex": 4,
+       "bellDecay": 3,
+       "bellPeriod": 6
+      }
+     },
+     "risset": {
+      "enabled": false,
+      "params": {
+       "gain": 0.4,
+       "rissF0": 480,
+       "rissDecay": 5,
+       "rissPeriod": 6
+      }
+     },
+     "fm": {
+      "enabled": true,
+      "params": {
+       "gain": 0.16,
+       "fc": 110,
+       "fm": 1.5,
+       "I": 8
+      }
+     },
+     "beats": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "fbeat": 220,
+       "df": 0.8
+      }
+     },
+     "pm": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "f": 220,
+       "f2pm": 3
+      }
+     },
+     "quasi": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fq": 120,
+       "Aq": 220,
+       "wq": 0.8
+      }
+     },
+     "logistic": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "base": 110,
+       "depth": 330,
+       "r": 3.86,
+       "lfoHz": 40
+      }
+     },
+     "dist": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fd": 110,
+       "alpha": 3
+      }
+     },
+     "karplus": {
+      "enabled": false,
+      "params": {
+       "gain": 0.14,
+       "ksFreq": 110,
+       "ksDamp": 0.985,
+       "ksBright": 0.5
+      }
+     },
+     "bytebeat": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "bbRecipe": 1,
+       "bbRate": 8000
+      }
+     },
+     "ocean": {
+      "enabled": false,
+      "params": {
+       "gain": 0.25,
+       "oceanRate": 0.12,
+       "oceanCut": 600,
+       "oceanDepth": 0.7
+      }
+     },
+     "rain": {
+      "enabled": false,
+      "params": {
+       "gain": 0.35,
+       "rainDensity": 4,
+       "rainPitch": 900,
+       "rainBed": 0.15
+      }
+     },
+     "noiselp": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "nCut": 800
+      }
+     },
+     "pinknoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "pinkBright": 0.3
+      }
+     },
+     "brownnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "brownStep": 0.02
+      }
+     },
+     "velvetnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "velvetDensity": 2000
+      }
+     }
+    }
+   },
+   "visual": {
+    "cards": {
+     "reaction": {
+      "on": true,
+      "params": {
+       "feed": 0.032,
+       "kill": 0.058,
+       "diffU": 0.2097,
+       "diffV": 0.105,
+       "speed": 18
+      }
+     },
+     "fieldVariation": {
+      "on": true,
+      "params": {
+       "feedVarAmount": 0.022,
+       "feedVarScale": 3,
+       "feedVarWarp": 1.6,
+       "killVarAmount": 0.011,
+       "killVarScale": 4,
+       "killVarWarp": 1.3
+      }
+     },
+     "flow": {
+      "on": true,
+      "params": {
+       "curlStrength": 0.015,
+       "curlScale": 2,
+       "driftX": 0,
+       "driftY": 0.002,
+       "advectAmount": 0.3,
+       "evolveRate": 0.008
+      }
+     },
+     "palette": {
+      "on": true,
+      "params": {
+       "shift": 0,
+       "contrast": 1,
+       "bands": 1,
+       "relief": 0.8,
+       "lightAngle": 2,
+       "gloss": 0.3,
+       "paletteId": 0
+      }
+     }
+    }
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "sine",
+      "rate": 0.05,
+      "phase": 0
+     },
+     {
+      "shape": "triangle",
+      "rate": 0.037,
+      "phase": 0.5
+     },
+     {
+      "shape": "sine",
+      "rate": 0.11,
+      "phase": 0.25
+     },
+     {
+      "shape": "random",
+      "rate": 0.08,
+      "phase": 0
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "fx",
+      "param": "filterFreq",
+      "depth": 0.33,
+      "exp": true
+     },
+     {
+      "src": 0,
+      "target": "fx",
+      "param": "chorusDepth",
+      "depth": 0.4
+     },
+     {
+      "src": 1,
+      "target": "fx",
+      "param": "delayTime",
+      "depth": 0.4,
+      "exp": true
+     },
+     {
+      "src": 2,
+      "target": "fx",
+      "param": "phaserRate",
+      "depth": 0.6,
+      "exp": true
+     },
+     {
+      "src": 2,
+      "target": "fx",
+      "param": "reverbMix",
+      "depth": 0.35
+     },
+     {
+      "src": 3,
+      "target": "fx",
+      "param": "filterQ",
+      "depth": 0.5
+     },
+     {
+      "src": 3,
+      "target": "fx",
+      "param": "delayFb",
+      "depth": 0.25
+     },
+     {
+      "src": 1,
+      "target": "flow",
+      "param": "driftY",
+      "depth": 0.3
+     },
+     {
+      "src": 0,
+      "target": "palette",
+      "param": "lightAngle",
+      "depth": 0.4
+     }
+    ]
+   },
+   "coupling": {
+    "loudToFlow": 0.7,
+    "loudToCurl": 0,
+    "loudToGloss": 0,
+    "brightToShift": 0.4,
+    "onsetToLight": 0,
+    "loudToPulse": 0.8,
+    "onsetToFlash": 0.3,
+    "onsetToSeed": 0.3,
+    "spectrumToTint": 0.7
+   },
+   "presetName": "Space breccia"
+  }
+ },
+ {
+  "name": "Cave coral",
+  "state": {
+   "v": 1,
+   "audio": {
+    "masterGain": 0.75,
+    "fx": {
+     "filterOn": true,
+     "filterType": "lowpass",
+     "filterFreq": 2000,
+     "filterQ": 0.7,
+     "filterGain": 0,
+     "filterVowel": 0,
+     "filterCombFb": 0.5,
+     "chorusOn": false,
+     "chorusMode": "chorus",
+     "chorusRate": 0.35,
+     "chorusDepth": 6,
+     "chorusMix": 0.35,
+     "chorusFb": 0.15,
+     "reverbOn": true,
+     "reverbDecay": 5,
+     "reverbMix": 0.55,
+     "limiterOn": true,
+     "limiterThr": -12,
+     "limiterRel": 0.15,
+     "delayOn": true,
+     "delayTime": 0.5,
+     "delayFb": 0.4,
+     "delayMix": 0.3,
+     "phaserOn": false,
+     "phaserRate": 0.5,
+     "phaserDepth": 0.7,
+     "phaserStages": 4,
+     "phaserFb": 0.3,
+     "phaserMix": 0.5
+    },
+    "formulas": {
+     "additive": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "fund": 110,
+       "N": 12,
+       "move": 0.35
+      }
+     },
+     "lorenz": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "sigma": 10,
+       "rho": 28,
+       "beta": 2.6667,
+       "lBase": 120,
+       "lFreqScale": 40,
+       "lAmp": 0.25
+      }
+     },
+     "rossler": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "rossA": 0.2,
+       "rossB": 0.2,
+       "rossC": 5.7,
+       "rossBase": 120,
+       "rossFreqScale": 30,
+       "rossAmp": 0.25
+      }
+     },
+     "gliss": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "f0": 55,
+       "k": 0.15
+      }
+     },
+     "shepard": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "shepBase": 55,
+       "shepSpeed": 0.1,
+       "shepOctaves": 6
+      }
+     },
+     "bell": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "bellF0": 320,
+       "bellRatio": 1.4,
+       "bellIndex": 4,
+       "bellDecay": 3,
+       "bellPeriod": 6
+      }
+     },
+     "risset": {
+      "enabled": false,
+      "params": {
+       "gain": 0.4,
+       "rissF0": 480,
+       "rissDecay": 5,
+       "rissPeriod": 6
+      }
+     },
+     "fm": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "fc": 220,
+       "fm": 2,
+       "I": 3
+      }
+     },
+     "beats": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "fbeat": 220,
+       "df": 0.8
+      }
+     },
+     "pm": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "f": 220,
+       "f2pm": 3
+      }
+     },
+     "quasi": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fq": 120,
+       "Aq": 220,
+       "wq": 0.8
+      }
+     },
+     "logistic": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "base": 110,
+       "depth": 330,
+       "r": 3.86,
+       "lfoHz": 40
+      }
+     },
+     "dist": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fd": 110,
+       "alpha": 3
+      }
+     },
+     "karplus": {
+      "enabled": false,
+      "params": {
+       "gain": 0.14,
+       "ksFreq": 110,
+       "ksDamp": 0.985,
+       "ksBright": 0.5
+      }
+     },
+     "bytebeat": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "bbRecipe": 1,
+       "bbRate": 8000
+      }
+     },
+     "ocean": {
+      "enabled": false,
+      "params": {
+       "gain": 0.25,
+       "oceanRate": 0.12,
+       "oceanCut": 600,
+       "oceanDepth": 0.7
+      }
+     },
+     "rain": {
+      "enabled": true,
+      "params": {
+       "gain": 0.4,
+       "rainDensity": 3,
+       "rainPitch": 1100,
+       "rainBed": 0.1
+      }
+     },
+     "noiselp": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "nCut": 800
+      }
+     },
+     "pinknoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "pinkBright": 0.3
+      }
+     },
+     "brownnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "brownStep": 0.02
+      }
+     },
+     "velvetnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "velvetDensity": 2000
+      }
+     }
+    }
+   },
+   "visual": {
+    "cards": {
+     "reaction": {
+      "on": true,
+      "params": {
+       "feed": 0.0545,
+       "kill": 0.062,
+       "diffU": 0.2097,
+       "diffV": 0.105,
+       "speed": 10
+      }
+     },
+     "fieldVariation": {
+      "on": false,
+      "params": {
+       "feedVarAmount": 0.015,
+       "feedVarScale": 4,
+       "feedVarWarp": 1,
+       "killVarAmount": 0.008,
+       "killVarScale": 5,
+       "killVarWarp": 1
+      }
+     },
+     "flow": {
+      "on": false,
+      "params": {
+       "curlStrength": 0.01,
+       "curlScale": 3,
+       "driftX": 0,
+       "driftY": 0,
+       "advectAmount": 0.35,
+       "evolveRate": 0.01
+      }
+     },
+     "palette": {
+      "on": true,
+      "params": {
+       "shift": 0,
+       "contrast": 1,
+       "bands": 1,
+       "relief": 1.1,
+       "lightAngle": 2,
+       "gloss": 0.35,
+       "paletteId": 1
+      }
+     }
+    }
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "sine",
+      "rate": 0.05,
+      "phase": 0
+     },
+     {
+      "shape": "triangle",
+      "rate": 0.03,
+      "phase": 0
+     },
+     {
+      "shape": "sine",
+      "rate": 0.09,
+      "phase": 0.4
+     },
+     {
+      "shape": "sine",
+      "rate": 0.05,
+      "phase": 0
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "rain",
+      "param": "rainDensity",
+      "depth": 0.3
+     },
+     {
+      "src": 1,
+      "target": "rain",
+      "param": "rainPitch",
+      "depth": 0.3,
+      "exp": true
+     },
+     {
+      "src": 0,
+      "target": "reaction",
+      "param": "feed",
+      "depth": 0.1
+     }
+    ]
+   },
+   "coupling": {
+    "loudToFlow": 0,
+    "loudToCurl": 0,
+    "loudToGloss": 0.6,
+    "brightToShift": 0,
+    "onsetToLight": 0.8,
+    "loudToPulse": 0.4,
+    "onsetToFlash": 0.9,
+    "onsetToSeed": 1,
+    "spectrumToTint": 0.5
+   },
+   "presetName": "Cave coral"
+  }
+ },
+ {
+  "name": "Loom & copper",
+  "state": {
+   "v": 1,
+   "audio": {
+    "masterGain": 0.72,
+    "fx": {
+     "filterOn": true,
+     "filterType": "comb",
+     "filterFreq": 220,
+     "filterQ": 0.7,
+     "filterGain": 0,
+     "filterVowel": 0,
+     "filterCombFb": 0.65,
+     "chorusOn": true,
+     "chorusMode": "chorus",
+     "chorusRate": 0.06,
+     "chorusDepth": 8,
+     "chorusMix": 0.4,
+     "chorusFb": 0.3,
+     "reverbOn": true,
+     "reverbDecay": 5.5,
+     "reverbMix": 0.35,
+     "limiterOn": true,
+     "limiterThr": -12,
+     "limiterRel": 0.15,
+     "delayOn": true,
+     "delayTime": 0.8,
+     "delayFb": 0.4,
+     "delayMix": 0.25,
+     "phaserOn": true,
+     "phaserRate": 0.12,
+     "phaserDepth": 0.65,
+     "phaserStages": 8,
+     "phaserFb": 0.45,
+     "phaserMix": 0.45
+    },
+    "formulas": {
+     "additive": {
+      "enabled": true,
+      "params": {
+       "gain": 0.65,
+       "fund": 55,
+       "N": 28,
+       "move": 0.2
+      }
+     },
+     "lorenz": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "sigma": 10,
+       "rho": 28,
+       "beta": 2.6667,
+       "lBase": 120,
+       "lFreqScale": 40,
+       "lAmp": 0.25
+      }
+     },
+     "rossler": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "rossA": 0.2,
+       "rossB": 0.2,
+       "rossC": 5.7,
+       "rossBase": 120,
+       "rossFreqScale": 30,
+       "rossAmp": 0.25
+      }
+     },
+     "gliss": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "f0": 55,
+       "k": 0.15
+      }
+     },
+     "shepard": {
+      "enabled": true,
+      "params": {
+       "gain": 0.09,
+       "shepBase": 60,
+       "shepSpeed": 0.03,
+       "shepOctaves": 7
+      }
+     },
+     "bell": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "bellF0": 320,
+       "bellRatio": 1.4,
+       "bellIndex": 4,
+       "bellDecay": 3,
+       "bellPeriod": 6
+      }
+     },
+     "risset": {
+      "enabled": false,
+      "params": {
+       "gain": 0.4,
+       "rissF0": 480,
+       "rissDecay": 5,
+       "rissPeriod": 6
+      }
+     },
+     "fm": {
+      "enabled": true,
+      "params": {
+       "gain": 0.16,
+       "fc": 440,
+       "fm": 55,
+       "I": 6
+      }
+     },
+     "beats": {
+      "enabled": true,
+      "params": {
+       "gain": 0.4,
+       "fbeat": 55,
+       "df": 0.6
+      }
+     },
+     "pm": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "f": 220,
+       "f2pm": 3
+      }
+     },
+     "quasi": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fq": 120,
+       "Aq": 220,
+       "wq": 0.8
+      }
+     },
+     "logistic": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "base": 110,
+       "depth": 330,
+       "r": 3.86,
+       "lfoHz": 40
+      }
+     },
+     "dist": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fd": 110,
+       "alpha": 3
+      }
+     },
+     "karplus": {
+      "enabled": false,
+      "params": {
+       "gain": 0.14,
+       "ksFreq": 110,
+       "ksDamp": 0.985,
+       "ksBright": 0.5
+      }
+     },
+     "bytebeat": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "bbRecipe": 1,
+       "bbRate": 8000
+      }
+     },
+     "ocean": {
+      "enabled": false,
+      "params": {
+       "gain": 0.25,
+       "oceanRate": 0.12,
+       "oceanCut": 600,
+       "oceanDepth": 0.7
+      }
+     },
+     "rain": {
+      "enabled": false,
+      "params": {
+       "gain": 0.35,
+       "rainDensity": 4,
+       "rainPitch": 900,
+       "rainBed": 0.15
+      }
+     },
+     "noiselp": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "nCut": 800
+      }
+     },
+     "pinknoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "pinkBright": 0.3
+      }
+     },
+     "brownnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "brownStep": 0.02
+      }
+     },
+     "velvetnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "velvetDensity": 2000
+      }
+     }
+    }
+   },
+   "visual": {
+    "cards": {
+     "reaction": {
+      "on": true,
+      "params": {
+       "feed": 0.062,
+       "kill": 0.061,
+       "diffU": 0.2097,
+       "diffV": 0.105,
+       "speed": 24
+      }
+     },
+     "fieldVariation": {
+      "on": true,
+      "params": {
+       "feedVarAmount": 0.014,
+       "feedVarScale": 3,
+       "feedVarWarp": 1.4,
+       "killVarAmount": 0.007,
+       "killVarScale": 4,
+       "killVarWarp": 1.1
+      }
+     },
+     "flow": {
+      "on": true,
+      "params": {
+       "curlStrength": 0.008,
+       "curlScale": 2.5,
+       "driftX": 0,
+       "driftY": 0.008,
+       "advectAmount": 0.16,
+       "evolveRate": 0.005
+      }
+     },
+     "palette": {
+      "on": true,
+      "params": {
+       "shift": 0.08,
+       "contrast": 1.2,
+       "bands": 1,
+       "relief": 0.8,
+       "lightAngle": 2,
+       "gloss": 0.3,
+       "paletteId": 1
+      }
+     }
+    }
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "sine",
+      "rate": 0.017,
+      "phase": 0
+     },
+     {
+      "shape": "triangle",
+      "rate": 0.043,
+      "phase": 0.5
+     },
+     {
+      "shape": "sine",
+      "rate": 0.061,
+      "phase": 0.25
+     },
+     {
+      "shape": "random",
+      "rate": 0.027,
+      "phase": 0
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "fx",
+      "param": "filterFreq",
+      "depth": 0.22,
+      "exp": true
+     },
+     {
+      "src": 0,
+      "target": "fx",
+      "param": "reverbMix",
+      "depth": 0.25
+     },
+     {
+      "src": 1,
+      "target": "fm",
+      "param": "I",
+      "depth": 0.35
+     },
+     {
+      "src": 1,
+      "target": "fx",
+      "param": "filterCombFb",
+      "depth": 0.15
+     },
+     {
+      "src": 2,
+      "target": "fm",
+      "param": "fc",
+      "depth": 0.08,
+      "exp": true
+     },
+     {
+      "src": 2,
+      "target": "fx",
+      "param": "chorusDepth",
+      "depth": 0.35
+     },
+     {
+      "src": 3,
+      "target": "shepard",
+      "param": "shepSpeed",
+      "depth": 0.1
+     },
+     {
+      "src": 3,
+      "target": "additive",
+      "param": "move",
+      "depth": 0.08
+     },
+     {
+      "src": 3,
+      "target": "fx",
+      "param": "delayFb",
+      "depth": 0.2
+     },
+     {
+      "src": 2,
+      "target": "palette",
+      "param": "shift",
+      "depth": 0.2
+     }
+    ]
+   },
+   "coupling": {
+    "loudToFlow": 0,
+    "loudToCurl": 0.6,
+    "loudToGloss": 0.4,
+    "brightToShift": 0,
+    "onsetToLight": 0,
+    "loudToPulse": 0.6,
+    "onsetToFlash": 0.4,
+    "onsetToSeed": 0.4,
+    "spectrumToTint": 0.7
+   },
+   "presetName": "Loom & copper"
+  }
+ },
+ {
+  "name": "Wind ash",
+  "state": {
+   "v": 1,
+   "audio": {
+    "masterGain": 0.75,
+    "fx": {
+     "filterOn": true,
+     "filterType": "lowpass",
+     "filterFreq": 1200,
+     "filterQ": 0.7,
+     "filterGain": 0,
+     "filterVowel": 0,
+     "filterCombFb": 0.5,
+     "chorusOn": true,
+     "chorusMode": "flanger",
+     "chorusRate": 0.08,
+     "chorusDepth": 6,
+     "chorusMix": 0.55,
+     "chorusFb": 0.75,
+     "reverbOn": true,
+     "reverbDecay": 4,
+     "reverbMix": 0.4,
+     "limiterOn": true,
+     "limiterThr": -12,
+     "limiterRel": 0.15,
+     "delayOn": false,
+     "delayTime": 0.35,
+     "delayFb": 0.4,
+     "delayMix": 0.3,
+     "phaserOn": false,
+     "phaserRate": 0.5,
+     "phaserDepth": 0.7,
+     "phaserStages": 4,
+     "phaserFb": 0.3,
+     "phaserMix": 0.5
+    },
+    "formulas": {
+     "additive": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "fund": 110,
+       "N": 12,
+       "move": 0.35
+      }
+     },
+     "lorenz": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "sigma": 10,
+       "rho": 28,
+       "beta": 2.6667,
+       "lBase": 120,
+       "lFreqScale": 40,
+       "lAmp": 0.25
+      }
+     },
+     "rossler": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "rossA": 0.2,
+       "rossB": 0.2,
+       "rossC": 5.7,
+       "rossBase": 120,
+       "rossFreqScale": 30,
+       "rossAmp": 0.25
+      }
+     },
+     "gliss": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "f0": 55,
+       "k": 0.15
+      }
+     },
+     "shepard": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "shepBase": 55,
+       "shepSpeed": 0.1,
+       "shepOctaves": 6
+      }
+     },
+     "bell": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "bellF0": 320,
+       "bellRatio": 1.4,
+       "bellIndex": 4,
+       "bellDecay": 3,
+       "bellPeriod": 6
+      }
+     },
+     "risset": {
+      "enabled": false,
+      "params": {
+       "gain": 0.4,
+       "rissF0": 480,
+       "rissDecay": 5,
+       "rissPeriod": 6
+      }
+     },
+     "fm": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "fc": 220,
+       "fm": 2,
+       "I": 3
+      }
+     },
+     "beats": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "fbeat": 220,
+       "df": 0.8
+      }
+     },
+     "pm": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "f": 220,
+       "f2pm": 3
+      }
+     },
+     "quasi": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fq": 120,
+       "Aq": 220,
+       "wq": 0.8
+      }
+     },
+     "logistic": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "base": 110,
+       "depth": 330,
+       "r": 3.86,
+       "lfoHz": 40
+      }
+     },
+     "dist": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fd": 110,
+       "alpha": 3
+      }
+     },
+     "karplus": {
+      "enabled": false,
+      "params": {
+       "gain": 0.14,
+       "ksFreq": 110,
+       "ksDamp": 0.985,
+       "ksBright": 0.5
+      }
+     },
+     "bytebeat": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "bbRecipe": 1,
+       "bbRate": 8000
+      }
+     },
+     "ocean": {
+      "enabled": true,
+      "params": {
+       "gain": 0.5,
+       "oceanRate": 0.1,
+       "oceanCut": 700,
+       "oceanDepth": 0.8
+      }
+     },
+     "rain": {
+      "enabled": false,
+      "params": {
+       "gain": 0.35,
+       "rainDensity": 4,
+       "rainPitch": 900,
+       "rainBed": 0.15
+      }
+     },
+     "noiselp": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "nCut": 800
+      }
+     },
+     "pinknoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "pinkBright": 0.3
+      }
+     },
+     "brownnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "brownStep": 0.02
+      }
+     },
+     "velvetnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "velvetDensity": 2000
+      }
+     }
+    }
+   },
+   "visual": {
+    "cards": {
+     "reaction": {
+      "on": true,
+      "params": {
+       "feed": 0.0545,
+       "kill": 0.062,
+       "diffU": 0.2097,
+       "diffV": 0.105,
+       "speed": 22
+      }
+     },
+     "fieldVariation": {
+      "on": true,
+      "params": {
+       "feedVarAmount": 0.014,
+       "feedVarScale": 4,
+       "feedVarWarp": 1.2,
+       "killVarAmount": 0.008,
+       "killVarScale": 5,
+       "killVarWarp": 1.2
+      }
+     },
+     "flow": {
+      "on": true,
+      "params": {
+       "curlStrength": 0.005,
+       "curlScale": 3,
+       "driftX": 0,
+       "driftY": 0.006,
+       "advectAmount": 0.14,
+       "evolveRate": 0.004
+      }
+     },
+     "palette": {
+      "on": true,
+      "params": {
+       "shift": 0,
+       "contrast": 1,
+       "bands": 1,
+       "relief": 0.8,
+       "lightAngle": 2,
+       "gloss": 0.3,
+       "paletteId": 1
+      }
+     }
+    }
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "sine",
+      "rate": 0.02,
+      "phase": 0
+     },
+     {
+      "shape": "triangle",
+      "rate": 0.01,
+      "phase": 0
+     },
+     {
+      "shape": "sine",
+      "rate": 0.05,
+      "phase": 0
+     },
+     {
+      "shape": "sine",
+      "rate": 0.05,
+      "phase": 0
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "flow",
+      "param": "curlStrength",
+      "depth": 0.3
+     },
+     {
+      "src": 1,
+      "target": "palette",
+      "param": "lightAngle",
+      "depth": 0.5
+     }
+    ]
+   },
+   "coupling": {
+    "loudToFlow": 0.8,
+    "loudToCurl": 0.7,
+    "loudToGloss": 0,
+    "brightToShift": 0.4,
+    "onsetToLight": 0,
+    "loudToPulse": 0.9,
+    "onsetToFlash": 0.2,
+    "onsetToSeed": 0.2,
+    "spectrumToTint": 0.6
+   },
+   "presetName": "Wind ash"
+  }
+ },
+ {
+  "name": "Bell spots",
+  "state": {
+   "v": 1,
+   "audio": {
+    "masterGain": 0.75,
+    "fx": {
+     "filterOn": false,
+     "filterType": "lowpass",
+     "filterFreq": 1000,
+     "filterQ": 0.7,
+     "filterGain": 0,
+     "filterVowel": 0,
+     "filterCombFb": 0.5,
+     "chorusOn": false,
+     "chorusMode": "chorus",
+     "chorusRate": 0.35,
+     "chorusDepth": 6,
+     "chorusMix": 0.35,
+     "chorusFb": 0.15,
+     "reverbOn": true,
+     "reverbDecay": 5,
+     "reverbMix": 0.5,
+     "limiterOn": true,
+     "limiterThr": -12,
+     "limiterRel": 0.15,
+     "delayOn": true,
+     "delayTime": 0.5,
+     "delayFb": 0.35,
+     "delayMix": 0.3,
+     "phaserOn": false,
+     "phaserRate": 0.5,
+     "phaserDepth": 0.7,
+     "phaserStages": 4,
+     "phaserFb": 0.3,
+     "phaserMix": 0.5
+    },
+    "formulas": {
+     "additive": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "fund": 110,
+       "N": 12,
+       "move": 0.35
+      }
+     },
+     "lorenz": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "sigma": 10,
+       "rho": 28,
+       "beta": 2.6667,
+       "lBase": 120,
+       "lFreqScale": 40,
+       "lAmp": 0.25
+      }
+     },
+     "rossler": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "rossA": 0.2,
+       "rossB": 0.2,
+       "rossC": 5.7,
+       "rossBase": 120,
+       "rossFreqScale": 30,
+       "rossAmp": 0.25
+      }
+     },
+     "gliss": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "f0": 55,
+       "k": 0.15
+      }
+     },
+     "shepard": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "shepBase": 55,
+       "shepSpeed": 0.1,
+       "shepOctaves": 6
+      }
+     },
+     "bell": {
+      "enabled": true,
+      "params": {
+       "gain": 0.3,
+       "bellF0": 320,
+       "bellRatio": 1.4,
+       "bellIndex": 4,
+       "bellDecay": 3,
+       "bellPeriod": 4
+      }
+     },
+     "risset": {
+      "enabled": false,
+      "params": {
+       "gain": 0.4,
+       "rissF0": 480,
+       "rissDecay": 5,
+       "rissPeriod": 6
+      }
+     },
+     "fm": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "fc": 220,
+       "fm": 2,
+       "I": 3
+      }
+     },
+     "beats": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "fbeat": 220,
+       "df": 0.8
+      }
+     },
+     "pm": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "f": 220,
+       "f2pm": 3
+      }
+     },
+     "quasi": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fq": 120,
+       "Aq": 220,
+       "wq": 0.8
+      }
+     },
+     "logistic": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "base": 110,
+       "depth": 330,
+       "r": 3.86,
+       "lfoHz": 40
+      }
+     },
+     "dist": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fd": 110,
+       "alpha": 3
+      }
+     },
+     "karplus": {
+      "enabled": false,
+      "params": {
+       "gain": 0.14,
+       "ksFreq": 110,
+       "ksDamp": 0.985,
+       "ksBright": 0.5
+      }
+     },
+     "bytebeat": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "bbRecipe": 1,
+       "bbRate": 8000
+      }
+     },
+     "ocean": {
+      "enabled": false,
+      "params": {
+       "gain": 0.25,
+       "oceanRate": 0.12,
+       "oceanCut": 600,
+       "oceanDepth": 0.7
+      }
+     },
+     "rain": {
+      "enabled": false,
+      "params": {
+       "gain": 0.35,
+       "rainDensity": 4,
+       "rainPitch": 900,
+       "rainBed": 0.15
+      }
+     },
+     "noiselp": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "nCut": 800
+      }
+     },
+     "pinknoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "pinkBright": 0.3
+      }
+     },
+     "brownnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "brownStep": 0.02
+      }
+     },
+     "velvetnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "velvetDensity": 2000
+      }
+     }
+    }
+   },
+   "visual": {
+    "cards": {
+     "reaction": {
+      "on": true,
+      "params": {
+       "feed": 0.025,
+       "kill": 0.06,
+       "diffU": 0.2097,
+       "diffV": 0.105,
+       "speed": 12
+      }
+     },
+     "fieldVariation": {
+      "on": true,
+      "params": {
+       "feedVarAmount": 0.005,
+       "feedVarScale": 5,
+       "feedVarWarp": 0.6,
+       "killVarAmount": 0.002,
+       "killVarScale": 6,
+       "killVarWarp": 0.6
+      }
+     },
+     "flow": {
+      "on": false,
+      "params": {
+       "curlStrength": 0.01,
+       "curlScale": 3,
+       "driftX": 0,
+       "driftY": 0,
+       "advectAmount": 0.35,
+       "evolveRate": 0.01
+      }
+     },
+     "palette": {
+      "on": true,
+      "params": {
+       "shift": 0,
+       "contrast": 1.2,
+       "bands": 1,
+       "relief": 0.8,
+       "lightAngle": 2,
+       "gloss": 0.4,
+       "paletteId": 1
+      }
+     }
+    }
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "random",
+      "rate": 0.25,
+      "phase": 0
+     },
+     {
+      "shape": "sine",
+      "rate": 0.07,
+      "phase": 0
+     },
+     {
+      "shape": "triangle",
+      "rate": 0.03,
+      "phase": 0
+     },
+     {
+      "shape": "sine",
+      "rate": 0.05,
+      "phase": 0
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "bell",
+      "param": "bellF0",
+      "depth": 0.4,
+      "exp": true
+     },
+     {
+      "src": 1,
+      "target": "bell",
+      "param": "bellIndex",
+      "depth": 0.5
+     },
+     {
+      "src": 0,
+      "target": "palette",
+      "param": "shift",
+      "depth": 0.3
+     },
+     {
+      "src": 2,
+      "target": "palette",
+      "param": "lightAngle",
+      "depth": 0.3
+     }
+    ]
+   },
+   "coupling": {
+    "loudToFlow": 0,
+    "loudToCurl": 0,
+    "loudToGloss": 0.5,
+    "brightToShift": 0,
+    "onsetToLight": 0.9,
+    "loudToPulse": 0.5,
+    "onsetToFlash": 0.9,
+    "onsetToSeed": 1,
+    "spectrumToTint": 0.6
+   },
+   "presetName": "Bell spots"
+  }
+ },
+ {
+  "name": "Subway basalt",
+  "state": {
+   "v": 1,
+   "audio": {
+    "masterGain": 0.75,
+    "fx": {
+     "filterOn": true,
+     "filterType": "lowpass",
+     "filterFreq": 2000,
+     "filterQ": 6.3,
+     "filterGain": 0,
+     "filterVowel": 0,
+     "filterCombFb": 0.5,
+     "chorusOn": true,
+     "chorusMode": "flanger",
+     "chorusRate": 0.98,
+     "chorusDepth": 5.7,
+     "chorusMix": 0.68,
+     "chorusFb": 0.45,
+     "reverbOn": true,
+     "reverbDecay": 3.2,
+     "reverbMix": 1,
+     "limiterOn": true,
+     "limiterThr": -12,
+     "limiterRel": 0.15,
+     "delayOn": false,
+     "delayTime": 0.35,
+     "delayFb": 0.4,
+     "delayMix": 0.3,
+     "phaserOn": false,
+     "phaserRate": 0.5,
+     "phaserDepth": 0.7,
+     "phaserStages": 4,
+     "phaserFb": 0.3,
+     "phaserMix": 0.5
+    },
+    "formulas": {
+     "additive": {
+      "enabled": true,
+      "params": {
+       "gain": 0.255,
+       "fund": 200,
+       "N": 5,
+       "move": 3.94
+      }
+     },
+     "lorenz": {
+      "enabled": true,
+      "params": {
+       "gain": 0.498,
+       "sigma": 10,
+       "rho": 24.51,
+       "beta": 2.6667,
+       "lBase": 192,
+       "lFreqScale": 40,
+       "lAmp": 0.25
+      }
+     },
+     "rossler": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "rossA": 0.2,
+       "rossB": 0.2,
+       "rossC": 5.7,
+       "rossBase": 120,
+       "rossFreqScale": 30,
+       "rossAmp": 0.25
+      }
+     },
+     "gliss": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "f0": 55,
+       "k": 0.15
+      }
+     },
+     "shepard": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "shepBase": 55,
+       "shepSpeed": 0.1,
+       "shepOctaves": 6
+      }
+     },
+     "bell": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "bellF0": 320,
+       "bellRatio": 1.4,
+       "bellIndex": 4,
+       "bellDecay": 3,
+       "bellPeriod": 6
+      }
+     },
+     "risset": {
+      "enabled": false,
+      "params": {
+       "gain": 0.4,
+       "rissF0": 480,
+       "rissDecay": 5,
+       "rissPeriod": 6
+      }
+     },
+     "fm": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "fc": 220,
+       "fm": 2,
+       "I": 3
+      }
+     },
+     "beats": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "fbeat": 220,
+       "df": 0.8
+      }
+     },
+     "pm": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "f": 220,
+       "f2pm": 3
+      }
+     },
+     "quasi": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fq": 120,
+       "Aq": 220,
+       "wq": 0.8
+      }
+     },
+     "logistic": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "base": 110,
+       "depth": 330,
+       "r": 3.86,
+       "lfoHz": 40
+      }
+     },
+     "dist": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "fd": 110,
+       "alpha": 3
+      }
+     },
+     "karplus": {
+      "enabled": false,
+      "params": {
+       "gain": 0.14,
+       "ksFreq": 110,
+       "ksDamp": 0.985,
+       "ksBright": 0.5
+      }
+     },
+     "bytebeat": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "bbRecipe": 1,
+       "bbRate": 8000
+      }
+     },
+     "ocean": {
+      "enabled": false,
+      "params": {
+       "gain": 0.25,
+       "oceanRate": 0.12,
+       "oceanCut": 600,
+       "oceanDepth": 0.7
+      }
+     },
+     "rain": {
+      "enabled": false,
+      "params": {
+       "gain": 0.35,
+       "rainDensity": 4,
+       "rainPitch": 900,
+       "rainBed": 0.15
+      }
+     },
+     "noiselp": {
+      "enabled": true,
+      "params": {
+       "gain": 0.081,
+       "nCut": 2085
+      }
+     },
+     "pinknoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.12,
+       "pinkBright": 0.3
+      }
+     },
+     "brownnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.15,
+       "brownStep": 0.02
+      }
+     },
+     "velvetnoise": {
+      "enabled": false,
+      "params": {
+       "gain": 0.1,
+       "velvetDensity": 2000
+      }
+     }
+    }
+   },
+   "visual": {
+    "cards": {
+     "reaction": {
+      "on": true,
+      "params": {
+       "feed": 0.029,
+       "kill": 0.057,
+       "diffU": 0.2097,
+       "diffV": 0.105,
+       "speed": 14
+      }
+     },
+     "fieldVariation": {
+      "on": false,
+      "params": {
+       "feedVarAmount": 0.015,
+       "feedVarScale": 4,
+       "feedVarWarp": 1,
+       "killVarAmount": 0.008,
+       "killVarScale": 5,
+       "killVarWarp": 1
+      }
+     },
+     "flow": {
+      "on": true,
+      "params": {
+       "curlStrength": 0.008,
+       "curlScale": 3,
+       "driftX": 0,
+       "driftY": 0,
+       "advectAmount": 0.2,
+       "evolveRate": 0.008
+      }
+     },
+     "palette": {
+      "on": true,
+      "params": {
+       "shift": 0,
+       "contrast": 1.4,
+       "bands": 1,
+       "relief": 1.5,
+       "lightAngle": 2,
+       "gloss": 0.5,
+       "paletteId": 4
+      }
+     }
+    }
+   },
+   "mod": {
+    "lfos": [
+     {
+      "shape": "sine",
+      "rate": 0.02,
+      "phase": 0
+     },
+     {
+      "shape": "sine",
+      "rate": 0.05,
+      "phase": 0
+     },
+     {
+      "shape": "sine",
+      "rate": 0.05,
+      "phase": 0
+     },
+     {
+      "shape": "sine",
+      "rate": 0.05,
+      "phase": 0
+     }
+    ],
+    "routes": [
+     {
+      "src": 0,
+      "target": "palette",
+      "param": "lightAngle",
+      "depth": 0.4
+     }
+    ]
+   },
+   "coupling": {
+    "loudToFlow": 0.7,
+    "loudToCurl": 0.9,
+    "loudToGloss": 0.4,
+    "brightToShift": 0,
+    "onsetToLight": 0,
+    "loudToPulse": 0.8,
+    "onsetToFlash": 0.4,
+    "onsetToSeed": 0.5,
+    "spectrumToTint": 0.7
+   },
+   "presetName": "Subway basalt"
+  }
+ }
+]

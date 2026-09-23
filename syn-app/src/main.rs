@@ -45,6 +45,7 @@ options:
   --no-sound        play into a null device (for measuring)
   --no-scout        do not score candidates in the background
   --score           print the fractality metrics of the render, as JSON
+  --sim             bench the picture's simulation instead of the sound
   --list            list the built-in presets
 
 `play` runs until Ctrl-C, or for --secs seconds if that is given.
@@ -61,6 +62,7 @@ struct Args {
     no_sound: bool,
     no_scout: bool,
     score: bool,
+    sim: bool,
 }
 
 fn main() -> ExitCode {
@@ -104,6 +106,7 @@ fn run(argv: &[String]) -> Result<(), String> {
         no_sound: false,
         no_scout: false,
         score: false,
+        sim: false,
     };
     let mut it = rest.iter();
     while let Some(flag) = it.next() {
@@ -126,6 +129,7 @@ fn run(argv: &[String]) -> Result<(), String> {
             "--no-sound" => a.no_sound = true,
             "--no-scout" => a.no_scout = true,
             "--score" => a.score = true,
+            "--sim" => a.sim = true,
             "--out" => a.out = Some(value()?),
             "--raw" => a.raw = Some(value()?),
             other => return Err(format!("unknown option `{other}`\n\n{USAGE}")),
@@ -153,7 +157,7 @@ fn run(argv: &[String]) -> Result<(), String> {
     };
 
     if command == "bench" {
-        return bench(&a);
+        return if a.sim { bench_sim(&a) } else { bench(&a) };
     }
     match command {
         "tui" => return tui(&name, state, &a),
@@ -692,6 +696,52 @@ fn bench(a: &Args) -> Result<(), String> {
         "\nslowest: {slowest_name} at {slowest:.1}x realtime — {:.1}% of one core to play live",
         100.0 / slowest
     );
+    Ok(())
+}
+
+/// The picture's simulation on the grid a 120x40 terminal gets (GRAPHICS.md,
+/// V1): `--secs` seconds of steps at the 30 Hz the app steps at, per preset.
+/// Run it under `taskset -c 6` to read the numbers as one A76 core.
+fn bench_sim(a: &Args) -> Result<(), String> {
+    use syn_core::sim::{grid_for_pixels, Sim, SimParams};
+    const SIM_HZ: f64 = 30.0;
+    let (w, h) = grid_for_pixels(120, 60);
+    let steps = (a.secs * SIM_HZ).round().max(1.0) as u64;
+    println!("grid {w}x{h}, {steps} steps at {SIM_HZ} Hz\n");
+    println!(
+        "{:<20} {:>6} {:>9} {:>12} {:>7} {:>7}",
+        "preset", "speed", "ms/step", "ns/cell/sub", "fields", "core %"
+    );
+    let mut worst = (0.0f64, String::new());
+    for p in presets() {
+        let params = SimParams::from_cards(&p.state.visual.cards);
+        let mut sim = Sim::new(w, h, a.seed);
+        for _ in 0..30 {
+            sim.step(&params);
+        }
+        let before = sim.stats();
+        let started = Instant::now();
+        for _ in 0..steps {
+            sim.step(&params);
+        }
+        let per_step = started.elapsed().as_secs_f64() / steps as f64;
+        let after = sim.stats();
+        let substeps = params.reaction.substeps();
+        let ns_cell = per_step * 1e9 / (w * h * substeps) as f64;
+        let draws = (after.param_field_draws - before.param_field_draws)
+            + (after.velocity_draws - before.velocity_draws);
+        let core = per_step * SIM_HZ * 100.0;
+        println!(
+            "{:<20} {substeps:>6} {:>9.2} {ns_cell:>12.2} {:>7.1} {core:>7.1}",
+            p.name,
+            per_step * 1e3,
+            draws as f64 / steps as f64
+        );
+        if core > worst.0 {
+            worst = (core, p.name.clone());
+        }
+    }
+    println!("\nheaviest: {} at {:.1}% of one core", worst.1, worst.0);
     Ok(())
 }
 

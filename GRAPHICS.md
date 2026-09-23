@@ -126,23 +126,50 @@ syn-app/src/main.rs      the field thread, the keys, the config keys
 **V0. Probe ✔** — the table above. The probe and the measuring script are
 kept: they are the bench for V3.
 
-**V1. The field** (`syn-core::sim`: field, noise, fields, advect).
-- The react kernel with a fast interior (no clamping, no bounds checks, rows
-  as slices so it vectorizes) and a clamped border — the zero-flux boundary
-  `CLAMP_TO_EDGE` gave the shader.
+**V1. The field ✔** (`syn-core::sim`: field, noise, fields, advect).
+- The react kernel with a fast interior (rows as slices, bounds checks
+  hoisted, fused multiply-adds — it vectorizes to NEON) and a clamped border,
+  the zero-flux boundary `CLAMP_TO_EDGE` gave the shader.
 - Paramfield and velocity at half the grid's side, recomputed only when
   their key (params + `evolveT`) changes, skipped when their card is off or
   their amount is zero — everything `src/sim/engine.ts` learned the hard way.
-- Tests: `u=1, v=0` is a fixed point; advect with amount 0 is an exact
-  identity; an off card never computes its field; every preset stays in
-  `[0, 1]` with no NaN at the extremes of every slider after 10 000
-  substeps; every preset is still alive (variance of `v` above a floor)
-  after 60 s of simulated time; same seed → same field.
-- Bench: ns per cell per substep. **Target: the default point at 120×40
-  (240×120 grid, `sim_hz` 30, speed 10) costs ≤ 10% of one A76 core.** The
-  probe's naive kernel would be ~80%; the budget assumes ~8 ns a cell, i.e.
-  a vectorized kernel. If it is missed, the knobs in order: `sim_hz`, then
-  the grid factor, never `speed` (it changes the pattern, not its cost).
+- Tests: `u=1, v=0` is a fixed point; the interior kernel agrees with the
+  clamped one; advect with no velocity is an exact copy and with no amount is
+  skipped; an off card never draws its field; every preset stays in `[0, 1]`
+  with no NaN at the corners of the reaction sliders and the fastest flow;
+  every preset is still alive after 10 s; same seed → same field.
+  `syn-core` is built at `opt-level = 1` in the dev profile so these run in
+  about a second rather than fifteen.
+- Bench: `taskset -c 6 synesthesia bench --sim`.
+
+Measured at 240×120, 30 Hz, one A76 core (2026-09-23):
+
+| | ms/step | % of a core |
+|---|---|---|
+| reaction alone | 5.2–5.5 ns a cell a substep | — |
+| presets without Field variation or Flow | 1.5–1.8 | 4.5–5.4 |
+| *Fractal garden* (preset 0, speed 16) | 3.5 | 10.6 |
+| heaviest, *Loom & copper* (speed 24) | 4.7 | 14.2 |
+
+Target was ≤ 10% for the default point: met for speed ≤ 12, ~11% at
+preset 0, 14% at the heaviest. What it took, in order of what it bought:
+
+- **Redrawing the fields at most every 6 steps** (`FIELD_REFRESH_STEPS`,
+  5 times a second). An evolving point redrew both every step, which was
+  two thirds of a step for a drift of ~1e-4 per step. 18.7% → 12.9% on
+  preset 0.
+- **The velocity sampled once per redraw, not per cell per step:** it now
+  lives as a full-resolution map in cells per step. Advection went from 47
+  to 23 ns a cell.
+- FMA in the kernel: ~4%.
+
+Two findings for V3:
+- **The kernel is compute-bound, not memory-bound:** 5.5 ns a cell at
+  240×120 (675 KB of state), 7.5 at 480×240, 8.6 at 60×30 where the clamped
+  border is a larger share. What is left is micro-optimization.
+- **The little cores are 4.5× slower** (preset 0 is 47% of an A55). The
+  field thread must be free to run on an A76 — it must not be pinned to the
+  scout's cores.
 
 **V2. The colour** (`display`, `coupling`).
 - Port the five palettes and `composePalette`, the cosine gradient with

@@ -12,6 +12,7 @@ pub mod genome;
 pub mod modmatrix;
 pub mod schema;
 pub mod share;
+pub mod sim;
 pub mod state;
 pub mod wav;
 

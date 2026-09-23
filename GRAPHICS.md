@@ -1,0 +1,184 @@
+# Graphics in the terminal — plan
+
+The picture of the web app, drawn in the console: the same Gray–Scott field,
+the same four visual cards, the same sound → image couplings, rasterized on
+the CPU at the resolution a terminal has and shown in half-block characters.
+It is a stopgap for the GPU renderer in PLAN.md's backlog, not a replacement:
+when a render node appears, `syn-viz-gpu` becomes the second implementation
+of the same `Visualizer` and this one stays as the fallback.
+
+Why it is affordable when the CPU renderer in the backlog was not: that one
+was sized for 512×288 grids and 720p output (69 ms a frame on all eight
+cores). A 120×40 terminal holds 120×80 pixels. The web app's own lowest
+quality rung is a 192-cell grid (`src/sim/quality.ts`), and the grid planned
+here (240×120 at 120×40) is above it — this is the web picture at its
+smallest, not a different picture.
+
+## The probe (2026-09-23)
+
+`syn-tui/examples/field_probe.rs` runs a real Gray–Scott field at 2× the
+pixel grid, draws it in `▀` cells through ratatui (the same cell diff the app
+uses) and counts the bytes written. `scripts/term-cost.py` opens it in a
+separate `xfce4-terminal --disable-server` window at 120×40 and reads the CPU
+of that terminal, of Xorg and of xfwm4 from `/proc` over 18 s. Every row
+below is one run; Xorg's own background load on this box moves by ~±10% of a
+core between runs, so read its column as a trend.
+
+| what runs | written to the tty | terminal | Xorg | xfwm4 | our process | draw, wall ms/frame |
+|---|---|---|---|---|---|---|
+| empty window (`sleep`) | — | 0% | 40–48% | 2% | — | — |
+| the app today, `ui_fps` 8 | ~2 KB/s | 14% | 53% | 3% | (audio etc.) | — |
+| field, 8 fps, truecolor, 8 bit, exposure breathing | 654 KB/s | 35% | 57% | 4% | 29% | 30.0 |
+| same, no breathing | 574 KB/s | 34% | 54% | 4% | 28% | 27.7 |
+| 8 fps, truecolor, 5 bit, breathing | 545 KB/s | 34% | 56% | 4% | 28% | 25.2 |
+| 8 fps, truecolor, 5 bit, no breathing | 431 KB/s | 33% | 59% | 4% | 27% | 21.7 |
+| 8 fps, 256 colours, breathing | 170 KB/s | 36% | 57% | 4% | 21% | 6.6 |
+| 8 fps, 256 colours, no breathing | 129 KB/s | 36% | 56% | 4% | 20% | 3.4 |
+| 4 fps, truecolor, 8 bit, breathing | 263 KB/s | 24% | 51% | 3% | 21% | 34.6 |
+| 4 fps, 256 colours, no breathing | 58 KB/s | 26% | 51% | 3% | 13% | 3.8 |
+
+(120×40 window, field 120×30 cells = 120×60 pixels, grid 240×120, 18 s per
+row. CPU is % of one core.)
+
+What it says:
+
+- **The terminal pays per frame, not per byte.** Five times fewer bytes
+  (654 → 129 KB/s) leave VTE at ~35%; halving the frame rate takes it to
+  ~25%. A frame in which most cells change costs a full repaint however
+  short its escapes are. So quantization and 256 colours buy the terminal
+  nothing, and `viz_fps` is the one knob that does.
+- **A growing pattern changes almost every cell every frame.** Dropping
+  three bits per channel, or the exposure breathing, cuts the bytes by only
+  15–35%: the ratatui diff has little to skip.
+- **Bytes cost *us*, though:** at truecolor a draw spends 25–35 ms of wall
+  time, most of it blocked in `write` while the terminal drains the pty (our
+  CPU goes up by only ~8% of a core). At 256 colours it is 3–7 ms.
+- Xorg adds ~10–15% over the empty window, within its own noise.
+
+The probe's own cost (simulation plus colour, single-threaded, unoptimized:
+bounds checks everywhere, five neighbour lookups per pixel) is not the
+number to budget against — see V1's target.
+
+## Decisions
+
+1. **Half-blocks, not Braille, not sixel.** `▀` with a foreground and a
+   background colour gives two square pixels per cell and a full colour for
+   each. Braille gives 2×4 dots but one colour a cell — wrong for a colour
+   field. Sixel and the kitty protocol are not relied on: VTE has sixel only
+   as a build option, and a terminal that lacks it shows garbage.
+2. **Truecolor at full depth, and `viz_fps` as the one knob.** The
+   probe shows that fewer colours do not make the terminal cheaper, so the
+   picture keeps them. `viz_color = "256"` exists only as the fallback,
+   picked automatically when `COLORTERM` does not say `truecolor`.
+   `viz_fps` defaults to 8 (the same as `ui_fps`); 4 takes ~10% of a core
+   off the terminal. Because a truecolor frame blocks in `write` for tens of
+   ms, the draw must never hold anything the keys or the scout wait on.
+3. **The simulation grid is 2× the pixel grid, box-filtered down.** A
+   Gray–Scott pattern has a fixed size *in cells* (set by the diffusion
+   rates), so a 1:1 grid shows a handful of blobs; 2× shows the pattern.
+   The long side is capped (384 cells) so a huge terminal does not buy a
+   huge grid, and the down-filter adapts.
+4. **The simulation clock is not the redraw clock.** The web steps the field
+   once per animation frame, so how fast a pattern grows depends on the
+   frame rate there. Here the field steps at a fixed `sim_hz` (30 by default,
+   `speed` substeps each) and is shown at `viz_fps`. Changing the redraw
+   rate to save the terminal must not slow the pattern down.
+5. **The field runs on its own thread**, not on the control thread: the
+   control thread keeps the keys, the morph and the scout, and the field
+   would take tens of ms a second from them. It publishes an RGB image at
+   the pixel grid through a double buffer (a mutex is fine — this is not the
+   audio thread); the TUI only copies colours into cells.
+6. **Seeded, not `Math.random()`.** Seed spots, onset positions and reseeds
+   use mulberry32 from the point's seed, so a test and a bench see the same
+   field every time. Parity with the browser is by eye, not by sample —
+   the browser's field is unseeded and cannot be compared bit for bit.
+7. **Inputs are exactly the web app's inputs.** Visual card params go
+   through `modmatrix::effective_params` (the LFOs already address visual
+   cards) and then through a port of `applyCoupling`; the display effects
+   come from a port of `displayCoupling`; onset hits are the `hits` counter
+   of `Frame` (a delta between two frames = that many hits, each one an
+   `inject` and a ripple, as `seedOnHit` does). During a 2 s morph the field
+   reads the morphing point, like the sound does.
+8. **Reseed when the web app reseeds:** on loading a point and on 🎲.
+   👍/👎 morph into the new visual genes without wiping the field.
+9. **The `Visualizer` trait is introduced now.** PLAN.md decision 5 promised
+   it from day one; it does not exist in the code yet. It takes one input
+   per frame — clock time, features, new hits, the effective point — so a
+   GPU renderer later consumes the same thing.
+
+## Where the code goes
+
+```
+syn-core/src/sim/        pure, no threads, deterministic
+  field.rs               Gray–Scott state, seed, inject, react substep
+  noise.rs               hash21 / noise2 / fbm / warpedFbm / curl — the GLSL, in f32
+  fields.rs              paramfield + velocity at half resolution, cached by key
+  advect.rs              semi-Lagrangian, bilinear
+  display.rs             palette, relief, gloss, tint, flash, exposure, ripples → RGB
+  coupling.rs            applyCoupling + displayCoupling + RippleSet
+  mod.rs                 Sim: one step(), one render(), the Visualizer input
+syn-tui/src/field.rs     the half-block widget and the colour mode
+syn-app/src/main.rs      the field thread, the keys, the config keys
+```
+
+## Phases
+
+**V0. Probe ✔** — the table above. The probe and the measuring script are
+kept: they are the bench for V3.
+
+**V1. The field** (`syn-core::sim`: field, noise, fields, advect).
+- The react kernel with a fast interior (no clamping, no bounds checks, rows
+  as slices so it vectorizes) and a clamped border — the zero-flux boundary
+  `CLAMP_TO_EDGE` gave the shader.
+- Paramfield and velocity at half the grid's side, recomputed only when
+  their key (params + `evolveT`) changes, skipped when their card is off or
+  their amount is zero — everything `src/sim/engine.ts` learned the hard way.
+- Tests: `u=1, v=0` is a fixed point; advect with amount 0 is an exact
+  identity; an off card never computes its field; every preset stays in
+  `[0, 1]` with no NaN at the extremes of every slider after 10 000
+  substeps; every preset is still alive (variance of `v` above a floor)
+  after 60 s of simulated time; same seed → same field.
+- Bench: ns per cell per substep. **Target: the default point at 120×40
+  (240×120 grid, `sim_hz` 30, speed 10) costs ≤ 10% of one A76 core.** The
+  probe's naive kernel would be ~80%; the budget assumes ~8 ns a cell, i.e.
+  a vectorized kernel. If it is missed, the knobs in order: `sim_hz`, then
+  the grid factor, never `speed` (it changes the pattern, not its cost).
+
+**V2. The colour** (`display`, `coupling`).
+- Port the five palettes and `composePalette`, the cosine gradient with
+  bands, the bump-mapped relief with the light vector and gloss, tint by
+  tone, flash, exposure, the four ripples — `display.frag` line by line, per
+  pixel of the *pixel* grid, reading the box-filtered field.
+- Port `applyCoupling` (with wrap for hue and light angle), `displayCoupling`
+  and `RippleSet`.
+- Tests: port `coupling.test.ts`, `visualfx.test.ts` and the palette cases
+  of `visual.test.ts`; neutral display effects leave a frame unchanged; a
+  ripple dies after `RIPPLE_LIFE`.
+
+**V3. On screen** (`Visualizer`, the thread, the widget, the keys).
+- `Visualizer` in `syn-core`, the field thread in `syn-app`, the half-block
+  widget in `syn-tui` with the colour mode of decision 2.
+- Layout: the field takes the space above the meters. `v` cycles
+  off → panel → full screen (meters hidden), and is remembered in the
+  config. Resizing regrids and resamples the current field instead of
+  reseeding it.
+- Config: `viz`, `viz_fps`, `sim_hz`, `viz_color`, written on
+  first run like the rest.
+- Measure with `scripts/term-cost.py` against the real app and fill the
+  "TUI redraw" row of PLAN.md's budget. **Target: the whole app with the
+  field at 120×40 and the defaults — terminal ≤ 40% of a core, our field
+  thread ≤ 10%, no xruns in a 2-minute soak with the scout running.**
+
+**V4. Side by side.** Every preset in the browser (lowest rung) and here,
+by eye: the same pattern family, the same palette, the same response to
+onsets and swells. Findings go into this file, as PLAN.md decision 3 did for
+the sound. Then PLAN.md: decision 1 gains "…and a picture in the terminal",
+the backlog points here.
+
+## Not now
+
+- Painting with the mouse (the web app's touch strokes) — the console is
+  keyboard-only by decision.
+- Sixel / kitty graphics as an optional sharper mode — only if a terminal on
+  this box turns out to support it, and only behind a config key.
+- The web's quality ladder and boot probe: a terminal's size is the ladder.

@@ -22,8 +22,13 @@ const dump = await page.evaluate(async () => {
   const state = await import('/src/state/schema.ts');
   const gen = await import('/src/dsp/generator.ts');
   const filters = await import('/src/audio/filters.ts');
+  const genes = await import('/src/genome/genes.ts');
+  const codec = await import('/src/genome/codec.ts');
   return {
     presets: PRESETS.map((p) => ({ name: p.name, state: p.state })),
+    // The same points as genome vectors — the fixture the Rust codec is
+    // checked against (tests/genome.rs).
+    genomes: PRESETS.map((p) => codec.encodeGenome(p.state)),
     schema: {
       formulaIds: gen.FORMULA_IDS,
       defaultParams: gen.DEFAULT_PARAMS,
@@ -41,6 +46,12 @@ const dump = await page.evaluate(async () => {
       fxExpParams: [...audio.FX_EXP_PARAMS],
       reverbDecayRange: audio.REVERB_DECAY_RANGE,
       cards: visual.CARDS,
+      alwaysOnCardIds: visual.ALWAYS_ON_CARD_IDS,
+      genes: genes.GENES,
+      modTargets: genes.MOD_TARGETS,
+      routeSlots: genes.ROUTE_SLOTS,
+      lfoShapes: genes.LFO_SHAPES,
+      lfoRateRange: genes.LFO_RATE_RANGE,
       lfoCount: state.LFO_COUNT,
       defaultLfo: state.DEFAULT_LFO,
       defaultMasterGain: state.DEFAULT_MASTER_GAIN,
@@ -55,7 +66,8 @@ const dump = await page.evaluate(async () => {
 
 writeFileSync(new URL('presets.json', OUT), JSON.stringify(dump.presets, null, 1) + '\n');
 writeFileSync(new URL('schema.json', OUT), JSON.stringify(dump.schema, null, 1) + '\n');
-console.log(`presets: ${dump.presets.length}, formulas: ${dump.schema.formulas.length}`);
+writeFileSync(new URL('genomes.json', OUT), JSON.stringify(dump.genomes) + '\n');
+console.log(`presets: ${dump.presets.length}, formulas: ${dump.schema.formulas.length}, genes: ${dump.schema.genes.length}`);
 
 await browser.close();
 await server.stop?.();

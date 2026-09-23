@@ -25,10 +25,23 @@ pub struct PipeSink {
 }
 
 impl PipeSink {
-    /// Opens the first player that starts. `SYN_AUDIO_CMD` overrides the choice
-    /// (the words of a command line; `{rate}` and `{channels}` are substituted).
+    /// Opens the first player that starts, trying `command` (if given), then
+    /// `SYN_AUDIO_CMD`, then pw-cat, then aplay. In a command, `{rate}` and
+    /// `{channels}` are substituted.
     pub fn open(sample_rate: u32, channels: u16, latency_frames: u32) -> std::io::Result<Self> {
+        Self::open_with("", sample_rate, channels, latency_frames)
+    }
+
+    pub fn open_with(
+        command: &str,
+        sample_rate: u32,
+        channels: u16,
+        latency_frames: u32,
+    ) -> std::io::Result<Self> {
         let mut attempts: Vec<Vec<String>> = Vec::new();
+        if !command.trim().is_empty() {
+            attempts.push(command.split_whitespace().map(str::to_string).collect());
+        }
         if let Ok(custom) = std::env::var("SYN_AUDIO_CMD") {
             attempts.push(custom.split_whitespace().map(str::to_string).collect());
         }
@@ -93,19 +106,36 @@ impl Drop for PipeSink {
     }
 }
 
-/// Throws samples away at the right pace — for tests and `--no-sound`.
+/// Throws the samples away, but at the right pace — for `--no-sound` and for
+/// tests. Without the pacing the render loop would free-run and burn a core.
 pub struct NullSink {
     name: String,
+    sample_rate: f64,
+    next: Option<std::time::Instant>,
+}
+
+impl NullSink {
+    pub fn new(sample_rate: f64) -> Self {
+        Self { name: format!("null ({sample_rate:.0} Hz)"), sample_rate, next: None }
+    }
 }
 
 impl Default for NullSink {
     fn default() -> Self {
-        Self { name: "null".into() }
+        Self::new(48000.0)
     }
 }
 
 impl Sink for NullSink {
-    fn write(&mut self, _block: &[f32]) -> std::io::Result<()> {
+    fn write(&mut self, block: &[f32]) -> std::io::Result<()> {
+        let now = std::time::Instant::now();
+        let deadline = self.next.unwrap_or(now);
+        if deadline > now {
+            std::thread::sleep(deadline - now);
+        }
+        let span = std::time::Duration::from_secs_f64(block.len() as f64 / self.sample_rate);
+        // Never let the deadline fall behind by more than one block.
+        self.next = Some(deadline.max(now - span) + span);
         Ok(())
     }
 

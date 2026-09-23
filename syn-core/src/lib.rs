@@ -3,16 +3,21 @@
 //! and the genome. Everything here is deterministic and testable; devices,
 //! terminals and files live in the other crates (PLAN.md).
 
+pub mod analysis;
 pub mod dsp;
 pub mod engine;
+pub mod features;
 pub mod fx;
+pub mod genome;
 pub mod modmatrix;
 pub mod schema;
+pub mod share;
 pub mod state;
 pub mod wav;
 
 pub use dsp::generator::{FormulaGenerator, FormulaId, Params};
 pub use engine::{render_offline, Engine};
+pub use features::{AudioFeatures, FeatureTracker, OnsetDetector};
 pub use fx::FxChain;
 pub use modmatrix::{effective_param, lfo_value, LfoDef, LfoShape, ModRoute, ModState};
 pub use state::{AppState, AudioState, FormulaSnapshot, FxState, Preset};

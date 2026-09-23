@@ -11,9 +11,13 @@ use super::delayline::DelayLine;
 const LINES: usize = 8;
 /// Mutually prime lengths in milliseconds — no common period, so echoes do not
 /// line up into a flutter.
-/// Calibrated so the wet level tracks the dry one across the decay range
-/// (`the_wet_level_barely_moves_with_the_decay`).
-const NORM_K: f64 = 6.0;
+/// Calibrated against the browser, not against a textbook: a normalized
+/// `ConvolverNode` fed with decaying noise returns a wet signal well below the
+/// dry one (measured wet/dry 0.16 at decay 0.5 s, 0.39 at 8 s), and every
+/// preset's Reverb Mix was tuned against that. Matching the shape but not the
+/// level would put points 16 dB out — which is exactly what the first version
+/// did.
+const NORM_K: f64 = 0.88;
 const LENGTHS_MS: [f64; LINES] = [23.1, 29.7, 37.3, 43.9, 53.1, 61.7, 71.3, 79.9];
 
 #[derive(Clone, Debug)]
@@ -129,7 +133,8 @@ mod tests {
         }
     }
 
-    /// Wet level should follow the input, not the decay time.
+    /// The wet level must not run away with the decay time: a longer tail is
+    /// longer, not louder. The absolute level is the browser's (see NORM_K).
     #[test]
     fn the_wet_level_barely_moves_with_the_decay() {
         let sr = 22050.0;
@@ -152,7 +157,7 @@ mod tests {
             levels.push((energy_out / energy_in).sqrt());
         }
         for (decay, level) in [0.5, 2.8, 8.0].iter().zip(&levels) {
-            assert!((0.6..=1.5).contains(level), "decay {decay}: wet/dry {level:.2}");
+            assert!((0.05..=0.30).contains(level), "decay {decay}: wet/dry {level:.2}");
         }
     }
 

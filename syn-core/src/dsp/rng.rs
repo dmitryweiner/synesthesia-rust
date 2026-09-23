@@ -32,7 +32,7 @@ impl Rng for Mulberry32 {
 }
 
 /// Standard normal sample (Box–Muller), guarding against `ln(0)`.
-pub fn gaussian(rng: &mut impl Rng) -> f64 {
+pub fn gaussian(rng: &mut (impl Rng + ?Sized)) -> f64 {
     let mut u = rng.next();
     while u <= 1e-12 {
         u = rng.next();

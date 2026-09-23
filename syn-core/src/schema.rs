@@ -37,12 +37,71 @@ pub struct Vowel {
 }
 
 #[derive(Clone, Debug, Deserialize)]
+pub struct SelectOption {
+    pub v: f64,
+    pub label: String,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct SelectDef {
+    pub k: String,
+    pub name: String,
+    pub value: f64,
+    pub options: Vec<SelectOption>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
 pub struct CardDef {
     pub id: String,
     pub title: String,
     pub tag: String,
     pub desc: String,
     pub sliders: Vec<SliderDef>,
+    #[serde(default)]
+    pub selects: Vec<SelectDef>,
+}
+
+/// One gene of the genome, as the web app derives it from these same schemas.
+/// The list is dumped rather than re-derived, so the two apps cannot disagree
+/// about gene order — share-compatibility depends on it (PLAN.md decision 2).
+#[derive(Clone, Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GeneDef {
+    pub id: String,
+    pub label: String,
+    pub kind: GeneKind,
+    /// Gene family for structural mutation: `a.<formula>`, `fx`, `v.<card>`,
+    /// `lfo.<i>`, `route.<i>`, `coupling`.
+    pub group: String,
+    pub min: f64,
+    pub max: f64,
+    pub step: Option<f64>,
+    #[serde(default)]
+    pub exp: bool,
+    /// The bool gene that gates this one (a disabled formula's params, an off
+    /// card's, an unused route slot).
+    pub active_if: Option<String>,
+    /// Normalized value at which the gene has no effect, so a morph can fade
+    /// it in and out instead of jumping.
+    pub neutral: Option<f64>,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum GeneKind {
+    Cont,
+    Bool,
+    Choice,
+}
+
+/// A parameter a modulation route can aim at.
+#[derive(Clone, Debug, Deserialize)]
+pub struct ModTarget {
+    pub target: String,
+    pub param: String,
+    #[serde(default)]
+    pub exp: bool,
+    pub label: String,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -76,7 +135,14 @@ pub struct Schema {
     pub coupling_ranges: BTreeMap<String, [f64; 2]>,
     pub coupling_floor: f64,
     pub cards: Vec<CardDef>,
+    pub always_on_card_ids: Vec<String>,
     pub vowels: Vec<Vowel>,
+    pub genes: Vec<GeneDef>,
+    pub mod_targets: Vec<ModTarget>,
+    pub route_slots: usize,
+    pub lfo_shapes: Vec<String>,
+    pub lfo_rate_range: [f64; 2],
+    pub fx_on_keys: Vec<String>,
     pub default_coupling: BTreeMap<String, f64>,
     pub default_state: serde_json::Value,
 }

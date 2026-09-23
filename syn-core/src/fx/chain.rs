@@ -20,6 +20,9 @@ const MAX_PHASER_STAGES: usize = 8;
 const FORMANT_BANDS: usize = 3;
 /// All-pass centre sweep, kept strictly positive: [200, 200 + 3600·depth].
 const PHASER_F_LO: f64 = 200.0;
+/// One Web Audio render quantum: the shortest delay the browser can put in a
+/// feedback loop, and therefore the shortest the presets were tuned with.
+const MIN_LOOP_DELAY: f64 = 128.0;
 
 #[derive(Clone, Copy, Debug, Default)]
 struct Smooth {
@@ -209,7 +212,14 @@ impl FxChain {
             FilterMode::Comb => {}
         }
 
-        let comb_delay = (sr / filter_freq.clamp(20.0, 2000.0)).clamp(2.0, self.comb.capacity() as f64 - 2.0);
+        // The browser cannot run a delay shorter than one render quantum inside
+        // a feedback loop, so its comb tops out at sr/128 (375 Hz at 48 kHz) no
+        // matter what the slider says — and every comb preset was tuned through
+        // that ceiling. Matching it keeps those points at the level and pitch
+        // they were built at (measured: comb ran +3.4 dB hot without it).
+        let comb_delay = (sr / filter_freq.clamp(20.0, 2000.0))
+            .max(MIN_LOOP_DELAY)
+            .clamp(2.0, self.comb.capacity() as f64 - 2.0);
         let chorus_base_ms = if fx.chorus_mode == "flanger" { 2.0 } else { 12.0 };
         let chorus_inc = std::f64::consts::TAU * chorus_rate / sr;
         let phaser_inc = std::f64::consts::TAU * phaser_rate / sr;

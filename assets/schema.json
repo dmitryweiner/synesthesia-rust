@@ -1425,6 +1425,3016 @@
    ]
   }
  ],
+ "alwaysOnCardIds": [
+  "reaction",
+  "palette"
+ ],
+ "genes": [
+  {
+   "id": "a.additive.enabled",
+   "label": "Harmonic Sum",
+   "kind": "bool",
+   "group": "a.additive",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.additive.gain",
+   "label": "Harmonic Sum · Gain",
+   "kind": "cont",
+   "group": "a.additive",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.additive.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.additive.fund",
+   "label": "Harmonic Sum · Fund (Hz)",
+   "kind": "cont",
+   "group": "a.additive",
+   "min": 20,
+   "max": 500,
+   "step": 1,
+   "exp": true,
+   "activeIf": "a.additive.enabled"
+  },
+  {
+   "id": "a.additive.N",
+   "label": "Harmonic Sum · Harmonics N",
+   "kind": "cont",
+   "group": "a.additive",
+   "min": 1,
+   "max": 40,
+   "step": 1,
+   "activeIf": "a.additive.enabled"
+  },
+  {
+   "id": "a.additive.move",
+   "label": "Harmonic Sum · Move (Hz)",
+   "kind": "cont",
+   "group": "a.additive",
+   "min": 0.01,
+   "max": 5,
+   "step": 0.01,
+   "exp": true,
+   "activeIf": "a.additive.enabled"
+  },
+  {
+   "id": "a.lorenz.enabled",
+   "label": "Lorenz Attractor",
+   "kind": "bool",
+   "group": "a.lorenz",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.lorenz.gain",
+   "label": "Lorenz Attractor · Gain",
+   "kind": "cont",
+   "group": "a.lorenz",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.lorenz.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.lorenz.sigma",
+   "label": "Lorenz Attractor · σ",
+   "kind": "cont",
+   "group": "a.lorenz",
+   "min": 0,
+   "max": 30,
+   "step": 0.01,
+   "activeIf": "a.lorenz.enabled"
+  },
+  {
+   "id": "a.lorenz.rho",
+   "label": "Lorenz Attractor · ρ",
+   "kind": "cont",
+   "group": "a.lorenz",
+   "min": 0,
+   "max": 60,
+   "step": 0.01,
+   "activeIf": "a.lorenz.enabled"
+  },
+  {
+   "id": "a.lorenz.beta",
+   "label": "Lorenz Attractor · β",
+   "kind": "cont",
+   "group": "a.lorenz",
+   "min": 0.1,
+   "max": 10,
+   "step": 0.0001,
+   "activeIf": "a.lorenz.enabled"
+  },
+  {
+   "id": "a.lorenz.lBase",
+   "label": "Lorenz Attractor · Base f (Hz)",
+   "kind": "cont",
+   "group": "a.lorenz",
+   "min": 20,
+   "max": 400,
+   "step": 1,
+   "exp": true,
+   "activeIf": "a.lorenz.enabled"
+  },
+  {
+   "id": "a.lorenz.lFreqScale",
+   "label": "Lorenz Attractor · Freq scale",
+   "kind": "cont",
+   "group": "a.lorenz",
+   "min": 0,
+   "max": 200,
+   "step": 0.1,
+   "activeIf": "a.lorenz.enabled"
+  },
+  {
+   "id": "a.lorenz.lAmp",
+   "label": "Lorenz Attractor · Amp scale",
+   "kind": "cont",
+   "group": "a.lorenz",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.lorenz.enabled"
+  },
+  {
+   "id": "a.rossler.enabled",
+   "label": "Rossler Attractor",
+   "kind": "bool",
+   "group": "a.rossler",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.rossler.gain",
+   "label": "Rossler Attractor · Gain",
+   "kind": "cont",
+   "group": "a.rossler",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.rossler.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.rossler.rossA",
+   "label": "Rossler Attractor · a",
+   "kind": "cont",
+   "group": "a.rossler",
+   "min": 0.01,
+   "max": 0.5,
+   "step": 0.001,
+   "activeIf": "a.rossler.enabled"
+  },
+  {
+   "id": "a.rossler.rossB",
+   "label": "Rossler Attractor · b",
+   "kind": "cont",
+   "group": "a.rossler",
+   "min": 0.01,
+   "max": 0.5,
+   "step": 0.001,
+   "activeIf": "a.rossler.enabled"
+  },
+  {
+   "id": "a.rossler.rossC",
+   "label": "Rossler Attractor · c",
+   "kind": "cont",
+   "group": "a.rossler",
+   "min": 2,
+   "max": 12,
+   "step": 0.01,
+   "activeIf": "a.rossler.enabled"
+  },
+  {
+   "id": "a.rossler.rossBase",
+   "label": "Rossler Attractor · Base f (Hz)",
+   "kind": "cont",
+   "group": "a.rossler",
+   "min": 20,
+   "max": 400,
+   "step": 1,
+   "exp": true,
+   "activeIf": "a.rossler.enabled"
+  },
+  {
+   "id": "a.rossler.rossFreqScale",
+   "label": "Rossler Attractor · Freq scale",
+   "kind": "cont",
+   "group": "a.rossler",
+   "min": 0,
+   "max": 100,
+   "step": 0.1,
+   "activeIf": "a.rossler.enabled"
+  },
+  {
+   "id": "a.rossler.rossAmp",
+   "label": "Rossler Attractor · Amp scale",
+   "kind": "cont",
+   "group": "a.rossler",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.rossler.enabled"
+  },
+  {
+   "id": "a.gliss.enabled",
+   "label": "Exponential Glissando",
+   "kind": "bool",
+   "group": "a.gliss",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.gliss.gain",
+   "label": "Exponential Glissando · Gain",
+   "kind": "cont",
+   "group": "a.gliss",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.gliss.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.gliss.f0",
+   "label": "Exponential Glissando · f0 (Hz)",
+   "kind": "cont",
+   "group": "a.gliss",
+   "min": 10,
+   "max": 400,
+   "step": 1,
+   "exp": true,
+   "activeIf": "a.gliss.enabled"
+  },
+  {
+   "id": "a.gliss.k",
+   "label": "Exponential Glissando · k",
+   "kind": "cont",
+   "group": "a.gliss",
+   "min": -2,
+   "max": 2,
+   "step": 0.001,
+   "activeIf": "a.gliss.enabled"
+  },
+  {
+   "id": "a.shepard.enabled",
+   "label": "Shepard Tone",
+   "kind": "bool",
+   "group": "a.shepard",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.shepard.gain",
+   "label": "Shepard Tone · Gain",
+   "kind": "cont",
+   "group": "a.shepard",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.shepard.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.shepard.shepBase",
+   "label": "Shepard Tone · Base f (Hz)",
+   "kind": "cont",
+   "group": "a.shepard",
+   "min": 20,
+   "max": 200,
+   "step": 1,
+   "exp": true,
+   "activeIf": "a.shepard.enabled"
+  },
+  {
+   "id": "a.shepard.shepSpeed",
+   "label": "Shepard Tone · Speed",
+   "kind": "cont",
+   "group": "a.shepard",
+   "min": -0.5,
+   "max": 0.5,
+   "step": 0.001,
+   "activeIf": "a.shepard.enabled"
+  },
+  {
+   "id": "a.shepard.shepOctaves",
+   "label": "Shepard Tone · Octaves",
+   "kind": "cont",
+   "group": "a.shepard",
+   "min": 3,
+   "max": 10,
+   "step": 1,
+   "activeIf": "a.shepard.enabled"
+  },
+  {
+   "id": "a.bell.enabled",
+   "label": "FM Bell",
+   "kind": "bool",
+   "group": "a.bell",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.bell.gain",
+   "label": "FM Bell · Gain",
+   "kind": "cont",
+   "group": "a.bell",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.bell.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.bell.bellF0",
+   "label": "FM Bell · f0 (Hz)",
+   "kind": "cont",
+   "group": "a.bell",
+   "min": 100,
+   "max": 1000,
+   "step": 1,
+   "exp": true,
+   "activeIf": "a.bell.enabled"
+  },
+  {
+   "id": "a.bell.bellRatio",
+   "label": "FM Bell · Inharmonicity",
+   "kind": "cont",
+   "group": "a.bell",
+   "min": 1,
+   "max": 3,
+   "step": 0.01,
+   "activeIf": "a.bell.enabled"
+  },
+  {
+   "id": "a.bell.bellIndex",
+   "label": "FM Bell · FM index",
+   "kind": "cont",
+   "group": "a.bell",
+   "min": 0,
+   "max": 10,
+   "step": 0.1,
+   "activeIf": "a.bell.enabled"
+  },
+  {
+   "id": "a.bell.bellDecay",
+   "label": "FM Bell · Decay (s)",
+   "kind": "cont",
+   "group": "a.bell",
+   "min": 0.5,
+   "max": 8,
+   "step": 0.1,
+   "activeIf": "a.bell.enabled"
+  },
+  {
+   "id": "a.bell.bellPeriod",
+   "label": "FM Bell · Strike every (s)",
+   "kind": "cont",
+   "group": "a.bell",
+   "min": 1,
+   "max": 20,
+   "step": 0.5,
+   "activeIf": "a.bell.enabled"
+  },
+  {
+   "id": "a.risset.enabled",
+   "label": "Risset Bell",
+   "kind": "bool",
+   "group": "a.risset",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.risset.gain",
+   "label": "Risset Bell · Gain",
+   "kind": "cont",
+   "group": "a.risset",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.risset.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.risset.rissF0",
+   "label": "Risset Bell · f0 (Hz)",
+   "kind": "cont",
+   "group": "a.risset",
+   "min": 100,
+   "max": 1200,
+   "step": 1,
+   "exp": true,
+   "activeIf": "a.risset.enabled"
+  },
+  {
+   "id": "a.risset.rissDecay",
+   "label": "Risset Bell · Decay (s)",
+   "kind": "cont",
+   "group": "a.risset",
+   "min": 0.5,
+   "max": 12,
+   "step": 0.1,
+   "activeIf": "a.risset.enabled"
+  },
+  {
+   "id": "a.risset.rissPeriod",
+   "label": "Risset Bell · Strike every (s)",
+   "kind": "cont",
+   "group": "a.risset",
+   "min": 1,
+   "max": 20,
+   "step": 0.5,
+   "activeIf": "a.risset.enabled"
+  },
+  {
+   "id": "a.fm.enabled",
+   "label": "FM Sine",
+   "kind": "bool",
+   "group": "a.fm",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.fm.gain",
+   "label": "FM Sine · Gain",
+   "kind": "cont",
+   "group": "a.fm",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.fm.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.fm.fc",
+   "label": "FM Sine · f_c (Hz)",
+   "kind": "cont",
+   "group": "a.fm",
+   "min": 20,
+   "max": 2000,
+   "step": 1,
+   "exp": true,
+   "activeIf": "a.fm.enabled"
+  },
+  {
+   "id": "a.fm.fm",
+   "label": "FM Sine · f_m (Hz)",
+   "kind": "cont",
+   "group": "a.fm",
+   "min": 0.1,
+   "max": 60,
+   "step": 0.1,
+   "exp": true,
+   "activeIf": "a.fm.enabled"
+  },
+  {
+   "id": "a.fm.I",
+   "label": "FM Sine · Index I",
+   "kind": "cont",
+   "group": "a.fm",
+   "min": 0,
+   "max": 20,
+   "step": 0.01,
+   "activeIf": "a.fm.enabled"
+  },
+  {
+   "id": "a.beats.enabled",
+   "label": "Two Sines (Beats)",
+   "kind": "bool",
+   "group": "a.beats",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.beats.gain",
+   "label": "Two Sines (Beats) · Gain",
+   "kind": "cont",
+   "group": "a.beats",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.beats.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.beats.fbeat",
+   "label": "Two Sines (Beats) · f (Hz)",
+   "kind": "cont",
+   "group": "a.beats",
+   "min": 20,
+   "max": 2000,
+   "step": 1,
+   "exp": true,
+   "activeIf": "a.beats.enabled"
+  },
+  {
+   "id": "a.beats.df",
+   "label": "Two Sines (Beats) · Δf (Hz)",
+   "kind": "cont",
+   "group": "a.beats",
+   "min": 0,
+   "max": 20,
+   "step": 0.01,
+   "activeIf": "a.beats.enabled"
+  },
+  {
+   "id": "a.pm.enabled",
+   "label": "Phase Modulation",
+   "kind": "bool",
+   "group": "a.pm",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.pm.gain",
+   "label": "Phase Modulation · Gain",
+   "kind": "cont",
+   "group": "a.pm",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.pm.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.pm.f",
+   "label": "Phase Modulation · f (Hz)",
+   "kind": "cont",
+   "group": "a.pm",
+   "min": 20,
+   "max": 2000,
+   "step": 1,
+   "exp": true,
+   "activeIf": "a.pm.enabled"
+  },
+  {
+   "id": "a.pm.f2pm",
+   "label": "Phase Modulation · f2 (Hz)",
+   "kind": "cont",
+   "group": "a.pm",
+   "min": 0.1,
+   "max": 40,
+   "step": 0.1,
+   "exp": true,
+   "activeIf": "a.pm.enabled"
+  },
+  {
+   "id": "a.quasi.enabled",
+   "label": "Quasi-random LFO",
+   "kind": "bool",
+   "group": "a.quasi",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.quasi.gain",
+   "label": "Quasi-random LFO · Gain",
+   "kind": "cont",
+   "group": "a.quasi",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.quasi.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.quasi.fq",
+   "label": "Quasi-random LFO · Base f (Hz)",
+   "kind": "cont",
+   "group": "a.quasi",
+   "min": 20,
+   "max": 500,
+   "step": 1,
+   "exp": true,
+   "activeIf": "a.quasi.enabled"
+  },
+  {
+   "id": "a.quasi.Aq",
+   "label": "Quasi-random LFO · Depth (Hz)",
+   "kind": "cont",
+   "group": "a.quasi",
+   "min": 0,
+   "max": 1200,
+   "step": 1,
+   "activeIf": "a.quasi.enabled"
+  },
+  {
+   "id": "a.quasi.wq",
+   "label": "Quasi-random LFO · w",
+   "kind": "cont",
+   "group": "a.quasi",
+   "min": 0.05,
+   "max": 6,
+   "step": 0.01,
+   "exp": true,
+   "activeIf": "a.quasi.enabled"
+  },
+  {
+   "id": "a.logistic.enabled",
+   "label": "Logistic Map",
+   "kind": "bool",
+   "group": "a.logistic",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.logistic.gain",
+   "label": "Logistic Map · Gain",
+   "kind": "cont",
+   "group": "a.logistic",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.logistic.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.logistic.base",
+   "label": "Logistic Map · Base f (Hz)",
+   "kind": "cont",
+   "group": "a.logistic",
+   "min": 20,
+   "max": 800,
+   "step": 1,
+   "exp": true,
+   "activeIf": "a.logistic.enabled"
+  },
+  {
+   "id": "a.logistic.depth",
+   "label": "Logistic Map · Depth (Hz)",
+   "kind": "cont",
+   "group": "a.logistic",
+   "min": 0,
+   "max": 1200,
+   "step": 1,
+   "activeIf": "a.logistic.enabled"
+  },
+  {
+   "id": "a.logistic.r",
+   "label": "Logistic Map · r",
+   "kind": "cont",
+   "group": "a.logistic",
+   "min": 2.8,
+   "max": 4,
+   "step": 0.0001,
+   "activeIf": "a.logistic.enabled"
+  },
+  {
+   "id": "a.logistic.lfoHz",
+   "label": "Logistic Map · Update rate (Hz)",
+   "kind": "cont",
+   "group": "a.logistic",
+   "min": 1,
+   "max": 400,
+   "step": 1,
+   "exp": true,
+   "activeIf": "a.logistic.enabled"
+  },
+  {
+   "id": "a.dist.enabled",
+   "label": "Nonlinear Saturation",
+   "kind": "bool",
+   "group": "a.dist",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.dist.gain",
+   "label": "Nonlinear Saturation · Gain",
+   "kind": "cont",
+   "group": "a.dist",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.dist.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.dist.fd",
+   "label": "Nonlinear Saturation · f (Hz)",
+   "kind": "cont",
+   "group": "a.dist",
+   "min": 20,
+   "max": 2000,
+   "step": 1,
+   "exp": true,
+   "activeIf": "a.dist.enabled"
+  },
+  {
+   "id": "a.dist.alpha",
+   "label": "Nonlinear Saturation · α",
+   "kind": "cont",
+   "group": "a.dist",
+   "min": 0,
+   "max": 10,
+   "step": 0.01,
+   "activeIf": "a.dist.enabled"
+  },
+  {
+   "id": "a.karplus.enabled",
+   "label": "Karplus–Strong (String)",
+   "kind": "bool",
+   "group": "a.karplus",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.karplus.gain",
+   "label": "Karplus–Strong (String) · Gain",
+   "kind": "cont",
+   "group": "a.karplus",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.karplus.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.karplus.ksFreq",
+   "label": "Karplus–Strong (String) · Freq (Hz)",
+   "kind": "cont",
+   "group": "a.karplus",
+   "min": 40,
+   "max": 880,
+   "step": 1,
+   "exp": true,
+   "activeIf": "a.karplus.enabled"
+  },
+  {
+   "id": "a.karplus.ksDamp",
+   "label": "Karplus–Strong (String) · Damping",
+   "kind": "cont",
+   "group": "a.karplus",
+   "min": 0.9,
+   "max": 0.9999,
+   "step": 0.0001,
+   "activeIf": "a.karplus.enabled"
+  },
+  {
+   "id": "a.karplus.ksBright",
+   "label": "Karplus–Strong (String) · Brightness",
+   "kind": "cont",
+   "group": "a.karplus",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.karplus.enabled"
+  },
+  {
+   "id": "a.bytebeat.enabled",
+   "label": "Bytebeat",
+   "kind": "bool",
+   "group": "a.bytebeat",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.bytebeat.gain",
+   "label": "Bytebeat · Gain",
+   "kind": "cont",
+   "group": "a.bytebeat",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.bytebeat.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.bytebeat.bbRecipe",
+   "label": "Bytebeat · Recipe #",
+   "kind": "cont",
+   "group": "a.bytebeat",
+   "min": 1,
+   "max": 5,
+   "step": 1,
+   "activeIf": "a.bytebeat.enabled"
+  },
+  {
+   "id": "a.bytebeat.bbRate",
+   "label": "Bytebeat · Rate (Hz)",
+   "kind": "cont",
+   "group": "a.bytebeat",
+   "min": 1000,
+   "max": 16000,
+   "step": 100,
+   "exp": true,
+   "activeIf": "a.bytebeat.enabled"
+  },
+  {
+   "id": "a.ocean.enabled",
+   "label": "Ocean / Wind",
+   "kind": "bool",
+   "group": "a.ocean",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.ocean.gain",
+   "label": "Ocean / Wind · Gain",
+   "kind": "cont",
+   "group": "a.ocean",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.ocean.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.ocean.oceanRate",
+   "label": "Ocean / Wind · Wave rate (Hz)",
+   "kind": "cont",
+   "group": "a.ocean",
+   "min": 0.03,
+   "max": 0.5,
+   "step": 0.001,
+   "exp": true,
+   "activeIf": "a.ocean.enabled"
+  },
+  {
+   "id": "a.ocean.oceanCut",
+   "label": "Ocean / Wind · Cutoff (Hz)",
+   "kind": "cont",
+   "group": "a.ocean",
+   "min": 100,
+   "max": 2000,
+   "step": 1,
+   "exp": true,
+   "activeIf": "a.ocean.enabled"
+  },
+  {
+   "id": "a.ocean.oceanDepth",
+   "label": "Ocean / Wind · Swell depth",
+   "kind": "cont",
+   "group": "a.ocean",
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "activeIf": "a.ocean.enabled"
+  },
+  {
+   "id": "a.rain.enabled",
+   "label": "Rain / Drops",
+   "kind": "bool",
+   "group": "a.rain",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.rain.gain",
+   "label": "Rain / Drops · Gain",
+   "kind": "cont",
+   "group": "a.rain",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.rain.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.rain.rainDensity",
+   "label": "Rain / Drops · Drops/s",
+   "kind": "cont",
+   "group": "a.rain",
+   "min": 0.5,
+   "max": 20,
+   "step": 0.1,
+   "exp": true,
+   "activeIf": "a.rain.enabled"
+  },
+  {
+   "id": "a.rain.rainPitch",
+   "label": "Rain / Drops · Drop pitch (Hz)",
+   "kind": "cont",
+   "group": "a.rain",
+   "min": 200,
+   "max": 3000,
+   "step": 1,
+   "exp": true,
+   "activeIf": "a.rain.enabled"
+  },
+  {
+   "id": "a.rain.rainBed",
+   "label": "Rain / Drops · Bed level",
+   "kind": "cont",
+   "group": "a.rain",
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "activeIf": "a.rain.enabled"
+  },
+  {
+   "id": "a.noiselp.enabled",
+   "label": "Noise → Low-pass",
+   "kind": "bool",
+   "group": "a.noiselp",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.noiselp.gain",
+   "label": "Noise → Low-pass · Gain",
+   "kind": "cont",
+   "group": "a.noiselp",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.noiselp.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.noiselp.nCut",
+   "label": "Noise → Low-pass · Cutoff (Hz)",
+   "kind": "cont",
+   "group": "a.noiselp",
+   "min": 20,
+   "max": 18000,
+   "step": 1,
+   "exp": true,
+   "activeIf": "a.noiselp.enabled"
+  },
+  {
+   "id": "a.pinknoise.enabled",
+   "label": "Pink Noise (1/f)",
+   "kind": "bool",
+   "group": "a.pinknoise",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.pinknoise.gain",
+   "label": "Pink Noise (1/f) · Gain",
+   "kind": "cont",
+   "group": "a.pinknoise",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.pinknoise.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.pinknoise.pinkBright",
+   "label": "Pink Noise (1/f) · Brightness",
+   "kind": "cont",
+   "group": "a.pinknoise",
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "activeIf": "a.pinknoise.enabled"
+  },
+  {
+   "id": "a.brownnoise.enabled",
+   "label": "Brown Noise (Brownian)",
+   "kind": "bool",
+   "group": "a.brownnoise",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.brownnoise.gain",
+   "label": "Brown Noise (Brownian) · Gain",
+   "kind": "cont",
+   "group": "a.brownnoise",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.brownnoise.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.brownnoise.brownStep",
+   "label": "Brown Noise (Brownian) · Step size",
+   "kind": "cont",
+   "group": "a.brownnoise",
+   "min": 0.001,
+   "max": 0.1,
+   "step": 0.001,
+   "exp": true,
+   "activeIf": "a.brownnoise.enabled"
+  },
+  {
+   "id": "a.velvetnoise.enabled",
+   "label": "Velvet Noise",
+   "kind": "bool",
+   "group": "a.velvetnoise",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "a.velvetnoise.gain",
+   "label": "Velvet Noise · Gain",
+   "kind": "cont",
+   "group": "a.velvetnoise",
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "activeIf": "a.velvetnoise.enabled",
+   "neutral": 0
+  },
+  {
+   "id": "a.velvetnoise.velvetDensity",
+   "label": "Velvet Noise · Density (imp/s)",
+   "kind": "cont",
+   "group": "a.velvetnoise",
+   "min": 100,
+   "max": 10000,
+   "step": 10,
+   "exp": true,
+   "activeIf": "a.velvetnoise.enabled"
+  },
+  {
+   "id": "fx.filterOn",
+   "label": "Filter",
+   "kind": "bool",
+   "group": "fx",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "fx.chorusOn",
+   "label": "Chorus",
+   "kind": "bool",
+   "group": "fx",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "fx.reverbOn",
+   "label": "Reverb",
+   "kind": "bool",
+   "group": "fx",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "fx.limiterOn",
+   "label": "Limiter",
+   "kind": "bool",
+   "group": "fx",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "fx.delayOn",
+   "label": "Delay",
+   "kind": "bool",
+   "group": "fx",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "fx.phaserOn",
+   "label": "Phaser",
+   "kind": "bool",
+   "group": "fx",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "fx.filterFreq",
+   "label": "Filter cutoff",
+   "kind": "cont",
+   "group": "fx",
+   "min": 20,
+   "max": 2000,
+   "exp": true,
+   "activeIf": "fx.filterOn"
+  },
+  {
+   "id": "fx.filterQ",
+   "label": "Filter Q",
+   "kind": "cont",
+   "group": "fx",
+   "min": 0.1,
+   "max": 30,
+   "exp": false,
+   "activeIf": "fx.filterOn"
+  },
+  {
+   "id": "fx.filterGain",
+   "label": "Filter gain",
+   "kind": "cont",
+   "group": "fx",
+   "min": -24,
+   "max": 24,
+   "exp": false,
+   "activeIf": "fx.filterOn"
+  },
+  {
+   "id": "fx.filterVowel",
+   "label": "Filter vowel",
+   "kind": "cont",
+   "group": "fx",
+   "min": 0,
+   "max": 1,
+   "exp": false,
+   "activeIf": "fx.filterOn"
+  },
+  {
+   "id": "fx.filterCombFb",
+   "label": "Comb feedback",
+   "kind": "cont",
+   "group": "fx",
+   "min": 0,
+   "max": 0.95,
+   "exp": false,
+   "activeIf": "fx.filterOn"
+  },
+  {
+   "id": "fx.chorusRate",
+   "label": "Chorus rate",
+   "kind": "cont",
+   "group": "fx",
+   "min": 0.01,
+   "max": 8,
+   "exp": true,
+   "activeIf": "fx.chorusOn"
+  },
+  {
+   "id": "fx.chorusDepth",
+   "label": "Chorus depth",
+   "kind": "cont",
+   "group": "fx",
+   "min": 0,
+   "max": 20,
+   "exp": false,
+   "activeIf": "fx.chorusOn"
+  },
+  {
+   "id": "fx.chorusMix",
+   "label": "Chorus mix",
+   "kind": "cont",
+   "group": "fx",
+   "min": 0,
+   "max": 1,
+   "exp": false,
+   "activeIf": "fx.chorusOn",
+   "neutral": 0
+  },
+  {
+   "id": "fx.chorusFb",
+   "label": "Chorus feedback",
+   "kind": "cont",
+   "group": "fx",
+   "min": 0,
+   "max": 0.95,
+   "exp": false,
+   "activeIf": "fx.chorusOn"
+  },
+  {
+   "id": "fx.delayTime",
+   "label": "Delay time",
+   "kind": "cont",
+   "group": "fx",
+   "min": 0.05,
+   "max": 2,
+   "exp": true,
+   "activeIf": "fx.delayOn"
+  },
+  {
+   "id": "fx.delayFb",
+   "label": "Delay feedback",
+   "kind": "cont",
+   "group": "fx",
+   "min": 0,
+   "max": 0.9,
+   "exp": false,
+   "activeIf": "fx.delayOn"
+  },
+  {
+   "id": "fx.delayMix",
+   "label": "Delay mix",
+   "kind": "cont",
+   "group": "fx",
+   "min": 0,
+   "max": 1,
+   "exp": false,
+   "activeIf": "fx.delayOn",
+   "neutral": 0
+  },
+  {
+   "id": "fx.phaserRate",
+   "label": "Phaser rate",
+   "kind": "cont",
+   "group": "fx",
+   "min": 0.1,
+   "max": 10,
+   "exp": true,
+   "activeIf": "fx.phaserOn"
+  },
+  {
+   "id": "fx.phaserDepth",
+   "label": "Phaser depth",
+   "kind": "cont",
+   "group": "fx",
+   "min": 0,
+   "max": 1,
+   "exp": false,
+   "activeIf": "fx.phaserOn"
+  },
+  {
+   "id": "fx.phaserFb",
+   "label": "Phaser feedback",
+   "kind": "cont",
+   "group": "fx",
+   "min": 0,
+   "max": 0.9,
+   "exp": false,
+   "activeIf": "fx.phaserOn"
+  },
+  {
+   "id": "fx.phaserMix",
+   "label": "Phaser mix",
+   "kind": "cont",
+   "group": "fx",
+   "min": 0,
+   "max": 1,
+   "exp": false,
+   "activeIf": "fx.phaserOn",
+   "neutral": 0
+  },
+  {
+   "id": "fx.reverbMix",
+   "label": "Reverb mix",
+   "kind": "cont",
+   "group": "fx",
+   "min": 0,
+   "max": 1,
+   "exp": false,
+   "activeIf": "fx.reverbOn",
+   "neutral": 0
+  },
+  {
+   "id": "fx.limiterThr",
+   "label": "Limiter threshold",
+   "kind": "cont",
+   "group": "fx",
+   "min": -40,
+   "max": 0,
+   "exp": false,
+   "activeIf": "fx.limiterOn"
+  },
+  {
+   "id": "fx.limiterRel",
+   "label": "Limiter release",
+   "kind": "cont",
+   "group": "fx",
+   "min": 0.02,
+   "max": 1,
+   "exp": false,
+   "activeIf": "fx.limiterOn"
+  },
+  {
+   "id": "fx.reverbDecay",
+   "label": "Reverb decay",
+   "kind": "cont",
+   "group": "fx",
+   "min": 0.1,
+   "max": 8,
+   "activeIf": "fx.reverbOn"
+  },
+  {
+   "id": "fx.filterType",
+   "label": "Filter type",
+   "kind": "choice",
+   "group": "fx",
+   "min": 0,
+   "max": 9,
+   "activeIf": "fx.filterOn"
+  },
+  {
+   "id": "fx.chorusMode",
+   "label": "Chorus mode",
+   "kind": "choice",
+   "group": "fx",
+   "min": 0,
+   "max": 1,
+   "activeIf": "fx.chorusOn"
+  },
+  {
+   "id": "fx.phaserStages",
+   "label": "Phaser stages",
+   "kind": "choice",
+   "group": "fx",
+   "min": 0,
+   "max": 3,
+   "activeIf": "fx.phaserOn"
+  },
+  {
+   "id": "v.reaction.feed",
+   "label": "Reaction · Feed",
+   "kind": "cont",
+   "group": "v.reaction",
+   "min": 0.01,
+   "max": 0.09,
+   "step": 0.0005
+  },
+  {
+   "id": "v.reaction.kill",
+   "label": "Reaction · Kill",
+   "kind": "cont",
+   "group": "v.reaction",
+   "min": 0.03,
+   "max": 0.075,
+   "step": 0.0005
+  },
+  {
+   "id": "v.reaction.diffU",
+   "label": "Reaction · Diff U",
+   "kind": "cont",
+   "group": "v.reaction",
+   "min": 0.05,
+   "max": 0.4,
+   "step": 0.001
+  },
+  {
+   "id": "v.reaction.diffV",
+   "label": "Reaction · Diff V",
+   "kind": "cont",
+   "group": "v.reaction",
+   "min": 0.02,
+   "max": 0.2,
+   "step": 0.001
+  },
+  {
+   "id": "v.reaction.speed",
+   "label": "Reaction · Speed",
+   "kind": "cont",
+   "group": "v.reaction",
+   "min": 1,
+   "max": 40,
+   "step": 1
+  },
+  {
+   "id": "v.fieldVariation.on",
+   "label": "Field variation",
+   "kind": "bool",
+   "group": "v.fieldVariation",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "v.fieldVariation.feedVarAmount",
+   "label": "Field variation · Feed amount",
+   "kind": "cont",
+   "group": "v.fieldVariation",
+   "min": 0,
+   "max": 0.03,
+   "step": 0.0005,
+   "activeIf": "v.fieldVariation.on",
+   "neutral": 0
+  },
+  {
+   "id": "v.fieldVariation.feedVarScale",
+   "label": "Field variation · Feed scale",
+   "kind": "cont",
+   "group": "v.fieldVariation",
+   "min": 1,
+   "max": 12,
+   "step": 0.5,
+   "exp": true,
+   "activeIf": "v.fieldVariation.on"
+  },
+  {
+   "id": "v.fieldVariation.feedVarWarp",
+   "label": "Field variation · Feed warp",
+   "kind": "cont",
+   "group": "v.fieldVariation",
+   "min": 0,
+   "max": 3,
+   "step": 0.05,
+   "activeIf": "v.fieldVariation.on"
+  },
+  {
+   "id": "v.fieldVariation.killVarAmount",
+   "label": "Field variation · Kill amount",
+   "kind": "cont",
+   "group": "v.fieldVariation",
+   "min": 0,
+   "max": 0.015,
+   "step": 0.0005,
+   "activeIf": "v.fieldVariation.on",
+   "neutral": 0
+  },
+  {
+   "id": "v.fieldVariation.killVarScale",
+   "label": "Field variation · Kill scale",
+   "kind": "cont",
+   "group": "v.fieldVariation",
+   "min": 1,
+   "max": 12,
+   "step": 0.5,
+   "exp": true,
+   "activeIf": "v.fieldVariation.on"
+  },
+  {
+   "id": "v.fieldVariation.killVarWarp",
+   "label": "Field variation · Kill warp",
+   "kind": "cont",
+   "group": "v.fieldVariation",
+   "min": 0,
+   "max": 3,
+   "step": 0.05,
+   "activeIf": "v.fieldVariation.on"
+  },
+  {
+   "id": "v.flow.on",
+   "label": "Flow",
+   "kind": "bool",
+   "group": "v.flow",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "v.flow.curlStrength",
+   "label": "Flow · Curl strength",
+   "kind": "cont",
+   "group": "v.flow",
+   "min": 0,
+   "max": 0.03,
+   "step": 0.0005,
+   "activeIf": "v.flow.on",
+   "neutral": 0
+  },
+  {
+   "id": "v.flow.curlScale",
+   "label": "Flow · Curl scale",
+   "kind": "cont",
+   "group": "v.flow",
+   "min": 1,
+   "max": 12,
+   "step": 0.5,
+   "exp": true,
+   "activeIf": "v.flow.on"
+  },
+  {
+   "id": "v.flow.driftX",
+   "label": "Flow · Drift X",
+   "kind": "cont",
+   "group": "v.flow",
+   "min": -0.02,
+   "max": 0.02,
+   "step": 0.0005,
+   "activeIf": "v.flow.on",
+   "neutral": 0.5
+  },
+  {
+   "id": "v.flow.driftY",
+   "label": "Flow · Drift Y (+down)",
+   "kind": "cont",
+   "group": "v.flow",
+   "min": -0.02,
+   "max": 0.02,
+   "step": 0.0005,
+   "activeIf": "v.flow.on",
+   "neutral": 0.5
+  },
+  {
+   "id": "v.flow.advectAmount",
+   "label": "Flow · Advect amount",
+   "kind": "cont",
+   "group": "v.flow",
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "activeIf": "v.flow.on",
+   "neutral": 0
+  },
+  {
+   "id": "v.flow.evolveRate",
+   "label": "Flow · Evolve rate",
+   "kind": "cont",
+   "group": "v.flow",
+   "min": 0,
+   "max": 0.05,
+   "step": 0.001,
+   "activeIf": "v.flow.on"
+  },
+  {
+   "id": "v.palette.paletteId",
+   "label": "Palette · Palette",
+   "kind": "choice",
+   "group": "v.palette",
+   "min": 0,
+   "max": 4
+  },
+  {
+   "id": "v.palette.shift",
+   "label": "Palette · Shift",
+   "kind": "cont",
+   "group": "v.palette",
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "v.palette.contrast",
+   "label": "Palette · Contrast",
+   "kind": "cont",
+   "group": "v.palette",
+   "min": 0.2,
+   "max": 2,
+   "step": 0.01
+  },
+  {
+   "id": "v.palette.bands",
+   "label": "Palette · Bands",
+   "kind": "cont",
+   "group": "v.palette",
+   "min": 1,
+   "max": 8,
+   "step": 1
+  },
+  {
+   "id": "v.palette.relief",
+   "label": "Palette · Relief",
+   "kind": "cont",
+   "group": "v.palette",
+   "min": 0,
+   "max": 3,
+   "step": 0.05
+  },
+  {
+   "id": "v.palette.lightAngle",
+   "label": "Palette · Light angle",
+   "kind": "cont",
+   "group": "v.palette",
+   "min": 0,
+   "max": 6.283,
+   "step": 0.05
+  },
+  {
+   "id": "v.palette.gloss",
+   "label": "Palette · Gloss",
+   "kind": "cont",
+   "group": "v.palette",
+   "min": 0,
+   "max": 1,
+   "step": 0.02
+  },
+  {
+   "id": "lfo.0.shape",
+   "label": "LFO 1 shape",
+   "kind": "choice",
+   "group": "lfo.0",
+   "min": 0,
+   "max": 4
+  },
+  {
+   "id": "lfo.0.rate",
+   "label": "LFO 1 rate",
+   "kind": "cont",
+   "group": "lfo.0",
+   "min": 0.003,
+   "max": 2,
+   "exp": true
+  },
+  {
+   "id": "lfo.0.phase",
+   "label": "LFO 1 phase",
+   "kind": "cont",
+   "group": "lfo.0",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "lfo.1.shape",
+   "label": "LFO 2 shape",
+   "kind": "choice",
+   "group": "lfo.1",
+   "min": 0,
+   "max": 4
+  },
+  {
+   "id": "lfo.1.rate",
+   "label": "LFO 2 rate",
+   "kind": "cont",
+   "group": "lfo.1",
+   "min": 0.003,
+   "max": 2,
+   "exp": true
+  },
+  {
+   "id": "lfo.1.phase",
+   "label": "LFO 2 phase",
+   "kind": "cont",
+   "group": "lfo.1",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "lfo.2.shape",
+   "label": "LFO 3 shape",
+   "kind": "choice",
+   "group": "lfo.2",
+   "min": 0,
+   "max": 4
+  },
+  {
+   "id": "lfo.2.rate",
+   "label": "LFO 3 rate",
+   "kind": "cont",
+   "group": "lfo.2",
+   "min": 0.003,
+   "max": 2,
+   "exp": true
+  },
+  {
+   "id": "lfo.2.phase",
+   "label": "LFO 3 phase",
+   "kind": "cont",
+   "group": "lfo.2",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "lfo.3.shape",
+   "label": "LFO 4 shape",
+   "kind": "choice",
+   "group": "lfo.3",
+   "min": 0,
+   "max": 4
+  },
+  {
+   "id": "lfo.3.rate",
+   "label": "LFO 4 rate",
+   "kind": "cont",
+   "group": "lfo.3",
+   "min": 0.003,
+   "max": 2,
+   "exp": true
+  },
+  {
+   "id": "lfo.3.phase",
+   "label": "LFO 4 phase",
+   "kind": "cont",
+   "group": "lfo.3",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "route.0.on",
+   "label": "Route 1",
+   "kind": "bool",
+   "group": "route.0",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "route.0.src",
+   "label": "Route 1 LFO",
+   "kind": "choice",
+   "group": "route.0",
+   "min": 0,
+   "max": 3,
+   "activeIf": "route.0.on"
+  },
+  {
+   "id": "route.0.target",
+   "label": "Route 1 target",
+   "kind": "choice",
+   "group": "route.0",
+   "min": 0,
+   "max": 121,
+   "activeIf": "route.0.on"
+  },
+  {
+   "id": "route.0.depth",
+   "label": "Route 1 depth",
+   "kind": "cont",
+   "group": "route.0",
+   "min": -1,
+   "max": 1,
+   "activeIf": "route.0.on",
+   "neutral": 0.5
+  },
+  {
+   "id": "route.0.exp",
+   "label": "Route 1 exp",
+   "kind": "bool",
+   "group": "route.0",
+   "min": 0,
+   "max": 1,
+   "activeIf": "route.0.on"
+  },
+  {
+   "id": "route.1.on",
+   "label": "Route 2",
+   "kind": "bool",
+   "group": "route.1",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "route.1.src",
+   "label": "Route 2 LFO",
+   "kind": "choice",
+   "group": "route.1",
+   "min": 0,
+   "max": 3,
+   "activeIf": "route.1.on"
+  },
+  {
+   "id": "route.1.target",
+   "label": "Route 2 target",
+   "kind": "choice",
+   "group": "route.1",
+   "min": 0,
+   "max": 121,
+   "activeIf": "route.1.on"
+  },
+  {
+   "id": "route.1.depth",
+   "label": "Route 2 depth",
+   "kind": "cont",
+   "group": "route.1",
+   "min": -1,
+   "max": 1,
+   "activeIf": "route.1.on",
+   "neutral": 0.5
+  },
+  {
+   "id": "route.1.exp",
+   "label": "Route 2 exp",
+   "kind": "bool",
+   "group": "route.1",
+   "min": 0,
+   "max": 1,
+   "activeIf": "route.1.on"
+  },
+  {
+   "id": "route.2.on",
+   "label": "Route 3",
+   "kind": "bool",
+   "group": "route.2",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "route.2.src",
+   "label": "Route 3 LFO",
+   "kind": "choice",
+   "group": "route.2",
+   "min": 0,
+   "max": 3,
+   "activeIf": "route.2.on"
+  },
+  {
+   "id": "route.2.target",
+   "label": "Route 3 target",
+   "kind": "choice",
+   "group": "route.2",
+   "min": 0,
+   "max": 121,
+   "activeIf": "route.2.on"
+  },
+  {
+   "id": "route.2.depth",
+   "label": "Route 3 depth",
+   "kind": "cont",
+   "group": "route.2",
+   "min": -1,
+   "max": 1,
+   "activeIf": "route.2.on",
+   "neutral": 0.5
+  },
+  {
+   "id": "route.2.exp",
+   "label": "Route 3 exp",
+   "kind": "bool",
+   "group": "route.2",
+   "min": 0,
+   "max": 1,
+   "activeIf": "route.2.on"
+  },
+  {
+   "id": "route.3.on",
+   "label": "Route 4",
+   "kind": "bool",
+   "group": "route.3",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "route.3.src",
+   "label": "Route 4 LFO",
+   "kind": "choice",
+   "group": "route.3",
+   "min": 0,
+   "max": 3,
+   "activeIf": "route.3.on"
+  },
+  {
+   "id": "route.3.target",
+   "label": "Route 4 target",
+   "kind": "choice",
+   "group": "route.3",
+   "min": 0,
+   "max": 121,
+   "activeIf": "route.3.on"
+  },
+  {
+   "id": "route.3.depth",
+   "label": "Route 4 depth",
+   "kind": "cont",
+   "group": "route.3",
+   "min": -1,
+   "max": 1,
+   "activeIf": "route.3.on",
+   "neutral": 0.5
+  },
+  {
+   "id": "route.3.exp",
+   "label": "Route 4 exp",
+   "kind": "bool",
+   "group": "route.3",
+   "min": 0,
+   "max": 1,
+   "activeIf": "route.3.on"
+  },
+  {
+   "id": "route.4.on",
+   "label": "Route 5",
+   "kind": "bool",
+   "group": "route.4",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "route.4.src",
+   "label": "Route 5 LFO",
+   "kind": "choice",
+   "group": "route.4",
+   "min": 0,
+   "max": 3,
+   "activeIf": "route.4.on"
+  },
+  {
+   "id": "route.4.target",
+   "label": "Route 5 target",
+   "kind": "choice",
+   "group": "route.4",
+   "min": 0,
+   "max": 121,
+   "activeIf": "route.4.on"
+  },
+  {
+   "id": "route.4.depth",
+   "label": "Route 5 depth",
+   "kind": "cont",
+   "group": "route.4",
+   "min": -1,
+   "max": 1,
+   "activeIf": "route.4.on",
+   "neutral": 0.5
+  },
+  {
+   "id": "route.4.exp",
+   "label": "Route 5 exp",
+   "kind": "bool",
+   "group": "route.4",
+   "min": 0,
+   "max": 1,
+   "activeIf": "route.4.on"
+  },
+  {
+   "id": "route.5.on",
+   "label": "Route 6",
+   "kind": "bool",
+   "group": "route.5",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "route.5.src",
+   "label": "Route 6 LFO",
+   "kind": "choice",
+   "group": "route.5",
+   "min": 0,
+   "max": 3,
+   "activeIf": "route.5.on"
+  },
+  {
+   "id": "route.5.target",
+   "label": "Route 6 target",
+   "kind": "choice",
+   "group": "route.5",
+   "min": 0,
+   "max": 121,
+   "activeIf": "route.5.on"
+  },
+  {
+   "id": "route.5.depth",
+   "label": "Route 6 depth",
+   "kind": "cont",
+   "group": "route.5",
+   "min": -1,
+   "max": 1,
+   "activeIf": "route.5.on",
+   "neutral": 0.5
+  },
+  {
+   "id": "route.5.exp",
+   "label": "Route 6 exp",
+   "kind": "bool",
+   "group": "route.5",
+   "min": 0,
+   "max": 1,
+   "activeIf": "route.5.on"
+  },
+  {
+   "id": "route.6.on",
+   "label": "Route 7",
+   "kind": "bool",
+   "group": "route.6",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "route.6.src",
+   "label": "Route 7 LFO",
+   "kind": "choice",
+   "group": "route.6",
+   "min": 0,
+   "max": 3,
+   "activeIf": "route.6.on"
+  },
+  {
+   "id": "route.6.target",
+   "label": "Route 7 target",
+   "kind": "choice",
+   "group": "route.6",
+   "min": 0,
+   "max": 121,
+   "activeIf": "route.6.on"
+  },
+  {
+   "id": "route.6.depth",
+   "label": "Route 7 depth",
+   "kind": "cont",
+   "group": "route.6",
+   "min": -1,
+   "max": 1,
+   "activeIf": "route.6.on",
+   "neutral": 0.5
+  },
+  {
+   "id": "route.6.exp",
+   "label": "Route 7 exp",
+   "kind": "bool",
+   "group": "route.6",
+   "min": 0,
+   "max": 1,
+   "activeIf": "route.6.on"
+  },
+  {
+   "id": "route.7.on",
+   "label": "Route 8",
+   "kind": "bool",
+   "group": "route.7",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "route.7.src",
+   "label": "Route 8 LFO",
+   "kind": "choice",
+   "group": "route.7",
+   "min": 0,
+   "max": 3,
+   "activeIf": "route.7.on"
+  },
+  {
+   "id": "route.7.target",
+   "label": "Route 8 target",
+   "kind": "choice",
+   "group": "route.7",
+   "min": 0,
+   "max": 121,
+   "activeIf": "route.7.on"
+  },
+  {
+   "id": "route.7.depth",
+   "label": "Route 8 depth",
+   "kind": "cont",
+   "group": "route.7",
+   "min": -1,
+   "max": 1,
+   "activeIf": "route.7.on",
+   "neutral": 0.5
+  },
+  {
+   "id": "route.7.exp",
+   "label": "Route 8 exp",
+   "kind": "bool",
+   "group": "route.7",
+   "min": 0,
+   "max": 1,
+   "activeIf": "route.7.on"
+  },
+  {
+   "id": "route.8.on",
+   "label": "Route 9",
+   "kind": "bool",
+   "group": "route.8",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "route.8.src",
+   "label": "Route 9 LFO",
+   "kind": "choice",
+   "group": "route.8",
+   "min": 0,
+   "max": 3,
+   "activeIf": "route.8.on"
+  },
+  {
+   "id": "route.8.target",
+   "label": "Route 9 target",
+   "kind": "choice",
+   "group": "route.8",
+   "min": 0,
+   "max": 121,
+   "activeIf": "route.8.on"
+  },
+  {
+   "id": "route.8.depth",
+   "label": "Route 9 depth",
+   "kind": "cont",
+   "group": "route.8",
+   "min": -1,
+   "max": 1,
+   "activeIf": "route.8.on",
+   "neutral": 0.5
+  },
+  {
+   "id": "route.8.exp",
+   "label": "Route 9 exp",
+   "kind": "bool",
+   "group": "route.8",
+   "min": 0,
+   "max": 1,
+   "activeIf": "route.8.on"
+  },
+  {
+   "id": "route.9.on",
+   "label": "Route 10",
+   "kind": "bool",
+   "group": "route.9",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "route.9.src",
+   "label": "Route 10 LFO",
+   "kind": "choice",
+   "group": "route.9",
+   "min": 0,
+   "max": 3,
+   "activeIf": "route.9.on"
+  },
+  {
+   "id": "route.9.target",
+   "label": "Route 10 target",
+   "kind": "choice",
+   "group": "route.9",
+   "min": 0,
+   "max": 121,
+   "activeIf": "route.9.on"
+  },
+  {
+   "id": "route.9.depth",
+   "label": "Route 10 depth",
+   "kind": "cont",
+   "group": "route.9",
+   "min": -1,
+   "max": 1,
+   "activeIf": "route.9.on",
+   "neutral": 0.5
+  },
+  {
+   "id": "route.9.exp",
+   "label": "Route 10 exp",
+   "kind": "bool",
+   "group": "route.9",
+   "min": 0,
+   "max": 1,
+   "activeIf": "route.9.on"
+  },
+  {
+   "id": "route.10.on",
+   "label": "Route 11",
+   "kind": "bool",
+   "group": "route.10",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "route.10.src",
+   "label": "Route 11 LFO",
+   "kind": "choice",
+   "group": "route.10",
+   "min": 0,
+   "max": 3,
+   "activeIf": "route.10.on"
+  },
+  {
+   "id": "route.10.target",
+   "label": "Route 11 target",
+   "kind": "choice",
+   "group": "route.10",
+   "min": 0,
+   "max": 121,
+   "activeIf": "route.10.on"
+  },
+  {
+   "id": "route.10.depth",
+   "label": "Route 11 depth",
+   "kind": "cont",
+   "group": "route.10",
+   "min": -1,
+   "max": 1,
+   "activeIf": "route.10.on",
+   "neutral": 0.5
+  },
+  {
+   "id": "route.10.exp",
+   "label": "Route 11 exp",
+   "kind": "bool",
+   "group": "route.10",
+   "min": 0,
+   "max": 1,
+   "activeIf": "route.10.on"
+  },
+  {
+   "id": "route.11.on",
+   "label": "Route 12",
+   "kind": "bool",
+   "group": "route.11",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "route.11.src",
+   "label": "Route 12 LFO",
+   "kind": "choice",
+   "group": "route.11",
+   "min": 0,
+   "max": 3,
+   "activeIf": "route.11.on"
+  },
+  {
+   "id": "route.11.target",
+   "label": "Route 12 target",
+   "kind": "choice",
+   "group": "route.11",
+   "min": 0,
+   "max": 121,
+   "activeIf": "route.11.on"
+  },
+  {
+   "id": "route.11.depth",
+   "label": "Route 12 depth",
+   "kind": "cont",
+   "group": "route.11",
+   "min": -1,
+   "max": 1,
+   "activeIf": "route.11.on",
+   "neutral": 0.5
+  },
+  {
+   "id": "route.11.exp",
+   "label": "Route 12 exp",
+   "kind": "bool",
+   "group": "route.11",
+   "min": 0,
+   "max": 1,
+   "activeIf": "route.11.on"
+  },
+  {
+   "id": "c.loudToFlow",
+   "label": "Coupling · loudToFlow",
+   "kind": "cont",
+   "group": "coupling",
+   "min": -1,
+   "max": 1
+  },
+  {
+   "id": "c.loudToCurl",
+   "label": "Coupling · loudToCurl",
+   "kind": "cont",
+   "group": "coupling",
+   "min": -1,
+   "max": 1
+  },
+  {
+   "id": "c.loudToGloss",
+   "label": "Coupling · loudToGloss",
+   "kind": "cont",
+   "group": "coupling",
+   "min": -1,
+   "max": 1
+  },
+  {
+   "id": "c.brightToShift",
+   "label": "Coupling · brightToShift",
+   "kind": "cont",
+   "group": "coupling",
+   "min": -1,
+   "max": 1
+  },
+  {
+   "id": "c.onsetToLight",
+   "label": "Coupling · onsetToLight",
+   "kind": "cont",
+   "group": "coupling",
+   "min": -1,
+   "max": 1
+  },
+  {
+   "id": "c.loudToPulse",
+   "label": "Coupling · loudToPulse",
+   "kind": "cont",
+   "group": "coupling",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "c.onsetToFlash",
+   "label": "Coupling · onsetToFlash",
+   "kind": "cont",
+   "group": "coupling",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "c.onsetToSeed",
+   "label": "Coupling · onsetToSeed",
+   "kind": "cont",
+   "group": "coupling",
+   "min": 0,
+   "max": 1
+  },
+  {
+   "id": "c.spectrumToTint",
+   "label": "Coupling · spectrumToTint",
+   "kind": "cont",
+   "group": "coupling",
+   "min": 0,
+   "max": 1
+  }
+ ],
+ "modTargets": [
+  {
+   "target": "additive",
+   "param": "gain",
+   "exp": false,
+   "label": "Harmonic Sum · Gain"
+  },
+  {
+   "target": "additive",
+   "param": "fund",
+   "exp": true,
+   "label": "Harmonic Sum · Fund (Hz)"
+  },
+  {
+   "target": "additive",
+   "param": "N",
+   "exp": false,
+   "label": "Harmonic Sum · Harmonics N"
+  },
+  {
+   "target": "additive",
+   "param": "move",
+   "exp": true,
+   "label": "Harmonic Sum · Move (Hz)"
+  },
+  {
+   "target": "lorenz",
+   "param": "gain",
+   "exp": false,
+   "label": "Lorenz Attractor · Gain"
+  },
+  {
+   "target": "lorenz",
+   "param": "sigma",
+   "exp": false,
+   "label": "Lorenz Attractor · σ"
+  },
+  {
+   "target": "lorenz",
+   "param": "rho",
+   "exp": false,
+   "label": "Lorenz Attractor · ρ"
+  },
+  {
+   "target": "lorenz",
+   "param": "beta",
+   "exp": false,
+   "label": "Lorenz Attractor · β"
+  },
+  {
+   "target": "lorenz",
+   "param": "lBase",
+   "exp": true,
+   "label": "Lorenz Attractor · Base f (Hz)"
+  },
+  {
+   "target": "lorenz",
+   "param": "lFreqScale",
+   "exp": false,
+   "label": "Lorenz Attractor · Freq scale"
+  },
+  {
+   "target": "lorenz",
+   "param": "lAmp",
+   "exp": false,
+   "label": "Lorenz Attractor · Amp scale"
+  },
+  {
+   "target": "rossler",
+   "param": "gain",
+   "exp": false,
+   "label": "Rossler Attractor · Gain"
+  },
+  {
+   "target": "rossler",
+   "param": "rossA",
+   "exp": false,
+   "label": "Rossler Attractor · a"
+  },
+  {
+   "target": "rossler",
+   "param": "rossB",
+   "exp": false,
+   "label": "Rossler Attractor · b"
+  },
+  {
+   "target": "rossler",
+   "param": "rossC",
+   "exp": false,
+   "label": "Rossler Attractor · c"
+  },
+  {
+   "target": "rossler",
+   "param": "rossBase",
+   "exp": true,
+   "label": "Rossler Attractor · Base f (Hz)"
+  },
+  {
+   "target": "rossler",
+   "param": "rossFreqScale",
+   "exp": false,
+   "label": "Rossler Attractor · Freq scale"
+  },
+  {
+   "target": "rossler",
+   "param": "rossAmp",
+   "exp": false,
+   "label": "Rossler Attractor · Amp scale"
+  },
+  {
+   "target": "gliss",
+   "param": "gain",
+   "exp": false,
+   "label": "Exponential Glissando · Gain"
+  },
+  {
+   "target": "gliss",
+   "param": "f0",
+   "exp": true,
+   "label": "Exponential Glissando · f0 (Hz)"
+  },
+  {
+   "target": "gliss",
+   "param": "k",
+   "exp": false,
+   "label": "Exponential Glissando · k"
+  },
+  {
+   "target": "shepard",
+   "param": "gain",
+   "exp": false,
+   "label": "Shepard Tone · Gain"
+  },
+  {
+   "target": "shepard",
+   "param": "shepBase",
+   "exp": true,
+   "label": "Shepard Tone · Base f (Hz)"
+  },
+  {
+   "target": "shepard",
+   "param": "shepSpeed",
+   "exp": false,
+   "label": "Shepard Tone · Speed"
+  },
+  {
+   "target": "shepard",
+   "param": "shepOctaves",
+   "exp": false,
+   "label": "Shepard Tone · Octaves"
+  },
+  {
+   "target": "bell",
+   "param": "gain",
+   "exp": false,
+   "label": "FM Bell · Gain"
+  },
+  {
+   "target": "bell",
+   "param": "bellF0",
+   "exp": true,
+   "label": "FM Bell · f0 (Hz)"
+  },
+  {
+   "target": "bell",
+   "param": "bellRatio",
+   "exp": false,
+   "label": "FM Bell · Inharmonicity"
+  },
+  {
+   "target": "bell",
+   "param": "bellIndex",
+   "exp": false,
+   "label": "FM Bell · FM index"
+  },
+  {
+   "target": "bell",
+   "param": "bellDecay",
+   "exp": false,
+   "label": "FM Bell · Decay (s)"
+  },
+  {
+   "target": "bell",
+   "param": "bellPeriod",
+   "exp": false,
+   "label": "FM Bell · Strike every (s)"
+  },
+  {
+   "target": "risset",
+   "param": "gain",
+   "exp": false,
+   "label": "Risset Bell · Gain"
+  },
+  {
+   "target": "risset",
+   "param": "rissF0",
+   "exp": true,
+   "label": "Risset Bell · f0 (Hz)"
+  },
+  {
+   "target": "risset",
+   "param": "rissDecay",
+   "exp": false,
+   "label": "Risset Bell · Decay (s)"
+  },
+  {
+   "target": "risset",
+   "param": "rissPeriod",
+   "exp": false,
+   "label": "Risset Bell · Strike every (s)"
+  },
+  {
+   "target": "fm",
+   "param": "gain",
+   "exp": false,
+   "label": "FM Sine · Gain"
+  },
+  {
+   "target": "fm",
+   "param": "fc",
+   "exp": true,
+   "label": "FM Sine · f_c (Hz)"
+  },
+  {
+   "target": "fm",
+   "param": "fm",
+   "exp": true,
+   "label": "FM Sine · f_m (Hz)"
+  },
+  {
+   "target": "fm",
+   "param": "I",
+   "exp": false,
+   "label": "FM Sine · Index I"
+  },
+  {
+   "target": "beats",
+   "param": "gain",
+   "exp": false,
+   "label": "Two Sines (Beats) · Gain"
+  },
+  {
+   "target": "beats",
+   "param": "fbeat",
+   "exp": true,
+   "label": "Two Sines (Beats) · f (Hz)"
+  },
+  {
+   "target": "beats",
+   "param": "df",
+   "exp": false,
+   "label": "Two Sines (Beats) · Δf (Hz)"
+  },
+  {
+   "target": "pm",
+   "param": "gain",
+   "exp": false,
+   "label": "Phase Modulation · Gain"
+  },
+  {
+   "target": "pm",
+   "param": "f",
+   "exp": true,
+   "label": "Phase Modulation · f (Hz)"
+  },
+  {
+   "target": "pm",
+   "param": "f2pm",
+   "exp": true,
+   "label": "Phase Modulation · f2 (Hz)"
+  },
+  {
+   "target": "quasi",
+   "param": "gain",
+   "exp": false,
+   "label": "Quasi-random LFO · Gain"
+  },
+  {
+   "target": "quasi",
+   "param": "fq",
+   "exp": true,
+   "label": "Quasi-random LFO · Base f (Hz)"
+  },
+  {
+   "target": "quasi",
+   "param": "Aq",
+   "exp": false,
+   "label": "Quasi-random LFO · Depth (Hz)"
+  },
+  {
+   "target": "quasi",
+   "param": "wq",
+   "exp": true,
+   "label": "Quasi-random LFO · w"
+  },
+  {
+   "target": "logistic",
+   "param": "gain",
+   "exp": false,
+   "label": "Logistic Map · Gain"
+  },
+  {
+   "target": "logistic",
+   "param": "base",
+   "exp": true,
+   "label": "Logistic Map · Base f (Hz)"
+  },
+  {
+   "target": "logistic",
+   "param": "depth",
+   "exp": false,
+   "label": "Logistic Map · Depth (Hz)"
+  },
+  {
+   "target": "logistic",
+   "param": "r",
+   "exp": false,
+   "label": "Logistic Map · r"
+  },
+  {
+   "target": "logistic",
+   "param": "lfoHz",
+   "exp": true,
+   "label": "Logistic Map · Update rate (Hz)"
+  },
+  {
+   "target": "dist",
+   "param": "gain",
+   "exp": false,
+   "label": "Nonlinear Saturation · Gain"
+  },
+  {
+   "target": "dist",
+   "param": "fd",
+   "exp": true,
+   "label": "Nonlinear Saturation · f (Hz)"
+  },
+  {
+   "target": "dist",
+   "param": "alpha",
+   "exp": false,
+   "label": "Nonlinear Saturation · α"
+  },
+  {
+   "target": "karplus",
+   "param": "gain",
+   "exp": false,
+   "label": "Karplus–Strong (String) · Gain"
+  },
+  {
+   "target": "karplus",
+   "param": "ksFreq",
+   "exp": true,
+   "label": "Karplus–Strong (String) · Freq (Hz)"
+  },
+  {
+   "target": "karplus",
+   "param": "ksDamp",
+   "exp": false,
+   "label": "Karplus–Strong (String) · Damping"
+  },
+  {
+   "target": "karplus",
+   "param": "ksBright",
+   "exp": false,
+   "label": "Karplus–Strong (String) · Brightness"
+  },
+  {
+   "target": "bytebeat",
+   "param": "gain",
+   "exp": false,
+   "label": "Bytebeat · Gain"
+  },
+  {
+   "target": "bytebeat",
+   "param": "bbRecipe",
+   "exp": false,
+   "label": "Bytebeat · Recipe #"
+  },
+  {
+   "target": "bytebeat",
+   "param": "bbRate",
+   "exp": true,
+   "label": "Bytebeat · Rate (Hz)"
+  },
+  {
+   "target": "ocean",
+   "param": "gain",
+   "exp": false,
+   "label": "Ocean / Wind · Gain"
+  },
+  {
+   "target": "ocean",
+   "param": "oceanRate",
+   "exp": true,
+   "label": "Ocean / Wind · Wave rate (Hz)"
+  },
+  {
+   "target": "ocean",
+   "param": "oceanCut",
+   "exp": true,
+   "label": "Ocean / Wind · Cutoff (Hz)"
+  },
+  {
+   "target": "ocean",
+   "param": "oceanDepth",
+   "exp": false,
+   "label": "Ocean / Wind · Swell depth"
+  },
+  {
+   "target": "rain",
+   "param": "gain",
+   "exp": false,
+   "label": "Rain / Drops · Gain"
+  },
+  {
+   "target": "rain",
+   "param": "rainDensity",
+   "exp": true,
+   "label": "Rain / Drops · Drops/s"
+  },
+  {
+   "target": "rain",
+   "param": "rainPitch",
+   "exp": true,
+   "label": "Rain / Drops · Drop pitch (Hz)"
+  },
+  {
+   "target": "rain",
+   "param": "rainBed",
+   "exp": false,
+   "label": "Rain / Drops · Bed level"
+  },
+  {
+   "target": "noiselp",
+   "param": "gain",
+   "exp": false,
+   "label": "Noise → Low-pass · Gain"
+  },
+  {
+   "target": "noiselp",
+   "param": "nCut",
+   "exp": true,
+   "label": "Noise → Low-pass · Cutoff (Hz)"
+  },
+  {
+   "target": "pinknoise",
+   "param": "gain",
+   "exp": false,
+   "label": "Pink Noise (1/f) · Gain"
+  },
+  {
+   "target": "pinknoise",
+   "param": "pinkBright",
+   "exp": false,
+   "label": "Pink Noise (1/f) · Brightness"
+  },
+  {
+   "target": "brownnoise",
+   "param": "gain",
+   "exp": false,
+   "label": "Brown Noise (Brownian) · Gain"
+  },
+  {
+   "target": "brownnoise",
+   "param": "brownStep",
+   "exp": true,
+   "label": "Brown Noise (Brownian) · Step size"
+  },
+  {
+   "target": "velvetnoise",
+   "param": "gain",
+   "exp": false,
+   "label": "Velvet Noise · Gain"
+  },
+  {
+   "target": "velvetnoise",
+   "param": "velvetDensity",
+   "exp": true,
+   "label": "Velvet Noise · Density (imp/s)"
+  },
+  {
+   "target": "fx",
+   "param": "filterFreq",
+   "exp": true,
+   "label": "Filter cutoff"
+  },
+  {
+   "target": "fx",
+   "param": "filterQ",
+   "exp": false,
+   "label": "Filter Q"
+  },
+  {
+   "target": "fx",
+   "param": "filterGain",
+   "exp": false,
+   "label": "Filter gain"
+  },
+  {
+   "target": "fx",
+   "param": "filterVowel",
+   "exp": false,
+   "label": "Filter vowel"
+  },
+  {
+   "target": "fx",
+   "param": "filterCombFb",
+   "exp": false,
+   "label": "Comb feedback"
+  },
+  {
+   "target": "fx",
+   "param": "chorusRate",
+   "exp": true,
+   "label": "Chorus rate"
+  },
+  {
+   "target": "fx",
+   "param": "chorusDepth",
+   "exp": false,
+   "label": "Chorus depth"
+  },
+  {
+   "target": "fx",
+   "param": "chorusMix",
+   "exp": false,
+   "label": "Chorus mix"
+  },
+  {
+   "target": "fx",
+   "param": "chorusFb",
+   "exp": false,
+   "label": "Chorus feedback"
+  },
+  {
+   "target": "fx",
+   "param": "delayTime",
+   "exp": true,
+   "label": "Delay time"
+  },
+  {
+   "target": "fx",
+   "param": "delayFb",
+   "exp": false,
+   "label": "Delay feedback"
+  },
+  {
+   "target": "fx",
+   "param": "delayMix",
+   "exp": false,
+   "label": "Delay mix"
+  },
+  {
+   "target": "fx",
+   "param": "phaserRate",
+   "exp": true,
+   "label": "Phaser rate"
+  },
+  {
+   "target": "fx",
+   "param": "phaserDepth",
+   "exp": false,
+   "label": "Phaser depth"
+  },
+  {
+   "target": "fx",
+   "param": "phaserFb",
+   "exp": false,
+   "label": "Phaser feedback"
+  },
+  {
+   "target": "fx",
+   "param": "phaserMix",
+   "exp": false,
+   "label": "Phaser mix"
+  },
+  {
+   "target": "fx",
+   "param": "reverbMix",
+   "exp": false,
+   "label": "Reverb mix"
+  },
+  {
+   "target": "fx",
+   "param": "limiterThr",
+   "exp": false,
+   "label": "Limiter threshold"
+  },
+  {
+   "target": "fx",
+   "param": "limiterRel",
+   "exp": false,
+   "label": "Limiter release"
+  },
+  {
+   "target": "reaction",
+   "param": "feed",
+   "exp": false,
+   "label": "Reaction · Feed"
+  },
+  {
+   "target": "reaction",
+   "param": "kill",
+   "exp": false,
+   "label": "Reaction · Kill"
+  },
+  {
+   "target": "reaction",
+   "param": "diffU",
+   "exp": false,
+   "label": "Reaction · Diff U"
+  },
+  {
+   "target": "reaction",
+   "param": "diffV",
+   "exp": false,
+   "label": "Reaction · Diff V"
+  },
+  {
+   "target": "reaction",
+   "param": "speed",
+   "exp": false,
+   "label": "Reaction · Speed"
+  },
+  {
+   "target": "fieldVariation",
+   "param": "feedVarAmount",
+   "exp": false,
+   "label": "Field variation · Feed amount"
+  },
+  {
+   "target": "fieldVariation",
+   "param": "feedVarScale",
+   "exp": true,
+   "label": "Field variation · Feed scale"
+  },
+  {
+   "target": "fieldVariation",
+   "param": "feedVarWarp",
+   "exp": false,
+   "label": "Field variation · Feed warp"
+  },
+  {
+   "target": "fieldVariation",
+   "param": "killVarAmount",
+   "exp": false,
+   "label": "Field variation · Kill amount"
+  },
+  {
+   "target": "fieldVariation",
+   "param": "killVarScale",
+   "exp": true,
+   "label": "Field variation · Kill scale"
+  },
+  {
+   "target": "fieldVariation",
+   "param": "killVarWarp",
+   "exp": false,
+   "label": "Field variation · Kill warp"
+  },
+  {
+   "target": "flow",
+   "param": "curlStrength",
+   "exp": false,
+   "label": "Flow · Curl strength"
+  },
+  {
+   "target": "flow",
+   "param": "curlScale",
+   "exp": true,
+   "label": "Flow · Curl scale"
+  },
+  {
+   "target": "flow",
+   "param": "driftX",
+   "exp": false,
+   "label": "Flow · Drift X"
+  },
+  {
+   "target": "flow",
+   "param": "driftY",
+   "exp": false,
+   "label": "Flow · Drift Y (+down)"
+  },
+  {
+   "target": "flow",
+   "param": "advectAmount",
+   "exp": false,
+   "label": "Flow · Advect amount"
+  },
+  {
+   "target": "flow",
+   "param": "evolveRate",
+   "exp": false,
+   "label": "Flow · Evolve rate"
+  },
+  {
+   "target": "palette",
+   "param": "shift",
+   "exp": false,
+   "label": "Palette · Shift"
+  },
+  {
+   "target": "palette",
+   "param": "contrast",
+   "exp": false,
+   "label": "Palette · Contrast"
+  },
+  {
+   "target": "palette",
+   "param": "bands",
+   "exp": false,
+   "label": "Palette · Bands"
+  },
+  {
+   "target": "palette",
+   "param": "relief",
+   "exp": false,
+   "label": "Palette · Relief"
+  },
+  {
+   "target": "palette",
+   "param": "lightAngle",
+   "exp": false,
+   "label": "Palette · Light angle"
+  },
+  {
+   "target": "palette",
+   "param": "gloss",
+   "exp": false,
+   "label": "Palette · Gloss"
+  }
+ ],
+ "routeSlots": 12,
+ "lfoShapes": [
+  "sine",
+  "triangle",
+  "saw",
+  "square",
+  "random"
+ ],
+ "lfoRateRange": [
+  0.003,
+  2
+ ],
  "lfoCount": 4,
  "defaultLfo": {
   "shape": "sine",

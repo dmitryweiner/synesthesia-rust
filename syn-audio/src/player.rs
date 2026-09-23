@@ -8,8 +8,9 @@
 use std::sync::mpsc::{sync_channel, Receiver, SyncSender, TrySendError};
 use std::thread::JoinHandle;
 
+use syn_core::engine::SPECTRUM_BANDS;
 use syn_core::state::AppState;
-use syn_core::{Engine, BLOCK};
+use syn_core::{AudioFeatures, Engine, BLOCK};
 
 use crate::sink::Sink;
 
@@ -26,14 +27,34 @@ pub enum Command {
     Stop,
 }
 
-/// What the UI gets to draw, published from the audio thread.
-#[derive(Clone, Copy, Debug, Default)]
+/// What the UI gets to draw, published from the audio thread — the feature bus
+/// of PLAN.md decision 5. A renderer, when there is one, reads the same frame.
+#[derive(Clone, Copy, Debug)]
 pub struct Frame {
     /// Engine time in seconds — the LFO clock.
     pub time: f64,
     pub peak: f32,
     pub rms: f32,
     pub limiter_db: f32,
+    pub features: AudioFeatures,
+    /// Log-spaced spectrum, 0..255 per band.
+    pub spectrum: [u8; SPECTRUM_BANDS],
+    /// Onset hits since the engine started.
+    pub hits: u64,
+}
+
+impl Default for Frame {
+    fn default() -> Self {
+        Self {
+            time: 0.0,
+            peak: 0.0,
+            rms: 0.0,
+            limiter_db: 0.0,
+            features: AudioFeatures::default(),
+            spectrum: [0; SPECTRUM_BANDS],
+            hits: 0,
+        }
+    }
 }
 
 pub struct Player {
@@ -69,7 +90,7 @@ impl Player {
                     since_frame += BLOCKS_PER_WRITE;
                     if since_frame >= FRAME_EVERY {
                         since_frame = 0;
-                        let frame = measure(&buf, engine.time(), engine.limiter_reduction_db());
+                        let frame = measure(&buf, &engine);
                         // A UI that fell behind loses frames, never the sound.
                         match tx_frame.try_send(frame) {
                             Ok(()) | Err(TrySendError::Full(_)) => {}
@@ -161,14 +182,22 @@ impl Drop for Player {
     }
 }
 
-fn measure(buf: &[f32], time: f64, limiter_db: f64) -> Frame {
+fn measure(buf: &[f32], engine: &Engine) -> Frame {
     let mut peak = 0.0f32;
     let mut sum = 0.0f64;
     for s in buf {
         peak = peak.max(s.abs());
         sum += f64::from(*s) * f64::from(*s);
     }
-    Frame { time, peak, rms: (sum / buf.len() as f64).sqrt() as f32, limiter_db: limiter_db as f32 }
+    Frame {
+        time: engine.time(),
+        peak,
+        rms: (sum / buf.len() as f64).sqrt() as f32,
+        limiter_db: engine.limiter_reduction_db() as f32,
+        features: engine.features(),
+        spectrum: *engine.spectrum(),
+        hits: engine.hits(),
+    }
 }
 
 /// A point always sounds the same on the noisy generators from run to run,
@@ -192,7 +221,7 @@ mod tests {
     #[test]
     fn it_renders_and_publishes_frames() {
         let state = presets()[0].state.clone();
-        let player = Player::start(22050.0, &state, Box::<NullSink>::default());
+        let player = Player::start(22050.0, &state, Box::new(NullSink::new(22050.0)));
         let mut seen = 0;
         for _ in 0..50 {
             if let Some(f) = player.latest_frame() {
@@ -213,7 +242,7 @@ mod tests {
     fn switching_points_keeps_it_running() {
         let a = presets()[0].state.clone();
         let b = presets()[5].state.clone();
-        let player = Player::start(22050.0, &a, Box::<NullSink>::default());
+        let player = Player::start(22050.0, &a, Box::new(NullSink::new(22050.0)));
         player.wait_frame();
         player.switch_to(b);
         player.set_state(presets()[5].state.clone());

@@ -60,6 +60,20 @@ project, so the two read alike.
    - Parity is stated as behaviour, not as samples: the same point, rendered
      here and in the browser, must land within the presets' fractality band
      (0.79 ± 0.14, see ../synesthesia/AGENTS.md) and within ±3 dB RMS.
+   - **Measured** (`scripts/parity.mjs`, 12 presets, 8 s at 48 kHz): mean
+     |Δ| 1.3 dB, mean fractality 0.67 in the browser against 0.62 here. Three
+     things had to be copied rather than invented to get there, each found by
+     measuring: the limiter's make-up gain (Blink boosts by ~6.8 dB at the
+     default threshold, and without it every point sat that much lower), the
+     convolver's normalization (its wet signal is far *below* the dry one —
+     0.16 to 0.39 of it across the decay range — and an FDN normalized the
+     textbook way came out 16 dB hot), and the browser's minimum delay inside
+     a feedback loop (one render quantum, so its comb filter cannot exceed
+     sr/128 whatever the slider says). What remains: one preset (*Loom &
+     copper*, a comb at 0.65 feedback) is 6 dB louder here, because a
+     resonant comb's peaks land on different partials — chasing that further
+     would mean re-implementing a Web Audio node, which decision 3 says not
+     to do.
 4. **The generators are a literal port and are verified bit-exact.** They are
    pure, per-sample, and `mulberry32` ports exactly, so each of the 21
    formulas is diffed sample-by-sample against a reference WAV rendered by
@@ -86,12 +100,17 @@ project, so the two read alike.
    Here an offline render is ~20× realtime, so candidates are scored at
    30 s @ 22 kHz on the little cores via rayon, while the two A76s keep
    playing. The surrogate stays available behind a flag for comparison.
-9. **Storage is local, and there is no network at all.** The app's own
-   config (`$XDG_CONFIG_HOME/synesthesia/config.toml`) holds the settings and
-   **the current point**, restored on the next start; named points the user
-   keeps go next to it in `points.json`, each under the name the user typed.
-   No cloud sharing, no Worker, no HTTP client, no point ids and no hashing —
-   a point is identified by its name here and by its file elsewhere.
+9. **Storage is local, and there is no network at all.**
+   `$XDG_CONFIG_HOME/synesthesia/config.toml` holds the settings (sample rate,
+   audio command, latency) and is written on the first run so it is visible
+   rather than folklore. The current point is restored on the next start from
+   `$XDG_DATA_HOME/synesthesia/last-point.json`, and the points the user keeps
+   live next to it in `points.json`, each under the name they typed. No cloud
+   sharing, no Worker, no HTTP client, no point ids and no hashing — a point
+   is identified by its name here and by its file elsewhere.
+   - Points are JSON, not TOML: a point *is* the web app's JSON (decision 2),
+     and a TOML rendering of a 500-gene nested state would be neither readable
+     nor compatible. TOML holds only what a person would hand-edit.
 10. **Measure first** — carried over verbatim from the sibling project. Every
     performance or audio claim in this repo comes with a number produced by a
     checked-in bench, not by an impression. Thresholds are stated as

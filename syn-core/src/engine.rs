@@ -7,6 +7,7 @@
 use crate::dsp::gate::{apply_gate, gate_is_silent};
 use crate::dsp::generator::FormulaGenerator;
 use crate::dsp::rng::{Mulberry32, Rng};
+use crate::features::{Analyser, AudioFeatures, FeatureTracker, OnsetDetector, FPS};
 use crate::fx::FxChain;
 use crate::modmatrix::{effective_param, lfo_value, LfoDef, ModRoute};
 use crate::schema::{formula_ranges, schema};
@@ -17,6 +18,8 @@ use crate::{FormulaId, BLOCK};
 const GAIN_SMOOTH: f64 = 0.02;
 /// Master gain smoothing, seconds (web: `PARAM_SMOOTH`).
 const MASTER_SMOOTH: f64 = 0.05;
+/// Bands in the spectrum the engine publishes for the UI to draw.
+pub const SPECTRUM_BANDS: usize = 64;
 
 struct Slot {
     id: &'static str,
@@ -39,6 +42,15 @@ pub struct Engine {
     /// read (PLAN.md decision 7).
     t: f64,
     scratch: Vec<f32>,
+
+    // The feature bus (PLAN.md decision 5): the same numbers the browser's
+    // analyser produced, published for whatever draws them.
+    analyser: Analyser,
+    tracker: FeatureTracker,
+    onsets: OnsetDetector,
+    features: AudioFeatures,
+    spectrum: [u8; SPECTRUM_BANDS],
+    hits: u64,
 }
 
 impl Engine {
@@ -51,6 +63,12 @@ impl Engine {
             master: state.audio.master_gain,
             t: 0.0,
             scratch: vec![0.0; BLOCK],
+            analyser: Analyser::new(sr),
+            tracker: FeatureTracker::new(sr),
+            onsets: OnsetDetector::default(),
+            features: AudioFeatures::default(),
+            spectrum: [0; SPECTRUM_BANDS],
+            hits: 0,
         };
         let mut seed_n = seed;
         for id in &schema().formula_ids {
@@ -161,16 +179,55 @@ impl Engine {
         self.fx.process(out);
 
         let master_target = self.state.audio.master_gain;
+        self.master += master_coef * (master_target - self.master);
+        let master = self.master as f32;
         for s in out.iter_mut() {
-            self.master += master_coef * (master_target - self.master) / n as f64;
-            *s *= self.master as f32;
+            *s *= master;
         }
 
         self.t += dt;
+
+        if self.analyser.push(out) {
+            self.features = self.tracker.update(self.analyser.rms, &self.analyser.bytes, 1.0 / FPS);
+            self.update_spectrum();
+            if self.onsets.update(self.features.onset, self.t) {
+                self.hits += 1;
+            }
+        }
     }
 
     pub fn limiter_reduction_db(&self) -> f64 {
         self.fx.limiter_reduction_db()
+    }
+
+    /// The latest features — loudness, swell, brightness, bands, onset.
+    pub fn features(&self) -> AudioFeatures {
+        self.features
+    }
+
+    /// A log-spaced summary of the spectrum, 0..255 per band.
+    pub fn spectrum(&self) -> &[u8; SPECTRUM_BANDS] {
+        &self.spectrum
+    }
+
+    /// Onset hits since the engine started.
+    pub fn hits(&self) -> u64 {
+        self.hits
+    }
+
+    /// Folds the analyser's linear bins into log-spaced bands, the way an ear
+    /// (and a spectrum display) groups them.
+    fn update_spectrum(&mut self) {
+        let bins = &self.analyser.bytes;
+        let hz_per_bin = self.sr / 2.0 / bins.len() as f64;
+        let (lo_hz, hi_hz) = (40.0, 16000.0f64.min(self.sr / 2.0 * 0.95));
+        for (b, out) in self.spectrum.iter_mut().enumerate() {
+            let lo = lo_hz * (hi_hz / lo_hz).powf(b as f64 / SPECTRUM_BANDS as f64);
+            let hi = lo_hz * (hi_hz / lo_hz).powf((b + 1) as f64 / SPECTRUM_BANDS as f64);
+            let i0 = ((lo / hz_per_bin) as usize).min(bins.len() - 1);
+            let i1 = (((hi / hz_per_bin).ceil() as usize).max(i0 + 1)).min(bins.len());
+            *out = bins[i0..i1].iter().copied().max().unwrap_or(0);
+        }
     }
 }
 
@@ -256,6 +313,21 @@ mod tests {
         // A hard switch drops tails, so the first sample after it must be near
         // silence rather than a step away from the last one.
         assert!(after[0].abs() < 0.2, "step of {} → {}", before, after[0]);
+    }
+
+    #[test]
+    fn it_publishes_features_while_it_plays() {
+        let sr = 48000.0;
+        let mut engine = Engine::new(sr, &presets()[10].state, 3);
+        let mut buf = vec![0.0f32; BLOCK];
+        for _ in 0..(sr as usize * 4 / BLOCK) {
+            engine.render(&mut buf);
+        }
+        let f = engine.features();
+        assert!(f.loudness > 0.0 && f.loudness <= 1.0, "loudness {}", f.loudness);
+        assert!(f.brightness > 0.0, "brightness {}", f.brightness);
+        assert!(engine.spectrum().iter().any(|b| *b > 0), "empty spectrum");
+        assert!(engine.hits() > 0, "Bell spots struck no onset in 4 s");
     }
 
     #[test]

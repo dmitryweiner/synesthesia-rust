@@ -41,14 +41,16 @@ pub enum Action {
     Details,
     Export,
     Help,
-    /// Cycles the picture: off → panel → full screen.
+    /// Cycles what fills the screen: spectrum → picture → full-screen picture.
     Picture,
 }
 
-/// Where the picture goes on the screen.
+/// What fills the screen: the spectrum, or the picture in its place, or the
+/// picture over the whole window. The two share the space because together
+/// they fight — the spectrum's bars read as part of the image.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum VizMode {
-    Off,
+    Spectrum,
     Panel,
     Full,
 }
@@ -56,16 +58,16 @@ pub enum VizMode {
 impl VizMode {
     pub fn next(self) -> Self {
         match self {
-            Self::Off => Self::Panel,
+            Self::Spectrum => Self::Panel,
             Self::Panel => Self::Full,
-            Self::Full => Self::Off,
+            Self::Full => Self::Spectrum,
         }
     }
 
     /// The config's spelling; anything unknown is the panel.
     pub fn parse(s: &str) -> Self {
         match s {
-            "off" => Self::Off,
+            "spectrum" | "off" => Self::Spectrum,
             "full" => Self::Full,
             _ => Self::Panel,
         }
@@ -73,9 +75,18 @@ impl VizMode {
 
     pub fn as_str(self) -> &'static str {
         match self {
-            Self::Off => "off",
+            Self::Spectrum => "spectrum",
             Self::Panel => "panel",
             Self::Full => "full",
+        }
+    }
+
+    /// How the status line names it.
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::Spectrum => "spectrum",
+            Self::Panel => "picture",
+            Self::Full => "full-screen picture",
         }
     }
 }
@@ -195,7 +206,7 @@ pub fn draw(f: &mut ratatui::Frame, v: &View) -> Option<Rect> {
 fn draw_full(f: &mut ratatui::Frame, v: &View, area: Rect) -> Option<Rect> {
     let [picture, status] = Layout::vertical([Constraint::Min(1), Constraint::Length(1)]).areas(area);
     let line = format!(
-        " {} {} · {} · [v] meters  [?] help",
+        " {} {} · {} · [v] spectrum  [?] help",
         v.name,
         if v.muted { "· silent" } else { "· ♪" },
         v.status
@@ -219,7 +230,7 @@ fn draw_panel(f: &mut ratatui::Frame, v: &View, area: Rect) -> Option<Rect> {
     let with_picture = v.viz == VizMode::Panel;
     let rows = Layout::vertical([
         Constraint::Length(2),                                            // meters
-        Constraint::Length(SPECTRUM_ROWS),                                // spectrum
+        Constraint::Length(if with_picture { 0 } else { SPECTRUM_ROWS }), // spectrum
         Constraint::Min(if with_picture { MIN_PICTURE_ROWS } else { 0 }), // picture
         if with_picture { Constraint::Length(text.len() as u16) } else { Constraint::Min(3) }, // formulas / lfos / fx
         Constraint::Length(1),                                                                 // status
@@ -228,7 +239,9 @@ fn draw_panel(f: &mut ratatui::Frame, v: &View, area: Rect) -> Option<Rect> {
     .split(inner);
 
     f.render_widget(meters(v), rows[0]);
-    f.render_widget(spectrum(v, rows[1]), rows[1]);
+    if !with_picture {
+        f.render_widget(spectrum(v, rows[1]), rows[1]);
+    }
     f.render_widget(Paragraph::new(text), rows[3]);
     f.render_widget(
         Paragraph::new(Line::from(Span::styled(v.status, Style::default().fg(Color::Yellow)))),
@@ -387,7 +400,7 @@ fn body_lines(v: &View) -> Vec<Line<'static>> {
 /// The key line, shortened when the terminal is narrow — a footer that runs
 /// off the edge hides the one key people look for, `q`.
 fn keys(width: u16) -> Paragraph<'static> {
-    const FULL: &str = "[space] sound  [l] like  [d] dislike  [r] surprise  [u] undo  [s] save  [p] points  [v] picture  [i] info  [?] help  [q] quit";
+    const FULL: &str = "[space] sound  [l] like  [d] dislike  [r] surprise  [u] undo  [s] save  [p] points  [v] spectrum/picture  [i] info  [?] help  [q] quit";
     const SHORT: &str = "[space] [l]ike [d]islike [r]andom [u]ndo [s]ave [p]oints [v]iew [i]nfo [?] [q]uit";
     let text = if usize::from(width) >= FULL.chars().count() { FULL } else { SHORT };
     Paragraph::new(Line::from(Span::styled(text, Style::default().add_modifier(Modifier::DIM))))
@@ -406,7 +419,7 @@ fn help_popup(f: &mut ratatui::Frame, area: Rect) {
         Line::from("r       surprise: jump near a random preset"),
         Line::from("u       undo the last step"),
         Line::from("s / p   save this point / open the points list"),
-        Line::from("v       the picture: off → panel → full screen"),
+        Line::from("v       spectrum → picture → full-screen picture"),
         Line::from("i       what is this point"),
         Line::from("e       copy the point as a #s= token"),
         Line::from("q       quit"),
@@ -452,7 +465,7 @@ mod tests {
             points_open: false,
             selected: 0,
             picture: None,
-            viz: VizMode::Off,
+            viz: VizMode::Spectrum,
             color: ColorMode::TrueColor,
         };
         let text = render(&view);
@@ -477,7 +490,7 @@ mod tests {
             points_open: false,
             selected: 0,
             picture: None,
-            viz: VizMode::Off,
+            viz: VizMode::Spectrum,
             color: ColorMode::TrueColor,
         };
         let text = render(&view);
@@ -501,7 +514,7 @@ mod tests {
             points_open: true,
             selected: 1,
             picture: None,
-            viz: VizMode::Off,
+            viz: VizMode::Spectrum,
             color: ColorMode::TrueColor,
         };
         let text = render(&view);
@@ -535,14 +548,17 @@ mod tests {
             terminal.draw(|f| area = draw(f, &view(viz))).unwrap();
             (area, terminal.backend().buffer().clone())
         };
-        assert_eq!(placed(VizMode::Off).0, None);
+        assert_eq!(placed(VizMode::Spectrum).0, None);
         let (panel, buf) = placed(VizMode::Panel);
         let panel = panel.expect("a 30-row screen has room for the panel");
         assert!(panel.height >= MIN_PICTURE_ROWS && panel.width == 98);
         assert_eq!(buf[(panel.x, panel.y)].fg, Color::Rgb(10, 200, 30));
+        // The picture takes the spectrum's place: it starts right under the
+        // two meter rows (border, then meters).
+        assert_eq!(panel.y, 3);
         let (full, _) = placed(VizMode::Full);
         assert_eq!(full, Some(Rect::new(0, 0, 100, 29)));
-        assert_eq!(VizMode::Off.next().next().next(), VizMode::Off);
+        assert_eq!(VizMode::Spectrum.next().next().next(), VizMode::Spectrum);
         assert_eq!(VizMode::parse(VizMode::Full.as_str()), VizMode::Full);
     }
 

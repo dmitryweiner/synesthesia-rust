@@ -245,8 +245,28 @@ optional cards on; 2026-09-23):
   need an affinity call (a dependency or `unsafe`), and is not done.
 - The control thread does not notice the picture: the whole app minus the
   picture thread is 67% with it and without it.
-- Not done: the 2-minute xrun soak with the sound and the scout running
-  (the player keeps no xrun count; it needs PipeWire's own).
+- **The spectrum and the picture share the screen** (after a first look:
+  the bars read as part of the image). `v` cycles spectrum → picture in the
+  spectrum's place → full-screen picture; `viz = "off"` in an older config
+  reads as the spectrum.
+
+**Soak, with the sound on** (130 s each, real `pw-cat` output, xruns from
+PipeWire's own ERR counter for the `pw-cat` node; the app in a pty that
+presses keys, next to a terminal window running the probe at 8 fps so the
+terminal and X are loaded as they would be; 2026-09-23):
+
+| picture | 👍/👎/🎲 every 10 s | scout | xruns |
+|---|---|---|---|
+| panel | no | on (runs once at start) | **0** |
+| panel | yes, 12 presses | on | 10 (2 of them at start-up) |
+| spectrum | yes, 12 presses | on | 6 |
+| spectrum | yes, 12 presses | **off** | **0** |
+
+The picture does not cause xruns; **the scout does**, picture or not — each
+press starts a rayon batch of offline renders over every core, and the audio
+thread loses. PLAN.md's "0 in a 2-minute soak" was measured without presses.
+That is an audio-side fix (a smaller pool, or the scout kept off the core the
+audio thread is on), not a graphics one, and is left to its own change.
 
 **V4. Side by side.** Every preset in the browser (lowest rung) and here,
 by eye: the same pattern family, the same palette, the same response to

@@ -207,7 +207,7 @@ convenience.
 | metric | target | in the browser | measured here |
 |---|---|---|---|
 | live point, one A76 core | ≤ 15% | ~95% | 12.2% worst (*Fractal garden*), 36% measured live with the TUI and the pipe sink |
-| xruns at 48 kHz / 1024 frames | 0 in 30 min | dropouts under load | 0 in a 2-minute soak; the long one is still to run |
+| xruns at 48 kHz / 1024 frames | 0 in 30 min | dropouts under load | 0 in a 2-minute soak, with the picture on too; **6–10 in 2 minutes when every press starts the scout** (GRAPHICS.md, V3); the long one is still to run |
 | offline render | ≥ 8× realtime | 1.1–1.6× | 8.2–49× (`synesthesia bench`) |
 | scout, 3 + 3 candidates | < 3 s wall, full quality | ~15 s CPU, surrogate quality | 1.3–1.6 s at 30 s / 22 kHz |
 | startup → first sound | < 300 ms | seconds | not measured yet |

@@ -534,7 +534,7 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
         &s.playing,
         picture::Settings { sim_hz: config.sim_hz, draw_fps: config.viz_fps, seed },
     );
-    pic.set_running(viz != VizMode::Off);
+    pic.set_running(viz != VizMode::Spectrum);
     let mut image = Image::default();
     // What the picture thread was last told the point is.
     let mut shown = s.playing.clone();
@@ -750,13 +750,13 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
             }
             Action::Picture => {
                 viz = viz.next();
-                pic.set_running(viz != VizMode::Off);
+                pic.set_running(viz != VizMode::Spectrum);
                 // Remembered for the next start; the rest of the file is kept.
                 let mut c = store::load_config();
                 c.viz = viz.as_str().to_string();
                 let msg = match store::save_config(&c) {
-                    Ok(()) => format!("picture: {}", viz.as_str()),
-                    Err(e) => format!("picture: {} (not saved: {e})", viz.as_str()),
+                    Ok(()) => viz.label().to_string(),
+                    Err(e) => format!("{} (not saved: {e})", viz.label()),
                 };
                 s.say(msg);
             }

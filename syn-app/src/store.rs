@@ -53,8 +53,8 @@ pub struct Config {
     /// enough for meters that breathe; raise it if the spectrum looks choppy.
     /// Key presses always redraw at once, whatever this is.
     pub ui_fps: f64,
-    /// The picture (GRAPHICS.md): "panel", "full" or "off" — what `v` last
-    /// left it at.
+    /// What fills the screen (GRAPHICS.md): "spectrum", "panel" (the
+    /// picture in the spectrum's place) or "full" — what `v` last left it at.
     pub viz: String,
     /// Picture frames drawn a second. Like `ui_fps`, the terminal pays for
     /// each one: 8 costs it about a third of a core here, 4 about a quarter.

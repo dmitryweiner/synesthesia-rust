@@ -44,9 +44,9 @@ X composites it, both in software here — so it is the one knob that makes the
 interface cheaper: 30 → 8 fps cuts what the terminal has to redraw from
 6.4 KB/s to 2.1 KB/s. Key presses always redraw at once, whatever it is set to.
 
-The picture — the web app's Gray–Scott field, in half-block characters — sits
-between the spectrum and the text, or fills the window; `v` switches it off,
-to the panel, to full screen, and the choice is kept. It costs the terminal
+The picture — the web app's Gray–Scott field, in half-block characters —
+takes the spectrum's place above the text, or fills the window; `v` cycles
+spectrum → picture → full-screen picture, and the choice is kept. It costs the terminal
 about a third of a core at the default 8 frames a second (`viz_fps`; 4 costs
 a quarter) and its own thread 10–15% of a big core, which the kernel usually
 runs as ~50% of a little one. GRAPHICS.md has the measurements.
@@ -56,7 +56,7 @@ tmpfs, so a `CARGO_TARGET_DIR` pointing there spends 2 GB of RAM on build
 artifacts and the machine starts swapping.
 
 Keys: `space` sound · `l`/`d` 👍/👎 · `r` surprise · `u` undo · `s` keep this
-point · `p` the points list · `v` the picture · `i` what this point is · `e`
+point · `p` the points list · `v` spectrum/picture · `i` what this point is · `e`
 write a `#s=` token · `?` help · `q` quit.
 
 ## Where things are kept

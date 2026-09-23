@@ -171,16 +171,39 @@ Two findings for V3:
   field thread must be free to run on an A76 — it must not be pinned to the
   scout's cores.
 
-**V2. The colour** (`display`, `coupling`).
-- Port the five palettes and `composePalette`, the cosine gradient with
-  bands, the bump-mapped relief with the light vector and gloss, tint by
-  tone, flash, exposure, the four ripples — `display.frag` line by line, per
-  pixel of the *pixel* grid, reading the box-filtered field.
-- Port `applyCoupling` (with wrap for hue and light angle), `displayCoupling`
-  and `RippleSet`.
-- Tests: port `coupling.test.ts`, `visualfx.test.ts` and the palette cases
-  of `visual.test.ts`; neutral display effects leave a frame unchanged; a
-  ripple dies after `RIPPLE_LIFE`.
+**V2. The colour ✔** (`palette`, `coupling`, `display`, `frame`, `picture`).
+- The five palettes and `composePalette`; `applyCoupling` (hue and light
+  angle wrap), `displayCoupling`, `RippleSet`; `display.frag` line by line,
+  per pixel of the picture. A bilinear lookup at a pixel's centre on a grid
+  twice as fine *is* the 2×2 box filter, so decision 3's down-filter costs
+  nothing extra.
+- The relief is computed in the web's Y-up terms on a Y-down grid, so the
+  light comes from the same side of the screen as in the browser — a test
+  lights a ramp from each side and checks which one is brighter.
+- `frame_params` derives one frame's inputs the way the web app's `loop()`
+  does: card params through the LFOs, then the couplings, off cards as zeros.
+  `Picture` wraps the simulation, the ripples and the image behind `step`
+  (sim clock: new onset hits become growth and ripples) and `draw` (redraw
+  clock) — what V3's thread will run.
+- `synesthesia render --preset N --secs S --picture out.ppm [--size WxH]`
+  drives the picture with the point's own offline sound and writes the last
+  frame. All twelve presets after 20 s show their pattern families: spots,
+  mazes, coral, worms; the drifting presets leave dead substrate along the
+  top edge, which the browser's `CLAMP_TO_EDGE` advection should do too —
+  to check in V4.
+- Tests: ported `coupling.test.ts`, `visualfx.test.ts` and the palette cases
+  of `visual.test.ts`; a flat field comes out as the colour computed by hand;
+  exposure, flash and tint act where they should; a ripple is gone at the
+  end of its life; LFO routes and the loudness coupling reach the params.
+
+Cost at 120×60 pixels, 8 fps: **1.4 ms a draw, ~1% of an A76**. Keeping
+feed/kill as two scalars plus per-cell offsets (not two per-cell maps) took
+*Fractal garden*, whose LFOs sweep feed, back from 4.0 to 3.5 ms a step.
+With the draws, the heaviest preset is 15.9% of a core, preset 0 11.7%.
+
+Found on the way, the same in the browser: `brightToShift` is centred on
+brightness 0.5, so in silence (brightness 0) the hue sits shifted by half
+the gene rather than at the card's value.
 
 **V3. On screen** (`Visualizer`, the thread, the widget, the keys).
 - `Visualizer` in `syn-core`, the field thread in `syn-app`, the half-block

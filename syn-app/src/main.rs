@@ -46,6 +46,8 @@ options:
   --no-scout        do not score candidates in the background
   --score           print the fractality metrics of the render, as JSON
   --sim             bench the picture's simulation instead of the sound
+  --picture FILE    render: also draw the picture at the end, as a PPM
+  --size WxH        the picture's size in pixels (default 120x60)
   --list            list the built-in presets
 
 `play` runs until Ctrl-C, or for --secs seconds if that is given.
@@ -63,6 +65,8 @@ struct Args {
     no_scout: bool,
     score: bool,
     sim: bool,
+    picture: Option<String>,
+    size: (usize, usize),
 }
 
 fn main() -> ExitCode {
@@ -107,6 +111,8 @@ fn run(argv: &[String]) -> Result<(), String> {
         no_scout: false,
         score: false,
         sim: false,
+        picture: None,
+        size: (120, 60),
     };
     let mut it = rest.iter();
     while let Some(flag) = it.next() {
@@ -130,6 +136,13 @@ fn run(argv: &[String]) -> Result<(), String> {
             "--no-scout" => a.no_scout = true,
             "--score" => a.score = true,
             "--sim" => a.sim = true,
+            "--picture" => a.picture = Some(value()?),
+            "--size" => {
+                let v = value()?;
+                let parsed = v.split_once('x').and_then(|(w, h)| Some((w.parse().ok()?, h.parse().ok()?)));
+                a.size =
+                    parsed.filter(|&(w, h)| w > 0 && h > 0).ok_or(format!("--size: `{v}` is not WxH"))?;
+            }
             "--out" => a.out = Some(value()?),
             "--raw" => a.raw = Some(value()?),
             other => return Err(format!("unknown option `{other}`\n\n{USAGE}")),
@@ -163,6 +176,10 @@ fn run(argv: &[String]) -> Result<(), String> {
         "tui" => return tui(&name, state, &a),
         "play" => return play(&name, &state, &a),
         _ => {}
+    }
+
+    if let Some(path) = &a.picture {
+        return render_picture(&state, &a, path);
     }
 
     let started = std::time::Instant::now();
@@ -203,6 +220,38 @@ fn run(argv: &[String]) -> Result<(), String> {
         }
         std::fs::write(path, bytes).map_err(|e| format!("{path}: {e}"))?;
     }
+    Ok(())
+}
+
+/// The point's sound, rendered offline, drives the picture the way it will
+/// live: its features and onset hits, stepped at 30 Hz; the last frame is
+/// written as a binary PPM. For looking at a point without a terminal.
+fn render_picture(state: &AppState, a: &Args, path: &str) -> Result<(), String> {
+    use syn_core::sim::Picture;
+    use syn_core::{Engine, BLOCK};
+    const SIM_HZ: f64 = 30.0;
+    let (w, h) = a.size;
+    let mut engine = Engine::new(a.sr, state, a.seed);
+    let mut picture = Picture::new(w, h, a.seed);
+    let mut block = [0.0f32; BLOCK];
+    let steps = (a.secs * SIM_HZ).round() as u64;
+    let started = Instant::now();
+    for i in 1..=steps {
+        while engine.time() < i as f64 / SIM_HZ {
+            engine.render(&mut block);
+        }
+        picture.step(state, &engine.features(), engine.hits(), engine.time());
+    }
+    let image = picture.draw(engine.time());
+    let mut ppm = format!("P6\n{} {}\n255\n", image.w, image.h).into_bytes();
+    ppm.extend(image.rgb.iter().flatten());
+    std::fs::write(path, ppm).map_err(|e| format!("{path}: {e}"))?;
+    println!(
+        "{path}: {w}x{h} after {:.1} s, {} onset hits, in {:.2} s",
+        a.secs,
+        engine.hits(),
+        started.elapsed().as_secs_f64()
+    );
     Ok(())
 }
 
@@ -699,43 +748,56 @@ fn bench(a: &Args) -> Result<(), String> {
     Ok(())
 }
 
-/// The picture's simulation on the grid a 120x40 terminal gets (GRAPHICS.md,
-/// V1): `--secs` seconds of steps at the 30 Hz the app steps at, per preset.
-/// Run it under `taskset -c 6` to read the numbers as one A76 core.
+/// The picture on the grid a 120x40 terminal gets (GRAPHICS.md): `--secs`
+/// seconds of steps at the 30 Hz the app steps at, per preset, with the
+/// point's LFOs and a steady mid-brightness sound; then the cost of drawing
+/// one frame. Run it under `taskset -c 6` to read the numbers as one A76 core.
 fn bench_sim(a: &Args) -> Result<(), String> {
-    use syn_core::sim::{grid_for_pixels, Sim, SimParams};
+    use syn_core::sim::{grid_for_pixels, Picture, SimParams};
+    use syn_core::AudioFeatures;
     const SIM_HZ: f64 = 30.0;
-    let (w, h) = grid_for_pixels(120, 60);
+    const DRAW_FPS: f64 = 8.0;
+    let (pw, ph) = (120, 60);
+    let (w, h) = grid_for_pixels(pw, ph);
     let steps = (a.secs * SIM_HZ).round().max(1.0) as u64;
-    println!("grid {w}x{h}, {steps} steps at {SIM_HZ} Hz\n");
+    let sound = AudioFeatures { loudness: 0.5, brightness: 0.5, ..Default::default() };
+    println!("grid {w}x{h}, picture {pw}x{ph}, {steps} steps at {SIM_HZ} Hz, drawn at {DRAW_FPS} fps\n");
     println!(
-        "{:<20} {:>6} {:>9} {:>12} {:>7} {:>7}",
-        "preset", "speed", "ms/step", "ns/cell/sub", "fields", "core %"
+        "{:<20} {:>6} {:>9} {:>12} {:>7} {:>8} {:>7}",
+        "preset", "speed", "ms/step", "ns/cell/sub", "fields", "ms/draw", "core %"
     );
     let mut worst = (0.0f64, String::new());
     for p in presets() {
-        let params = SimParams::from_cards(&p.state.visual.cards);
-        let mut sim = Sim::new(w, h, a.seed);
+        let substeps = SimParams::from_cards(&p.state.visual.cards).reaction.substeps();
+        let mut pic = Picture::new(pw, ph, a.seed);
+        let mut t = 0.0;
         for _ in 0..30 {
-            sim.step(&params);
+            t += 1.0 / SIM_HZ;
+            pic.step(&p.state, &sound, 0, t);
         }
-        let before = sim.stats();
+        let before = pic.sim().stats();
         let started = Instant::now();
         for _ in 0..steps {
-            sim.step(&params);
+            t += 1.0 / SIM_HZ;
+            pic.step(&p.state, &sound, 0, t);
         }
         let per_step = started.elapsed().as_secs_f64() / steps as f64;
-        let after = sim.stats();
-        let substeps = params.reaction.substeps();
+        let after = pic.sim().stats();
+        let started = Instant::now();
+        for _ in 0..20 {
+            pic.draw(t);
+        }
+        let per_draw = started.elapsed().as_secs_f64() / 20.0;
         let ns_cell = per_step * 1e9 / (w * h * substeps) as f64;
         let draws = (after.param_field_draws - before.param_field_draws)
             + (after.velocity_draws - before.velocity_draws);
-        let core = per_step * SIM_HZ * 100.0;
+        let core = (per_step * SIM_HZ + per_draw * DRAW_FPS) * 100.0;
         println!(
-            "{:<20} {substeps:>6} {:>9.2} {ns_cell:>12.2} {:>7.1} {core:>7.1}",
+            "{:<20} {substeps:>6} {:>9.2} {ns_cell:>12.2} {:>7.1} {:>8.2} {core:>7.1}",
             p.name,
             per_step * 1e3,
-            draws as f64 / steps as f64
+            draws as f64 / steps as f64,
+            per_draw * 1e3
         );
         if core > worst.0 {
             worst = (core, p.name.clone());

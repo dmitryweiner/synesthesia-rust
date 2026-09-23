@@ -104,28 +104,31 @@ impl Field {
     }
 
     /// One Gray–Scott substep with `dt = 1`, a 9-point weighted Laplacian
-    /// and a zero-flux border (`react.frag`). `feed`/`kill` are per cell, so
-    /// a spatially varied field costs the kernel two loads and nothing else.
-    pub fn react(&mut self, feed: &[f32], kill: &[f32], diff_u: f32, diff_v: f32) {
+    /// and a zero-flux border (`react.frag`).
+    pub fn react(&mut self, rates: &Rates, diff_u: f32, diff_v: f32) {
         let (w, h) = (self.w, self.h);
-        assert!(feed.len() == w * h && kill.len() == w * h);
+        assert!(rates.feed_off.len() == w * h && rates.kill_off.len() == w * h);
         for y in 0..h {
             let row = y * w..(y + 1) * w;
             if y == 0 || y == h - 1 {
                 for x in 0..w {
-                    self.edge_cell(x, y, feed, kill, diff_u, diff_v);
+                    self.edge_cell(x, y, rates, diff_u, diff_v);
                 }
                 continue;
             }
-            self.edge_cell(0, y, feed, kill, diff_u, diff_v);
-            self.edge_cell(w - 1, y, feed, kill, diff_u, diff_v);
+            self.edge_cell(0, y, rates, diff_u, diff_v);
+            self.edge_cell(w - 1, y, rates, diff_u, diff_v);
             let up = (y - 1) * w..y * w;
             let dn = (y + 1) * w..(y + 2) * w;
             interior_row(
                 Rows { up: &self.u[up.clone()], mid: &self.u[row.clone()], dn: &self.u[dn.clone()] },
                 Rows { up: &self.v[up], mid: &self.v[row.clone()], dn: &self.v[dn] },
-                &feed[row.clone()],
-                &kill[row.clone()],
+                RowRates {
+                    feed: rates.feed,
+                    kill: rates.kill,
+                    feed_off: &rates.feed_off[row.clone()],
+                    kill_off: &rates.kill_off[row.clone()],
+                },
                 (diff_u, diff_v),
                 &mut self.nu[row.clone()],
                 &mut self.nv[row],
@@ -136,7 +139,7 @@ impl Field {
     }
 
     /// The same update with every tap clamped into the grid — the border.
-    fn edge_cell(&mut self, x: usize, y: usize, feed: &[f32], kill: &[f32], diff_u: f32, diff_v: f32) {
+    fn edge_cell(&mut self, x: usize, y: usize, rates: &Rates, diff_u: f32, diff_v: f32) {
         let (w, h) = (self.w as isize, self.h as isize);
         let at = |dx: isize, dy: isize| {
             let cx = (x as isize + dx).clamp(0, w - 1);
@@ -149,11 +152,30 @@ impl Field {
                 + 0.2 * (f[at(0, -1)] + f[at(-1, 0)] + f[at(1, 0)] + f[at(0, 1)])
         };
         let i = at(0, 0);
-        let (nu, nv) =
-            update(self.u[i], self.v[i], lap(&self.u), lap(&self.v), feed[i], kill[i], diff_u, diff_v);
+        let fk = combine(rates.feed, rates.kill, rates.feed_off[i], rates.kill_off[i]);
+        let (nu, nv) = update(self.u[i], self.v[i], lap(&self.u), lap(&self.v), fk, (diff_u, diff_v));
         self.nu[i] = nu;
         self.nv[i] = nv;
     }
+}
+
+/// Feed and kill: the card's values plus the Field variation's offset per
+/// cell (all zeros when the card is off). The sum is clamped per cell, as
+/// `react.frag` does per fragment — so an LFO sweeping feed changes two
+/// numbers and not two maps.
+pub struct Rates<'a> {
+    pub feed: f32,
+    pub kill: f32,
+    pub feed_off: &'a [f32],
+    pub kill_off: &'a [f32],
+}
+
+/// [`Rates`] cut down to one row.
+struct RowRates<'a> {
+    feed: f32,
+    kill: f32,
+    feed_off: &'a [f32],
+    kill_off: &'a [f32],
 }
 
 struct Rows<'a> {
@@ -172,16 +194,18 @@ impl Rows<'_> {
 }
 
 #[inline(always)]
-#[allow(clippy::too_many_arguments)]
+fn combine(feed: f32, kill: f32, df: f32, dk: f32) -> (f32, f32) {
+    ((feed + df).clamp(0.0, 1.0), (kill + dk).clamp(0.0, 1.0))
+}
+
+#[inline(always)]
 fn update(
     u: f32,
     v: f32,
     lap_u: f32,
     lap_v: f32,
-    feed: f32,
-    kill: f32,
-    diff_u: f32,
-    diff_v: f32,
+    (feed, kill): (f32, f32),
+    (diff_u, diff_v): (f32, f32),
 ) -> (f32, f32) {
     // Fused multiply-adds: one `fmla` each on aarch64, which Rust never
     // contracts `a * b + c` into by itself.
@@ -194,20 +218,13 @@ fn update(
 /// Columns 1..w-1 of one interior row. Every slice is exactly one row long,
 /// so after the asserts the compiler can drop the bounds checks and
 /// vectorize the loop.
-fn interior_row(
-    u: Rows,
-    v: Rows,
-    feed: &[f32],
-    kill: &[f32],
-    diff: (f32, f32),
-    nu: &mut [f32],
-    nv: &mut [f32],
-) {
+fn interior_row(u: Rows, v: Rows, r: RowRates, diff: (f32, f32), nu: &mut [f32], nv: &mut [f32]) {
     let w = u.mid.len();
     assert!(u.up.len() == w && u.dn.len() == w && v.up.len() == w && v.mid.len() == w && v.dn.len() == w);
-    assert!(feed.len() == w && kill.len() == w && nu.len() == w && nv.len() == w);
+    assert!(r.feed_off.len() == w && r.kill_off.len() == w && nu.len() == w && nv.len() == w);
     for x in 1..w - 1 {
-        let (a, b) = update(u.mid[x], v.mid[x], u.lap(x), v.lap(x), feed[x], kill[x], diff.0, diff.1);
+        let fk = combine(r.feed, r.kill, r.feed_off[x], r.kill_off[x]);
+        let (a, b) = update(u.mid[x], v.mid[x], u.lap(x), v.lap(x), fk, diff);
         nu[x] = a;
         nv[x] = b;
     }
@@ -217,16 +234,20 @@ fn interior_row(
 mod tests {
     use super::*;
 
-    fn uniform(f: &Field, value: f32) -> Vec<f32> {
-        vec![value; f.w * f.h]
+    fn zeros(f: &Field) -> Vec<f32> {
+        vec![0.0; f.w * f.h]
+    }
+
+    fn default_rates(zero: &[f32]) -> Rates<'_> {
+        Rates { feed: 0.037, kill: 0.06, feed_off: zero, kill_off: zero }
     }
 
     #[test]
     fn the_blank_substrate_is_a_fixed_point() {
         let mut f = Field::blank(17, 11);
-        let (feed, kill) = (uniform(&f, 0.037), uniform(&f, 0.06));
+        let zero = zeros(&f);
         for _ in 0..100 {
-            f.react(&feed, &kill, 0.2097, 0.105);
+            f.react(&default_rates(&zero), 0.2097, 0.105);
         }
         assert!(f.u.iter().all(|&u| u == 1.0));
         assert!(f.v.iter().all(|&v| v == 0.0));
@@ -238,11 +259,11 @@ mod tests {
         let mut a = Field::blank(40, 30);
         a.seed(&mut rng);
         let mut b = a.clone();
-        let (feed, kill) = (uniform(&a, 0.037), uniform(&a, 0.06));
-        a.react(&feed, &kill, 0.2097, 0.105);
+        let zero = zeros(&a);
+        a.react(&default_rates(&zero), 0.2097, 0.105);
         for y in 0..b.h {
             for x in 0..b.w {
-                b.edge_cell(x, y, &feed, &kill, 0.2097, 0.105);
+                b.edge_cell(x, y, &default_rates(&zero), 0.2097, 0.105);
             }
         }
         std::mem::swap(&mut b.u, &mut b.nu);

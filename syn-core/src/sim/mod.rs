@@ -8,17 +8,27 @@
 //! redraw rate (GRAPHICS.md decision 4).
 
 pub mod advect;
+pub mod coupling;
+pub mod display;
 pub mod field;
 pub mod fields;
+pub mod frame;
 pub mod noise;
+pub mod palette;
+pub mod picture;
 
 use std::collections::BTreeMap;
 
 use crate::dsp::rng::{Mulberry32, Rng};
 use crate::state::{CardState, Params};
 
-pub use field::Field;
+pub use coupling::{DisplayFx, Ripple, RippleSet};
+pub use display::Image;
+pub use field::{Field, Rates};
 use fields::{half_size, ParamField, Velocity};
+pub use frame::{frame_params, FrameParams};
+pub use palette::Palette;
+pub use picture::Picture;
 
 /// Nominal frame time `evolve_t` advances by per step; it is an aesthetic
 /// drift, not a clock (`EVOLVE_DT` in `engine.ts`).
@@ -199,10 +209,11 @@ pub struct Sim {
     field: Field,
     param_field: ParamField,
     velocity: Velocity,
-    /// Per-cell feed and kill, and what they were built from.
-    feed: Vec<f32>,
-    kill: Vec<f32>,
-    maps_key: Option<(f64, f64, u64)>,
+    /// Field variation's feed and kill offsets per cell, and which
+    /// paramfield drawing they were sampled from (0: none — all zeros).
+    feed_off: Vec<f32>,
+    kill_off: Vec<f32>,
+    offsets_from: u64,
     scratch: (Vec<f32>, Vec<f32>),
     /// The velocity per cell, in cells per step — rebuilt on each redraw.
     velocity_cells: (Vec<f32>, Vec<f32>),
@@ -222,9 +233,9 @@ impl Sim {
             field: Field::blank(w, h),
             param_field: ParamField::new(fw, fh),
             velocity: Velocity::new(fw, fh),
-            feed: vec![0.0; w * h],
-            kill: vec![0.0; w * h],
-            maps_key: None,
+            feed_off: vec![0.0; w * h],
+            kill_off: vec![0.0; w * h],
+            offsets_from: 0,
             scratch: Default::default(),
             velocity_cells: Default::default(),
             evolve_t: 0.0,
@@ -287,15 +298,20 @@ impl Sim {
             self.param_field_at = None;
         }
         let generation = if varied { self.param_field.draws } else { 0 };
-        let key = (p.reaction.feed, p.reaction.kill, generation);
-        if self.maps_key != Some(key) {
-            self.build_maps(&p.reaction, varied);
-            self.maps_key = Some(key);
+        if self.offsets_from != generation {
+            self.build_offsets(varied);
+            self.offsets_from = generation;
         }
 
         let (du, dv) = (p.reaction.diff_u as f32, p.reaction.diff_v as f32);
         for _ in 0..p.reaction.substeps() {
-            self.field.react(&self.feed, &self.kill, du, dv);
+            let rates = Rates {
+                feed: p.reaction.feed as f32,
+                kill: p.reaction.kill as f32,
+                feed_off: &self.feed_off,
+                kill_off: &self.kill_off,
+            };
+            self.field.react(&rates, du, dv);
         }
 
         if p.flow.advect_active() {
@@ -315,13 +331,12 @@ impl Sim {
         }
     }
 
-    /// Per-cell feed/kill: the base plus the paramfield's offset, clamped —
-    /// what `react.frag` computes per fragment per substep, done once.
-    fn build_maps(&mut self, r: &Reaction, varied: bool) {
-        let (feed, kill) = (r.feed as f32, r.kill as f32);
+    /// The paramfield's offsets at every cell centre — what `react.frag`
+    /// samples per fragment per substep, sampled once per drawing.
+    fn build_offsets(&mut self, varied: bool) {
         if !varied {
-            self.feed.fill(feed.clamp(0.0, 1.0));
-            self.kill.fill(kill.clamp(0.0, 1.0));
+            self.feed_off.fill(0.0);
+            self.kill_off.fill(0.0);
             return;
         }
         let (w, h) = (self.field.w, self.field.h);
@@ -329,8 +344,8 @@ impl Sim {
             let vy = (y as f32 + 0.5) / h as f32;
             for x in 0..w {
                 let (df, dk) = self.param_field.tex.sample((x as f32 + 0.5) / w as f32, vy);
-                self.feed[y * w + x] = (feed + df).clamp(0.0, 1.0);
-                self.kill[y * w + x] = (kill + dk).clamp(0.0, 1.0);
+                self.feed_off[y * w + x] = df;
+                self.kill_off[y * w + x] = dk;
             }
         }
     }

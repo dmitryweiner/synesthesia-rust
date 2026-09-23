@@ -113,5 +113,6 @@ syn-core/   the model: generators, modulation, FX, engine, features,
 syn-audio/  the sink and the render thread
 syn-tui/    the screen, the key map, the half-block picture widget
 syn-app/    the binary: CLI, storage, the loop, the picture thread
-scripts/    check.sh; the web-app dumps and parity; term-cost.py
+scripts/    check.sh; the web-app dumps and parity; term-cost.py, soak.py,
+            picture-sheet.py (see AGENTS.md)
 ```

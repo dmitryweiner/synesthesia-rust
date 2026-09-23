@@ -3,11 +3,11 @@
 xfce4-terminal window at 120x40 and reads the CPU of that terminal, of Xorg
 and of xfwm4 from /proc, next to the command's own. GRAPHICS.md, the probe.
 
-  scripts/term-cost.py idle app app:off app:panel app:full FPS:COLOR:BITS:BREATHE ...
-  e.g. scripts/term-cost.py idle app:off app:panel 8:true:8:1 8:256:8:0
+  scripts/term-cost.py idle app app:spectrum app:panel app:full FPS:COLOR:BITS:BREATHE ...
+  e.g. scripts/term-cost.py idle app:spectrum app:panel 8:true:8:1 8:256:8:0
 
 `app` runs the interface on the user's own config; `app:<viz>` runs it on a
-throwaway config with the picture set to off, panel or full. The `viz`
+throwaway config with `viz` set to spectrum, panel or full. The `viz`
 column is the picture thread alone. With SHOT=dir set, each run leaves a
 screenshot of its window there.
 

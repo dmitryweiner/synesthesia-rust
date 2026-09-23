@@ -14,6 +14,7 @@ pub mod schema;
 pub mod share;
 pub mod sim;
 pub mod state;
+pub mod visualizer;
 pub mod wav;
 
 pub use dsp::generator::{FormulaGenerator, FormulaId, Params};

@@ -5,6 +5,7 @@
 //! Y-up). Nothing here depends on the orientation except the drift, which
 //! the caller passes already pointing down (see `fields.rs`).
 
+use super::fields::taps;
 use crate::dsp::rng::{Mulberry32, Rng};
 
 const MAX_SPOTS: usize = 24;
@@ -78,6 +79,26 @@ impl Field {
                 self.v[y * self.w + x] = v;
             }
         }
+    }
+
+    /// The same pattern on a `w`×`h` grid, resampled bilinearly — a
+    /// resized terminal keeps its picture instead of starting over.
+    pub fn resampled(&self, w: usize, h: usize) -> Self {
+        let mut out = Self::blank(w, h);
+        for y in 0..h {
+            let (j0, j1, fy) = taps((y as f32 + 0.5) / h as f32, self.h);
+            for x in 0..w {
+                let (i0, i1, fx) = taps((x as f32 + 0.5) / w as f32, self.w);
+                let lerp2 = |c: &[f32]| {
+                    let top = c[j0 * self.w + i0] + (c[j0 * self.w + i1] - c[j0 * self.w + i0]) * fx;
+                    let bot = c[j1 * self.w + i0] + (c[j1 * self.w + i1] - c[j1 * self.w + i0]) * fx;
+                    top + (bot - top) * fy
+                };
+                out.u[y * w + x] = lerp2(&self.u);
+                out.v[y * w + x] = lerp2(&self.v);
+            }
+        }
+        out
     }
 
     /// Fresh "ink" in a disc at `(cx, cy)` (UV, 0..1), `radius` in height
@@ -282,6 +303,24 @@ mod tests {
         let lit = a.v.iter().filter(|&&v| v > 0.25).count();
         assert!(lit > 20, "only {lit} cells seeded");
         assert!(a.v.iter().all(|&v| (0.0..=0.5).contains(&v)));
+    }
+
+    #[test]
+    fn resampling_keeps_the_pattern() {
+        let mut a = Field::blank(40, 20);
+        a.seed(&mut Mulberry32::new(8));
+        let same = a.resampled(40, 20);
+        assert!(a.v.iter().zip(&same.v).all(|(x, y)| (x - y).abs() < 1e-6), "identity");
+        let big = a.resampled(80, 40);
+        // Each cell of the original is the mean of the 2x2 it became.
+        let mean = |x: usize, y: usize| {
+            (big.v[2 * y * 80 + 2 * x]
+                + big.v[2 * y * 80 + 2 * x + 1]
+                + big.v[(2 * y + 1) * 80 + 2 * x]
+                + big.v[(2 * y + 1) * 80 + 2 * x + 1])
+                / 4.0
+        };
+        assert!((mean(20, 10) - a.v[10 * 40 + 20]).abs() < 0.05);
     }
 
     #[test]

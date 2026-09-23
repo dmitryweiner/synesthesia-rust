@@ -260,6 +260,23 @@ impl Sim {
         }
     }
 
+    /// The same pattern on a `w`×`h` grid. The fields are redrawn at the new
+    /// size on the next step.
+    pub fn resize(&mut self, w: usize, h: usize) {
+        if (w, h) == (self.field.w, self.field.h) {
+            return;
+        }
+        let (fw, fh) = half_size(w, h);
+        self.field = self.field.resampled(w, h);
+        self.param_field = ParamField::new(fw, fh);
+        self.velocity = Velocity::new(fw, fh);
+        self.feed_off = vec![0.0; w * h];
+        self.kill_off = vec![0.0; w * h];
+        self.offsets_from = u64::MAX; // whatever the next step's drawing is, rebuild
+        self.param_field_at = None;
+        self.velocity_at = None;
+    }
+
     /// A fresh start: new spots, the pattern wiped.
     pub fn reseed(&mut self) {
         self.field.seed(&mut self.rng);

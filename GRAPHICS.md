@@ -205,19 +205,48 @@ Found on the way, the same in the browser: `brightToShift` is centred on
 brightness 0.5, so in silence (brightness 0) the hue sits shifted by half
 the gene rather than at the card's value.
 
-**V3. On screen** (`Visualizer`, the thread, the widget, the keys).
-- `Visualizer` in `syn-core`, the field thread in `syn-app`, the half-block
-  widget in `syn-tui` with the colour mode of decision 2.
-- Layout: the field takes the space above the meters. `v` cycles
-  off → panel → full screen (meters hidden), and is remembered in the
-  config. Resizing regrids and resamples the current field instead of
-  reseeding it.
-- Config: `viz`, `viz_fps`, `sim_hz`, `viz_color`, written on
-  first run like the rest.
-- Measure with `scripts/term-cost.py` against the real app and fill the
-  "TUI redraw" row of PLAN.md's budget. **Target: the whole app with the
-  field at 120×40 and the defaults — terminal ≤ 40% of a core, our field
-  thread ≤ 10%, no xruns in a 2-minute soak with the scout running.**
+**V3. On screen ✔** (`Visualizer`, the thread, the widget, the keys).
+- `syn_core::visualizer::Visualizer` — `step(VizInput)` and `reseed()`;
+  the input is the point as it sounds (mid-morph included), the features,
+  the hit counter and the engine clock. `Picture` is the first one.
+- `syn-app/src/picture.rs`: the thread steps at `sim_hz` on its own clock,
+  drops steps rather than racing when it falls behind, draws at `viz_fps`
+  into a buffer the interface copies from, and idles while the picture is
+  off. The control thread hands it the point (only when it changed), each
+  feature frame and the size the layout gave the picture.
+- `syn-tui/src/field.rs`: `▀` cells, truecolor or the nearest xterm-256
+  colour (cube or grey ramp). The layout gives the picture whatever height
+  the text leaves in the panel, or the whole window minus a status line.
+- `v` cycles off → panel → full and writes `viz` to the config. Loading a
+  point and 🎲 reseed the field, as in the browser; 👍/👎 morph it.
+  Resizing resamples the field instead of reseeding it.
+- Config: `viz`, `viz_fps` (8), `sim_hz` (30), `viz_color` ("auto").
+
+Measured with `scripts/term-cost.py idle app:off app:panel app:full`
+(120×40 window, `--no-sound --no-scout`, the last point — speed 16, both
+optional cards on; 2026-09-23):
+
+| | terminal | Xorg | picture thread | whole app |
+|---|---|---|---|---|
+| empty window | 0% | 50% | — | — |
+| picture off | 14% | 52% | 0.2% | 67% |
+| panel (118×48 px) | 35% | 63% | 49% | 116% |
+| full screen (120×78 px) | 36% | 66% | 32% | 102% |
+
+- The terminal lands where the probe said it would: ~35% at 8 fps, the
+  same for the panel and the full screen — per frame, not per pixel.
+- **The picture thread runs on the little cores.** Sampling its CPU number
+  every 20 ms: 93% of the time on 0–5 (A55), 7% on 6–7 (A76). The kernel's
+  energy-aware scheduler sees a periodic load it can fit on a little core and
+  puts it there, where a step costs 4.5× more (V1) — ~50% of an A55, which
+  is the bench's ~11% of an A76. The panel/full difference is where it
+  happened to be scheduled, not the pixel count. A step takes ~16 ms of its
+  33 ms at 30 Hz there, so the pace holds. Pinning it to the A76 cores would
+  need an affinity call (a dependency or `unsafe`), and is not done.
+- The control thread does not notice the picture: the whole app minus the
+  picture thread is 67% with it and without it.
+- Not done: the 2-minute xrun soak with the sound and the scout running
+  (the player keeps no xrun count; it needs PipeWire's own).
 
 **V4. Side by side.** Every preset in the browser (lowest rung) and here,
 by eye: the same pattern family, the same palette, the same response to

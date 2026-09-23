@@ -3,8 +3,13 @@
 xfce4-terminal window at 120x40 and reads the CPU of that terminal, of Xorg
 and of xfwm4 from /proc, next to the command's own. GRAPHICS.md, the probe.
 
-  scripts/term-cost.py idle app FPS:COLOR:BITS:BREATHE ...
-  e.g. scripts/term-cost.py idle app 8:true:8:1 8:256:8:0
+  scripts/term-cost.py idle app app:off app:panel app:full FPS:COLOR:BITS:BREATHE ...
+  e.g. scripts/term-cost.py idle app:off app:panel 8:true:8:1 8:256:8:0
+
+`app` runs the interface on the user's own config; `app:<viz>` runs it on a
+throwaway config with the picture set to off, panel or full. The `viz`
+column is the picture thread alone. With SHOT=dir set, each run leaves a
+screenshot of its window there.
 
 Build first: cargo build --release && cargo build --release --example field_probe -p syn-tui
 """
@@ -42,15 +47,31 @@ def descendants(pid):
 
 XORG, XFWM = pidof('Xorg'), pidof('xfwm4')
 
-def run(label, cmd):
+def threads_named(pids, name):
+    out = []
+    for pid in pids:
+        try:
+            for tid in os.listdir(f'/proc/{pid}/task'):
+                if open(f'/proc/{pid}/task/{tid}/comm').read().strip() == name:
+                    out.append(f'{pid}/task/{tid}')
+        except Exception:
+            pass
+    return out
+
+def run(label, cmd, env=None):
     term = subprocess.Popen(['xfce4-terminal', '--disable-server', '--geometry=120x40', '--hide-menubar', '--hide-toolbar', '-x'] + cmd,
-                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=env)
     time.sleep(SKIP)
     kids = descendants(term.pid)
-    pids = {'term': [term.pid], 'Xorg': [XORG], 'xfwm4': [XFWM], 'app': kids}
+    pids = {'term': [term.pid], 'Xorg': [XORG], 'xfwm4': [XFWM], 'app': kids, 'viz': threads_named(kids, 'picture')}
     a = {k: sum(ticks(p) or 0 for p in v) for k, v in pids.items()}
     t0 = time.time()
-    time.sleep(SECS - SKIP - TAIL)
+    if os.environ.get('SHOT'):
+        time.sleep(4)
+        name = label.replace(' ', '_').replace(':', '-').replace('=', '')
+        subprocess.run(['xfce4-screenshooter', '-w', '-s', os.path.join(os.environ['SHOT'], name + '.png')],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    time.sleep(max(0, SECS - SKIP - TAIL - (time.time() - t0)))
     b = {k: sum(ticks(p) or 0 for p in v) for k, v in pids.items()}
     dt = time.time() - t0
     term.wait(timeout=30)
@@ -63,7 +84,13 @@ for c in configs:
     if c == 'idle':
         run('idle (sleep)', ['sleep', str(SECS)])
     elif c == 'app':
-        run('app ui_fps=8', ['timeout', str(SECS), APP, '--no-sound', '--no-scout'])
+        run('app', ['timeout', str(SECS), APP, '--no-sound', '--no-scout'])
+    elif c.startswith('app:'):
+        viz = c.split(':', 1)[1]
+        conf = tempfile.mkdtemp(prefix='term-cost-config-')
+        os.makedirs(f'{conf}/synesthesia')
+        open(f'{conf}/synesthesia/config.toml', 'w').write(f'viz = "{viz}"\n')
+        run(c, ['timeout', str(SECS), APP, '--no-sound', '--no-scout'], env={**os.environ, 'XDG_CONFIG_HOME': conf})
     else:
         fps, color, bits, breathe = c.split(':')
         out = f'{SCR}/probe-{c.replace(":", "_")}.json'

@@ -53,6 +53,17 @@ pub struct Config {
     /// enough for meters that breathe; raise it if the spectrum looks choppy.
     /// Key presses always redraw at once, whatever this is.
     pub ui_fps: f64,
+    /// The picture (GRAPHICS.md): "panel", "full" or "off" — what `v` last
+    /// left it at.
+    pub viz: String,
+    /// Picture frames drawn a second. Like `ui_fps`, the terminal pays for
+    /// each one: 8 costs it about a third of a core here, 4 about a quarter.
+    pub viz_fps: f64,
+    /// Simulation steps a second — how fast the pattern grows, whatever the
+    /// frame rate. The web app steps once per animation frame.
+    pub sim_hz: f64,
+    /// "truecolor", "256", or "auto" to go by `COLORTERM`.
+    pub viz_color: String,
 }
 
 impl Default for Config {
@@ -66,6 +77,10 @@ impl Default for Config {
             scout_sample_rate: 22050.0,
             scout_candidates: 3,
             ui_fps: 8.0,
+            viz: "panel".into(),
+            viz_fps: 8.0,
+            sim_hz: 30.0,
+            viz_color: "auto".into(),
         }
     }
 }

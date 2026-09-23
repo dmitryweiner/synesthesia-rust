@@ -6,6 +6,7 @@
 
 use std::process::ExitCode;
 
+mod picture;
 mod store;
 
 use std::sync::mpsc::{Receiver, TryRecvError};
@@ -18,7 +19,8 @@ use syn_core::genome::explorer::ExplorerOptions;
 use syn_core::genome::scout::{self, ScoutKind, ScoutResult, ScoutSettings};
 use syn_core::genome::{decode_genome, encode_genome, Explorer, Genome};
 use syn_core::share::encode_token;
-use syn_tui::{draw, poll_action, Action, Screen, View};
+use syn_core::sim::Image;
+use syn_tui::{draw, poll_action, Action, ColorMode, Screen, View, VizMode};
 
 use store::NamedPoint;
 use syn_core::analysis::fractal::analyze_sound;
@@ -228,6 +230,7 @@ fn run(argv: &[String]) -> Result<(), String> {
 /// written as a binary PPM. For looking at a point without a terminal.
 fn render_picture(state: &AppState, a: &Args, path: &str) -> Result<(), String> {
     use syn_core::sim::Picture;
+    use syn_core::visualizer::{Visualizer, VizInput};
     use syn_core::{Engine, BLOCK};
     const SIM_HZ: f64 = 30.0;
     let (w, h) = a.size;
@@ -240,7 +243,12 @@ fn render_picture(state: &AppState, a: &Args, path: &str) -> Result<(), String> 
         while engine.time() < i as f64 / SIM_HZ {
             engine.render(&mut block);
         }
-        picture.step(state, &engine.features(), engine.hits(), engine.time());
+        picture.step(&VizInput {
+            state,
+            features: engine.features(),
+            hits: engine.hits(),
+            time: engine.time(),
+        });
     }
     let image = picture.draw(engine.time());
     let mut ppm = format!("P6\n{} {}\n255\n", image.w, image.h).into_bytes();
@@ -520,13 +528,25 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
         },
     };
 
+    let mut viz = VizMode::parse(&config.viz);
+    let color = ColorMode::pick(&config.viz_color, std::env::var("COLORTERM").ok().as_deref());
+    let mut pic = picture::PictureThread::start(
+        &s.playing,
+        picture::Settings { sim_hz: config.sim_hz, draw_fps: config.viz_fps, seed },
+    );
+    pic.set_running(viz != VizMode::Off);
+    let mut image = Image::default();
+    // What the picture thread was last told the point is.
+    let mut shown = s.playing.clone();
+
     let mut screen = Screen::open().map_err(|e| format!("terminal: {e}"))?;
     let mut frame = Frame::default();
     // Drawing is what the interface actually costs: the terminal emulator
     // repaints the whole window for every redraw, and on a machine with no GPU
     // driver that repaint is software. So redraws are rate-limited, while keys
     // are polled far more often than that and always redraw at once.
-    let redraw_every = Duration::from_secs_f64(1.0 / config.ui_fps.clamp(1.0, 60.0));
+    // The picture's frames come at `viz_fps`, and only while it is on.
+    let redraw_every = Duration::from_secs_f64(1.0 / config.ui_fps.max(config.viz_fps).clamp(1.0, 60.0));
     let mut last_draw = Instant::now() - redraw_every;
     let mut dirty = true;
     // A key press redraws at once: the rate limit is there to slow the
@@ -535,9 +555,17 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
     loop {
         if let Some(f) = s.player.latest_frame() {
             frame = f;
+            pic.set_frame(f);
             dirty = true;
         }
         if s.tick_morph() {
+            dirty = true;
+        }
+        if s.playing != shown {
+            shown.clone_from(&s.playing);
+            pic.set_state(&shown);
+        }
+        if pic.take_new(&mut image) {
             dirty = true;
         }
         s.tick_scout();
@@ -560,8 +588,15 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
                 points: &names,
                 points_open: s.points_open,
                 selected: s.selected,
+                picture: (image.w > 0).then_some(&image),
+                viz,
+                color,
             };
-            screen.terminal.draw(|f| draw(f, &view)).map_err(|e| format!("draw: {e}"))?;
+            let mut area = None;
+            screen.terminal.draw(|f| area = draw(f, &view)).map_err(|e| format!("draw: {e}"))?;
+            if let Some(r) = area {
+                pic.set_size(usize::from(r.width), usize::from(r.height) * 2);
+            }
             last_draw = now;
             dirty = false;
             pressed = false;
@@ -588,6 +623,7 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
                 Action::Enter => {
                     if let Some(p) = s.points.get(s.selected).cloned() {
                         s.load_point(p.name.clone(), &p.state);
+                        pic.reseed();
                         s.say(format!("loaded “{}”", p.name));
                     }
                     s.points_open = false;
@@ -655,6 +691,7 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
                 s.steps = 0;
                 s.master = preset.state.audio.master_gain;
                 s.start_morph(from, to);
+                pic.reseed();
                 let msg = format!("surprise: {}", preset.name);
                 s.say(msg);
             }
@@ -711,9 +748,22 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
                 };
                 s.say(msg);
             }
+            Action::Picture => {
+                viz = viz.next();
+                pic.set_running(viz != VizMode::Off);
+                // Remembered for the next start; the rest of the file is kept.
+                let mut c = store::load_config();
+                c.viz = viz.as_str().to_string();
+                let msg = match store::save_config(&c) {
+                    Ok(()) => format!("picture: {}", viz.as_str()),
+                    Err(e) => format!("picture: {} (not saved: {e})", viz.as_str()),
+                };
+                s.say(msg);
+            }
             Action::Up | Action::Down | Action::Enter | Action::Delete => {}
         }
     }
+    drop(pic);
 
     let _ = store::save_last_point(&decode_genome(&s.explorer.current));
     drop(screen);
@@ -754,6 +804,7 @@ fn bench(a: &Args) -> Result<(), String> {
 /// one frame. Run it under `taskset -c 6` to read the numbers as one A76 core.
 fn bench_sim(a: &Args) -> Result<(), String> {
     use syn_core::sim::{grid_for_pixels, Picture, SimParams};
+    use syn_core::visualizer::{Visualizer, VizInput};
     use syn_core::AudioFeatures;
     const SIM_HZ: f64 = 30.0;
     const DRAW_FPS: f64 = 8.0;
@@ -773,13 +824,13 @@ fn bench_sim(a: &Args) -> Result<(), String> {
         let mut t = 0.0;
         for _ in 0..30 {
             t += 1.0 / SIM_HZ;
-            pic.step(&p.state, &sound, 0, t);
+            pic.step(&VizInput { state: &p.state, features: sound, hits: 0, time: t });
         }
         let before = pic.sim().stats();
         let started = Instant::now();
         for _ in 0..steps {
             t += 1.0 / SIM_HZ;
-            pic.step(&p.state, &sound, 0, t);
+            pic.step(&VizInput { state: &p.state, features: sound, hits: 0, time: t });
         }
         let per_step = started.elapsed().as_secs_f64() / steps as f64;
         let after = pic.sim().stats();

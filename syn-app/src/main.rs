@@ -319,6 +319,21 @@ struct ScoutState {
     start_at: Option<Instant>,
     rx: Option<Receiver<ScoutResult>>,
     result: Option<ScoutResult>,
+    /// The scout's own pool, smaller than the machine, so the sound always
+    /// has a core to run on.
+    pool: Option<std::sync::Arc<rayon::ThreadPool>>,
+}
+
+/// `threads` from the config, 0 meaning every core but two.
+fn scout_pool(threads: usize) -> Option<std::sync::Arc<rayon::ThreadPool>> {
+    let cores = std::thread::available_parallelism().map_or(4, std::num::NonZeroUsize::get);
+    let n = if threads == 0 { cores.saturating_sub(2).max(1) } else { threads };
+    rayon::ThreadPoolBuilder::new()
+        .num_threads(n)
+        .thread_name(|i| format!("syn-scout-{i}"))
+        .build()
+        .ok()
+        .map(std::sync::Arc::new)
 }
 
 impl ScoutState {
@@ -448,12 +463,16 @@ impl Session {
         let mut settings = self.scout.settings;
         settings.master_gain = self.master;
         let (tx, rx) = std::sync::mpsc::channel();
-        std::thread::Builder::new()
-            .name("syn-scout".into())
-            .spawn(move || {
-                let _ = tx.send(scout::run(version, &parent, &likes, &dislikes, settings));
-            })
-            .ok();
+        let job = move || {
+            let _ = tx.send(scout::run(version, &parent, &likes, &dislikes, settings));
+        };
+        // Inside the pool, the scout's own par_iter/join stay on its threads.
+        match &self.scout.pool {
+            Some(pool) => pool.spawn(job),
+            None => {
+                std::thread::Builder::new().name("syn-scout".into()).spawn(job).ok();
+            }
+        }
         self.scout.rx = Some(rx);
         self.scout.start_at = None;
     }
@@ -525,6 +544,7 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
             start_at: None,
             rx: None,
             result: None,
+            pool: scout_pool(config.scout_threads),
         },
     };
 

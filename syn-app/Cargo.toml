@@ -16,6 +16,7 @@ syn-tui = { path = "../syn-tui" }
 serde_json = "1"
 serde = { version = "1", features = ["derive"] }
 toml = "0.8"
+rayon = "1"
 
 [lints]
 workspace = true

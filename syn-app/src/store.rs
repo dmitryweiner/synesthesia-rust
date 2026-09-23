@@ -47,6 +47,10 @@ pub struct Config {
     pub scout_sample_rate: f64,
     /// Candidates per direction.
     pub scout_candidates: usize,
+    /// Threads the scout renders on; 0 means every core but two. With every
+    /// core busy, the audio thread and `pw-cat` lose to it and the sound
+    /// drops out on each 👍/👎 (GRAPHICS.md, the soak).
+    pub scout_threads: usize,
     /// Screen redraws per second. Every one of them is paid for outside this
     /// process — the terminal emulator repaints its window and X composites it,
     /// both in software on this machine, which is where the cycles go. Eight is
@@ -76,6 +80,7 @@ impl Default for Config {
             scout_seconds: 30.0,
             scout_sample_rate: 22050.0,
             scout_candidates: 3,
+            scout_threads: 0,
             ui_fps: 8.0,
             viz: "panel".into(),
             viz_fps: 8.0,

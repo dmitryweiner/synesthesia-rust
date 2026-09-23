@@ -63,7 +63,7 @@ write a `#s=` token · `?` help · `q` quit.
 
 | path | what |
 |---|---|
-| `~/.config/synesthesia/config.toml` | sample rate, audio command, latency, scout settings, `ui_fps`, the picture: `viz`, `viz_fps`, `sim_hz`, `viz_color` |
+| `~/.config/synesthesia/config.toml` | sample rate, audio command, latency, scout settings (`scout_threads`: 0 = every core but two), `ui_fps`, the picture: `viz`, `viz_fps`, `sim_hz`, `viz_color` |
 | `~/.local/share/synesthesia/last-point.json` | the point you were on |
 | `~/.local/share/synesthesia/points.json` | the points you kept |
 

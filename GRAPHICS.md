@@ -262,11 +262,24 @@ terminal and X are loaded as they would be; 2026-09-23):
 | spectrum | yes, 12 presses | on | 6 |
 | spectrum | yes, 12 presses | **off** | **0** |
 
-The picture does not cause xruns; **the scout does**, picture or not — each
-press starts a rayon batch of offline renders over every core, and the audio
-thread loses. PLAN.md's "0 in a 2-minute soak" was measured without presses.
-That is an audio-side fix (a smaller pool, or the scout kept off the core the
-audio thread is on), not a graphics one, and is left to its own change.
+The picture does not cause xruns; **the scout did**, picture or not — each
+press started a batch of seven offline renders on rayon's global pool, one
+thread per core, and the audio thread and `pw-cat` lost to it. PLAN.md's "0
+in a 2-minute soak" had been measured without presses.
+
+**Fixed:** the scout now runs on its own pool of every core but two
+(`scout_threads`, 0 = that default). The same soak — picture on, a press
+every 10 s:
+
+| scout threads | xruns in 130 s | one scout batch, wall |
+|---|---|---|
+| 8 (as before) | 4 | 1.4–2.1 s |
+| **6 (the default now)** | **0** | 1.3–2.3 s |
+| 4 | 0 | 2.0–2.5 s |
+
+(batch length read from the `syn-scout-*` threads' CPU, sampled every 50 ms;
+the scout's own status line cannot be read back from the tty, since ratatui
+only rewrites the cells that changed.)
 
 **V4. Side by side.** Every preset in the browser (lowest rung) and here,
 by eye: the same pattern family, the same palette, the same response to

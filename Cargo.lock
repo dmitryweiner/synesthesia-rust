@@ -574,6 +574,7 @@ dependencies = [
 name = "syn-app"
 version = "0.1.0"
 dependencies = [
+ "rayon",
  "serde",
  "serde_json",
  "syn-audio",

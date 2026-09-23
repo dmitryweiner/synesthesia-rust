@@ -8,17 +8,20 @@ use std::process::ExitCode;
 
 mod store;
 
+use std::sync::mpsc::{Receiver, TryRecvError};
 use std::time::{Duration, Instant};
 
 use syn_audio::{Frame, NullSink, PipeSink, Player, Sink};
 use syn_core::dsp::rng::{Mulberry32, Rng};
 use syn_core::genome::evolve::lerp_genome;
 use syn_core::genome::explorer::ExplorerOptions;
+use syn_core::genome::scout::{self, ScoutKind, ScoutResult, ScoutSettings};
 use syn_core::genome::{decode_genome, encode_genome, Explorer, Genome};
 use syn_core::share::encode_token;
 use syn_tui::{draw, poll_action, Action, Screen, View};
 
 use store::NamedPoint;
+use syn_core::analysis::fractal::analyze_sound;
 use syn_core::state::{presets, AppState};
 use syn_core::{render_offline, wav};
 
@@ -29,6 +32,7 @@ usage:
   synesthesia [options]             open the console interface
   synesthesia play [options]        play a point without the interface
   synesthesia render [options]      render a point offline
+  synesthesia bench [options]       render every preset and report
 
 options:
   --preset N        built-in preset, 0..11 (default 0)
@@ -39,6 +43,8 @@ options:
   --out FILE        write a 16-bit WAV here (render only)
   --raw FILE        write raw little-endian f32 samples here (render only)
   --no-sound        play into a null device (for measuring)
+  --no-scout        do not score candidates in the background
+  --score           print the fractality metrics of the render, as JSON
   --list            list the built-in presets
 
 `play` runs until Ctrl-C, or for --secs seconds if that is given.
@@ -53,6 +59,8 @@ struct Args {
     out: Option<String>,
     raw: Option<String>,
     no_sound: bool,
+    no_scout: bool,
+    score: bool,
 }
 
 fn main() -> ExitCode {
@@ -74,7 +82,7 @@ fn run(argv: &[String]) -> Result<(), String> {
     }
     // No command means the interface; flags may follow either way.
     let (command, rest): (&str, &[String]) = match first {
-        "render" | "play" | "tui" => (first, &argv[1..]),
+        "render" | "play" | "tui" | "bench" => (first, &argv[1..]),
         _ => ("tui", argv),
     };
 
@@ -94,6 +102,8 @@ fn run(argv: &[String]) -> Result<(), String> {
         out: None,
         raw: None,
         no_sound: false,
+        no_scout: false,
+        score: false,
     };
     let mut it = rest.iter();
     while let Some(flag) = it.next() {
@@ -114,6 +124,8 @@ fn run(argv: &[String]) -> Result<(), String> {
             "--sr" => a.sr = value()?.parse().map_err(|e| format!("--sr: {e}"))?,
             "--seed" => a.seed = value()?.parse().map_err(|e| format!("--seed: {e}"))?,
             "--no-sound" => a.no_sound = true,
+            "--no-scout" => a.no_scout = true,
+            "--score" => a.score = true,
             "--out" => a.out = Some(value()?),
             "--raw" => a.raw = Some(value()?),
             other => return Err(format!("unknown option `{other}`\n\n{USAGE}")),
@@ -140,6 +152,9 @@ fn run(argv: &[String]) -> Result<(), String> {
         }
     };
 
+    if command == "bench" {
+        return bench(&a);
+    }
     match command {
         "tui" => return tui(&name, state, &a),
         "play" => return play(&name, &state, &a),
@@ -159,6 +174,20 @@ fn run(argv: &[String]) -> Result<(), String> {
         a.sr,
         a.secs / wall
     );
+
+    if a.score {
+        let m = analyze_sound(&samples, a.sr);
+        println!(
+            "{{\"score\":{:.6},\"loudness\":{:.3},\"envBeta\":{},\"centroidBeta\":{},\"envHiguchi\":{},\"boxDim\":{:.4},\"silent\":{}}}",
+            m.score,
+            m.loudness,
+            json_number(m.env_beta),
+            json_number(m.centroid_beta),
+            json_number(m.env_higuchi),
+            m.box_dim,
+            m.silent
+        );
+    }
 
     if let Some(path) = &a.out {
         std::fs::write(path, wav::encode_mono(&samples, a.sr as u32)).map_err(|e| format!("{path}: {e}"))?;
@@ -220,6 +249,30 @@ fn play(name: &str, state: &AppState, a: &Args) -> Result<(), String> {
 /// The console interface: the search, the points and the sound in one loop.
 /// Everything the screen shows comes from `syn-tui`; everything it changes
 /// goes through the explorer and the player.
+/// The background search: candidates are rendered and scored while the user
+/// listens, and a press takes the best one prepared for that direction.
+struct ScoutState {
+    settings: ScoutSettings,
+    candidates: usize,
+    enabled: bool,
+    start_at: Option<Instant>,
+    rx: Option<Receiver<ScoutResult>>,
+    result: Option<ScoutResult>,
+}
+
+impl ScoutState {
+    /// Drops what was prepared: the point moved, so it is stale.
+    fn invalidate(&mut self) {
+        self.result = None;
+        self.rx = None;
+        self.start_at = None;
+    }
+
+    fn ready(&self, version: u64) -> Option<&ScoutResult> {
+        self.result.as_ref().filter(|r| r.version == version)
+    }
+}
+
 struct Session {
     explorer: Explorer,
     rng: Mulberry32,
@@ -235,6 +288,7 @@ struct Session {
     selected: usize,
     show_help: bool,
     status: String,
+    scout: ScoutState,
 }
 
 struct Morph {
@@ -247,6 +301,18 @@ struct Morph {
 const MORPH_SECS: f64 = 2.0;
 
 impl Session {
+    /// Says something to the status line, and to `$SYN_LOG` when it is set —
+    /// the only way to see what a full-screen interface did, from a script.
+    fn say(&mut self, message: String) {
+        if let Ok(path) = std::env::var("SYN_LOG") {
+            if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(path) {
+                use std::io::Write;
+                let _ = writeln!(f, "{message}");
+            }
+        }
+        self.status = message;
+    }
+
     fn name(&self) -> String {
         if self.steps == 0 {
             self.base_name.clone()
@@ -271,7 +337,72 @@ impl Session {
     fn start_morph(&mut self, from: Genome, to: Genome) {
         self.morph = Some(Morph { from, to, started: Instant::now() });
         self.steps += 1;
+        self.scout.invalidate();
         let _ = store::save_last_point(&decode_genome(&self.explorer.current));
+    }
+
+    /// Starts scouting once the sound has settled, and picks up a finished job.
+    fn tick_scout(&mut self) {
+        if !self.scout.enabled {
+            return;
+        }
+        if let Some(rx) = &self.scout.rx {
+            match rx.try_recv() {
+                Ok(result) => {
+                    self.scout.rx = None;
+                    if result.version == self.explorer.version {
+                        let msg = format!(
+                            "scouted {} + {} candidates in {:.1} s",
+                            result.ready(ScoutKind::Like),
+                            result.ready(ScoutKind::Dislike),
+                            result.seconds
+                        );
+                        self.say(msg);
+                        self.scout.result = Some(result);
+                    }
+                }
+                Err(TryRecvError::Disconnected) => self.scout.rx = None,
+                Err(TryRecvError::Empty) => {}
+            }
+            return;
+        }
+        if self.morph.is_some() || self.scout.result.is_some() {
+            return;
+        }
+        let Some(at) = self.scout.start_at else {
+            // Settle first: the user may press again straight away.
+            self.scout.start_at = Some(Instant::now() + Duration::from_millis(800));
+            return;
+        };
+        if Instant::now() < at {
+            return;
+        }
+
+        let version = self.explorer.version;
+        let parent = self.explorer.current.clone();
+        let likes: Vec<Genome> =
+            (0..self.scout.candidates).map(|_| self.explorer.propose_like(&mut self.rng)).collect();
+        let dislikes: Vec<Genome> =
+            (0..self.scout.candidates).map(|_| self.explorer.propose_dislike(&mut self.rng)).collect();
+        let mut settings = self.scout.settings;
+        settings.master_gain = self.master;
+        let (tx, rx) = std::sync::mpsc::channel();
+        std::thread::Builder::new()
+            .name("syn-scout".into())
+            .spawn(move || {
+                let _ = tx.send(scout::run(version, &parent, &likes, &dislikes, settings));
+            })
+            .ok();
+        self.scout.rx = Some(rx);
+        self.scout.start_at = None;
+    }
+
+    /// The candidate the scout prepared for this direction, if it is still
+    /// about the point the user is listening to.
+    fn scouted(&self, kind: ScoutKind) -> Option<(Genome, f64, usize)> {
+        let result = self.scout.ready(self.explorer.version)?;
+        let best = result.best(kind)?;
+        Some((best.genome.clone(), best.analysis.score, result.ready(kind)))
     }
 
     /// Advances a running morph; returns true while one is in flight.
@@ -288,6 +419,7 @@ impl Session {
     }
 
     fn load_point(&mut self, name: String, state: &AppState) {
+        self.scout.invalidate();
         self.base_name = name;
         self.steps = 0;
         self.master = state.audio.master_gain;
@@ -298,6 +430,7 @@ impl Session {
 }
 
 fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
+    let config = store::load_config();
     let sink = open_sink(a)?;
     let sink_name = sink.name().to_string();
     let player = Player::start(a.sr, &state, sink);
@@ -319,6 +452,19 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
         selected: 0,
         show_help: true,
         status: format!("{sink_name} · {:.0} Hz", a.sr),
+        scout: ScoutState {
+            settings: ScoutSettings {
+                seconds: config.scout_seconds,
+                sample_rate: config.scout_sample_rate,
+                master_gain: state.audio.master_gain,
+                seed: seed ^ 0x5f36_1a2b,
+            },
+            candidates: config.scout_candidates,
+            enabled: config.scout && !a.no_scout,
+            start_at: None,
+            rx: None,
+            result: None,
+        },
     };
 
     let mut screen = Screen::open().map_err(|e| format!("terminal: {e}"))?;
@@ -328,6 +474,7 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
             frame = f;
         }
         s.tick_morph();
+        s.tick_scout();
 
         let title = s.name();
         let names: Vec<String> = s.points.iter().map(|p| p.name.clone()).collect();
@@ -358,7 +505,7 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
                 Action::Enter => {
                     if let Some(p) = s.points.get(s.selected).cloned() {
                         s.load_point(p.name.clone(), &p.state);
-                        s.status = format!("loaded “{}”", p.name);
+                        s.say(format!("loaded “{}”", p.name));
                     }
                     s.points_open = false;
                 }
@@ -366,10 +513,11 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
                     if s.selected < s.points.len() {
                         let gone = s.points.remove(s.selected);
                         s.selected = s.selected.min(s.points.len().saturating_sub(1));
-                        s.status = match store::save_points(&s.points) {
+                        let msg = match store::save_points(&s.points) {
                             Ok(()) => format!("forgot “{}”", gone.name),
                             Err(e) => format!("could not write the points file: {e}"),
                         };
+                        s.say(msg);
                     }
                 }
                 Action::Quit => break,
@@ -386,19 +534,33 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
                 s.muted = !s.muted;
                 let playing = s.playing.clone();
                 s.push_state(playing, false);
-                s.status = if s.muted { "silent".into() } else { "playing".into() };
+                s.say(if s.muted { "silent".into() } else { "playing".into() });
             }
             Action::Like => {
+                let picked = s.scouted(ScoutKind::Like);
                 let from = s.explorer.current.clone();
-                let to = s.explorer.like(None, &mut s.rng).clone();
+                let to = s.explorer.like(picked.as_ref().map(|p| p.0.clone()), &mut s.rng).clone();
                 s.start_morph(from, to);
-                s.status = format!("more of this · spread {:.2}", s.explorer.sigma);
+                let msg = match picked {
+                    Some((_, score, of)) => {
+                        format!("more of this · best of {of} scouted (fractality {score:.2})")
+                    }
+                    None => format!("more of this · spread {:.2}", s.explorer.sigma),
+                };
+                s.say(msg);
             }
             Action::Dislike => {
+                let picked = s.scouted(ScoutKind::Dislike);
                 let from = s.explorer.current.clone();
-                let to = s.explorer.dislike(None, &mut s.rng).clone();
+                let to = s.explorer.dislike(picked.as_ref().map(|p| p.0.clone()), &mut s.rng).clone();
                 s.start_morph(from, to);
-                s.status = format!("not this · spread {:.2}", s.explorer.sigma);
+                let msg = match picked {
+                    Some((_, score, of)) => {
+                        format!("not this · best of {of} scouted (fractality {score:.2})")
+                    }
+                    None => format!("not this · spread {:.2}", s.explorer.sigma),
+                };
+                s.say(msg);
             }
             Action::Surprise => {
                 let i = (s.rng.next() * presets().len() as f64) as usize;
@@ -410,7 +572,8 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
                 s.steps = 0;
                 s.master = preset.state.audio.master_gain;
                 s.start_morph(from, to);
-                s.status = format!("surprise: {}", preset.name);
+                let msg = format!("surprise: {}", preset.name);
+                s.say(msg);
             }
             Action::Undo => {
                 let from = s.explorer.current.clone();
@@ -419,21 +582,23 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
                         let to = to.clone();
                         s.start_morph(from, to);
                         s.steps = s.steps.saturating_sub(2);
-                        s.status = format!("undo · {} left", s.explorer.undo_depth());
+                        let msg = format!("undo · {} left", s.explorer.undo_depth());
+                        s.say(msg);
                     }
-                    None => s.status = "nothing to undo".into(),
+                    None => s.say("nothing to undo".into()),
                 }
             }
             Action::Save => {
                 let state = decode_genome(&s.explorer.current);
                 let name = format!("{} #{}", s.base_name, s.points.len() + 1);
-                s.status = match store::keep_point(&name, &state) {
+                let msg = match store::keep_point(&name, &state) {
                     Ok(n) => {
                         s.points = store::load_points();
                         format!("kept as “{name}” ({n} points)")
                     }
                     Err(e) => format!("could not keep the point: {e}"),
                 };
+                s.say(msg);
             }
             Action::Points => {
                 s.points = store::load_points();
@@ -442,7 +607,7 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
             }
             Action::Details => {
                 let g = &s.explorer.current;
-                s.status = format!(
+                let msg = format!(
                     "{} formulas · {} routes · spread {:.2} · {} undo steps · genome {}",
                     decode_genome(g).enabled_formulas().len(),
                     s.playing.modulation.routes.len(),
@@ -450,16 +615,18 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
                     s.explorer.undo_depth(),
                     g.len()
                 );
+                s.say(msg);
             }
             Action::Export => {
                 let token = encode_token(&decode_genome(&s.explorer.current));
                 let path = store::data_dir().join("token.txt");
-                s.status = match std::fs::create_dir_all(store::data_dir())
+                let msg = match std::fs::create_dir_all(store::data_dir())
                     .and_then(|()| std::fs::write(&path, format!("#s={token}\n")))
                 {
                     Ok(()) => format!("token written to {}", path.display()),
                     Err(e) => format!("could not write the token: {e}"),
                 };
+                s.say(msg);
             }
             Action::Up | Action::Down | Action::Enter | Action::Delete => {}
         }
@@ -468,4 +635,41 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
     let _ = store::save_last_point(&decode_genome(&s.explorer.current));
     drop(screen);
     s.player.stop()
+}
+
+/// Renders every preset and reports what it cost and what it scored — the
+/// bench this project judges changes by (PLAN.md decision 10).
+fn bench(a: &Args) -> Result<(), String> {
+    println!("{:<20} {:>10} {:>9} {:>8} {:>7} {:>7}", "preset", "x realtime", "rms", "peak", "score", "boxDim");
+    let (mut slowest, mut slowest_name) = (f64::INFINITY, String::new());
+    for p in presets() {
+        let started = std::time::Instant::now();
+        let x = render_offline(&p.state, a.secs, a.sr, a.seed);
+        let speed = a.secs / started.elapsed().as_secs_f64();
+        let m = analyze_sound(&x, a.sr);
+        let peak = x.iter().fold(0.0f32, |acc, v| acc.max(v.abs()));
+        let rms = (x.iter().map(|v| f64::from(*v) * f64::from(*v)).sum::<f64>() / x.len() as f64).sqrt();
+        println!(
+            "{:<20} {speed:>10.1} {rms:>9.4} {peak:>8.3} {:>7.2} {:>7.2}",
+            p.name, m.score, m.box_dim
+        );
+        if speed < slowest {
+            slowest = speed;
+            slowest_name = p.name.clone();
+        }
+    }
+    println!(
+        "\nslowest: {slowest_name} at {slowest:.1}x realtime — {:.1}% of one core to play live",
+        100.0 / slowest
+    );
+    Ok(())
+}
+
+/// JSON has no NaN; the web app's metrics use it for "nothing to fit here".
+fn json_number(v: f64) -> String {
+    if v.is_finite() {
+        format!("{v:.4}")
+    } else {
+        "null".to_string()
+    }
 }

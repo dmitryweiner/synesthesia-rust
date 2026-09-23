@@ -212,13 +212,12 @@ impl FxChain {
             FilterMode::Comb => {}
         }
 
-        // The browser cannot run a delay shorter than one render quantum inside
-        // a feedback loop, so its comb tops out at sr/128 (375 Hz at 48 kHz) no
-        // matter what the slider says — and every comb preset was tuned through
-        // that ceiling. Matching it keeps those points at the level and pitch
-        // they were built at (measured: comb ran +3.4 dB hot without it).
-        let comb_delay = (sr / filter_freq.clamp(20.0, 2000.0))
-            .max(MIN_LOOP_DELAY)
+        // A feedback loop in Web Audio is broken once per render quantum, so
+        // every loop carries 128 samples of latency on top of its delay time.
+        // The presets were tuned through that, and it is audible: without the
+        // extra quantum the comb ran +3.4 dB hot and resonated on the wrong
+        // partials. Measured, with it: 0.0–0.1 dB (scripts/parity.mjs).
+        let comb_delay = (sr / filter_freq.clamp(20.0, 2000.0) + MIN_LOOP_DELAY)
             .clamp(2.0, self.comb.capacity() as f64 - 2.0);
         let chorus_base_ms = if fx.chorus_mode == "flanger" { 2.0 } else { 12.0 };
         let chorus_inc = std::f64::consts::TAU * chorus_rate / sr;
@@ -227,7 +226,7 @@ impl FxChain {
         let p_hi = PHASER_F_LO + 3600.0 * phaser_depth;
         let p_centre = 0.5 * (PHASER_F_LO + p_hi);
         let p_half = 0.5 * (p_hi - PHASER_F_LO);
-        let delay_samples = delay_time * sr;
+        let delay_samples = delay_time * sr + MIN_LOOP_DELAY;
 
         let decay_moved = !matches!(
             (fx.reverb_decay - self.last_reverb_decay).abs().partial_cmp(&0.05),
@@ -264,7 +263,7 @@ impl FxChain {
             if fx.chorus_on {
                 let lfo = self.chorus_phase.sin();
                 self.chorus_phase += chorus_inc;
-                let d = ((chorus_base_ms + chorus_depth * lfo) * 1e-3 * sr).max(1.0);
+                let d = ((chorus_base_ms + chorus_depth * lfo) * 1e-3 * sr + MIN_LOOP_DELAY).max(1.0);
                 let wet = self.chorus.read(d);
                 self.chorus.write(x + wet * chorus_fb);
                 x = x * (1.0 - chorus_mix) + wet * chorus_mix;
@@ -427,9 +426,13 @@ mod tests {
         let mut buf = vec![0.0f32; (sr * 0.6) as usize];
         buf[0] = 1.0;
         chain.process(&mut buf);
-        let at = (sr * 0.25) as usize;
-        assert!(buf[at].abs() > 0.5, "no echo at 250 ms: {}", buf[at]);
-        let at2 = (sr * 0.5) as usize;
-        assert!(buf[at2].abs() > 0.2, "no second echo: {}", buf[at2]);
+        // The echo lands a render quantum late, like the browser's (see
+        // MIN_LOOP_DELAY), so look in a window rather than at one sample.
+        let peak_near = |centre: f64| {
+            let c = (sr * centre) as usize;
+            (c - 200..c + 400).fold(0.0f32, |m, i| m.max(buf[i].abs()))
+        };
+        assert!(peak_near(0.25) > 0.5, "no echo at 250 ms: {}", peak_near(0.25));
+        assert!(peak_near(0.5) > 0.2, "no second echo: {}", peak_near(0.5));
     }
 }

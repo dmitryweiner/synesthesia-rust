@@ -60,8 +60,11 @@ const count = await evaluate(async () => (await import('/src/presets.ts')).PRESE
 
 for (let i = 0; i < count; i++) {
   const raw = join(dir, `p${i}.f32`);
-  const out = execFileSync(BIN, ['render', '--preset', String(i), '--secs', String(SECS), '--sr', String(SR), '--raw', raw], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+  const out = execFileSync(BIN, ['render', '--preset', String(i), '--secs', String(SECS), '--sr', String(SR), '--raw', raw, '--score'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
   const speed = /\(([\d.]+)x realtime\)/.exec(out)?.[1];
+  // The same samples, scored by our own port of the metric — so a difference
+  // in the metric can be told from a difference in the sound.
+  const ownScore = JSON.parse(out.slice(out.indexOf('{'))).score;
   const buf = readFileSync(raw);
   const rust = Array.from(new Float32Array(buf.buffer, buf.byteOffset, buf.length / 4));
 
@@ -80,11 +83,11 @@ for (let i = 0; i < count; i++) {
     return { name: PRESETS[i].name, webScore: a.score, rustScore: b.score, webRms: rmsOf(web) };
   }, { i, secs: SECS, sr: SR, rust });
 
-  rows.push({ ...r, rustRms: rms(rust), speed });
+  rows.push({ ...r, rustRms: rms(rust), speed, ownScore });
 }
 
 let bad = 0;
-console.log('\npreset                 rms(web)  rms(rust)   Δ dB   score(web)  score(rust)    x realtime');
+console.log('\npreset                 rms(web)  rms(rust)   Δ dB   score(web)  score(rust)  own metric    x realtime');
 for (const r of rows) {
   const d = db(r.rustRms) - db(r.webRms);
   // Budget (PLAN.md decision 3): within ±3 dB of the browser's loudness, and
@@ -95,12 +98,13 @@ for (const r of rows) {
   console.log(
     `${r.name.padEnd(20)} ${r.webRms.toFixed(4).padStart(8)} ${r.rustRms.toFixed(4).padStart(10)} ` +
     `${d.toFixed(1).padStart(6)}   ${r.webScore.toFixed(2).padStart(9)} ${r.rustScore.toFixed(2).padStart(12)} ` +
-    `${String(r.speed).padStart(13)}${flagged ? '  <-- outside the budget' : ''}`,
+    `${r.ownScore.toFixed(2).padStart(11)} ${String(r.speed).padStart(13)}${flagged ? '  <-- outside the budget' : ''}`,
   );
 }
 const mean = (f) => rows.reduce((s, r) => s + f(r), 0) / rows.length;
 console.log(`\nmean score: web ${mean((r) => r.webScore).toFixed(2)}, rust ${mean((r) => r.rustScore).toFixed(2)}`);
 console.log(`mean |Δ| rms: ${mean((r) => Math.abs(db(r.rustRms) - db(r.webRms))).toFixed(1)} dB`);
+console.log(`metric port: mean |score(web metric) − score(own metric)| on the same samples: ${mean((r) => Math.abs(r.rustScore - r.ownScore)).toFixed(3)}`);
 
 await browser.close();
 await server.stop?.();

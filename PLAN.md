@@ -61,19 +61,23 @@ project, so the two read alike.
      here and in the browser, must land within the presets' fractality band
      (0.79 ± 0.14, see ../synesthesia/AGENTS.md) and within ±3 dB RMS.
    - **Measured** (`scripts/parity.mjs`, 12 presets, 8 s at 48 kHz): mean
-     |Δ| 1.3 dB, mean fractality 0.67 in the browser against 0.62 here. Three
-     things had to be copied rather than invented to get there, each found by
-     measuring: the limiter's make-up gain (Blink boosts by ~6.8 dB at the
-     default threshold, and without it every point sat that much lower), the
-     convolver's normalization (its wet signal is far *below* the dry one —
-     0.16 to 0.39 of it across the decay range — and an FDN normalized the
-     textbook way came out 16 dB hot), and the browser's minimum delay inside
-     a feedback loop (one render quantum, so its comb filter cannot exceed
-     sr/128 whatever the slider says). What remains: one preset (*Loom &
-     copper*, a comb at 0.65 feedback) is 6 dB louder here, because a
-     resonant comb's peaks land on different partials — chasing that further
-     would mean re-implementing a Web Audio node, which decision 3 says not
-     to do.
+     |Δ| 1.7 dB, every preset within ±2.1 dB, mean fractality 0.61 in the
+     browser against 0.55 here — and the browser's own score for one preset
+     moves by ±0.3 between runs, since its noise generators are unseeded.
+     Three things had to be *copied* rather than invented to get there, each
+     found by measuring, none of them obvious:
+     - the limiter's **make-up gain** — Blink boosts by ~6.8 dB at the
+       default threshold, and without it every point sat that much lower;
+     - the convolver's **normalization** — its wet signal is far *below* the
+       dry one (0.16 of it at decay 0.5 s, 0.39 at 8 s), and an FDN
+       normalized the textbook way came out 16 dB hot;
+     - the **render quantum inside every feedback loop** — Web Audio breaks a
+       cycle once per 128 samples, so each loop carries that much latency on
+       top of its delay time. The comb was +3.4 dB and resonating on the
+       wrong partials until the port did the same; with it, filter-only lands
+       within 0.1 dB.
+   - The metric itself is a faithful port: scored on identical samples, our
+     `analyze_sound` and the web app's `analyzeSound` agree to 0.000.
 4. **The generators are a literal port and are verified bit-exact.** They are
    pure, per-sample, and `mulberry32` ports exactly, so each of the 21
    formulas is diffed sample-by-sample against a reference WAV rendered by
@@ -176,31 +180,38 @@ convenience.
 
 ## Phases
 
-0. **Scaffold.** `rustup` is *not installed on this machine* — that is step
-   one. Workspace, `cargo check/clippy/test` as the equivalent of
-   `npm run check`, then two dumps from the running web app, both committed:
-   `assets/presets.json` (decision 2) and the golden WAVs for decision 4.
-1. **Generators.** All 21, with the bit-exact diff against the golden WAVs.
-2. **Mod matrix + FX + master**, offline render to WAV, fractality/RMS check
-   against the browser renders (decision 3).
-3. **Realtime output.** Device, block scheduler, triple-buffered state,
-   ducked switching, the 2 s morph on the audio thread. Success = 30 minutes
-   without an xrun at a 256-frame period.
-4. **TUI.** Screens, keys, feature bus, meters and spectrum.
-5. **Genome + explorer + storage.** 👍/👎/🎲/undo, the config file with the
-   current point, the named-points file, `#s=` import/export.
-6. **Scout** on rayon, full-quality renders, `take()` on version change.
+0. **Scaffold** ✔ — workspace, `scripts/check.sh` (fmt + clippy + tests) as
+   the equivalent of `npm run check`, and the dumps from the running web app,
+   all committed: `assets/presets.json`, `assets/schema.json` (ranges,
+   defaults, the gene list), `assets/genomes.json` and the 63 golden takes in
+   `golden/`.
+1. **Generators** ✔ — all 21, diffed sample by sample against the golden
+   takes at 48 kHz, at 8 kHz with their slow events forced to fire, and with
+   an LFO route on a slider. Worst difference 1e-6; the chaotic ones needed
+   no exemption.
+2. **Mod matrix + FX + master** ✔ — offline render, WAV and `--score`,
+   loudness and fractality checked against the browser (decision 3).
+3. **Realtime output** ✔ — a render thread writing into `pw-cat`, commands
+   and frames on bounded channels, replaced points dropped off the audio
+   thread. No ALSA headers on this machine, so `cpal` waits behind the same
+   `Sink` trait; the 30-minute xrun soak is still to run.
+4. **TUI** ✔ — the screen, the keys, the feature bus, meters and spectrum.
+5. **Genome + explorer + storage** ✔ — 👍/👎/🎲/undo with a 2 s morph, the
+   config, the kept points, `#s=` tokens.
+6. **Scout** ✔ — rayon, full-quality renders (30 s at 22 kHz), a version
+   check that drops what the last press made stale. Measured: 3 + 3
+   candidates scored in 1.3–1.6 s.
 
 ## Performance budget (thresholds, checked by the bench)
 
 | metric | target | in the browser | measured here |
 |---|---|---|---|
-| live point, one A76 core | ≤ 15% | ~95% | 1.6–12% (worst: *Fractal garden*) |
-| xruns at 48 kHz / 256 frames | 0 in 30 min | dropouts under load | phase 3 |
-| offline render | ≥ 8× realtime | 1.1–1.6× | 8.6–61× (48 kHz, one A76) |
-| scout, 7 candidates | < 3 s wall, full quality | ~15 s CPU, surrogate quality | phase 6 |
-| startup → first sound | < 300 ms | seconds | phase 3 |
-| TUI redraw | < 2 ms | — | phase 4 |
+| live point, one A76 core | ≤ 15% | ~95% | 12.2% worst (*Fractal garden*), 36% measured live with the TUI and the pipe sink |
+| xruns at 48 kHz / 1024 frames | 0 in 30 min | dropouts under load | 0 in a 2-minute soak; the long one is still to run |
+| offline render | ≥ 8× realtime | 1.1–1.6× | 8.2–49× (`synesthesia bench`) |
+| scout, 3 + 3 candidates | < 3 s wall, full quality | ~15 s CPU, surrogate quality | 1.3–1.6 s at 30 s / 22 kHz |
+| startup → first sound | < 300 ms | seconds | not measured yet |
+| TUI redraw | < 2 ms | — | not measured yet |
 
 The first and third rows started as ≤ 5% and ≥ 20× — a guess, corrected by the
 first measurement, which is what this project does with guesses. The generators

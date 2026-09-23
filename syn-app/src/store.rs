@@ -40,11 +40,26 @@ pub struct Config {
     pub audio_command: String,
     /// Frames of latency asked of the player.
     pub latency_frames: u32,
+    /// Score candidates in the background and pick the best on a press.
+    pub scout: bool,
+    /// Seconds rendered per candidate, and at what rate.
+    pub scout_seconds: f64,
+    pub scout_sample_rate: f64,
+    /// Candidates per direction.
+    pub scout_candidates: usize,
 }
 
 impl Default for Config {
     fn default() -> Self {
-        Self { sample_rate: 48000.0, audio_command: String::new(), latency_frames: 1024 }
+        Self {
+            sample_rate: 48000.0,
+            audio_command: String::new(),
+            latency_frames: 1024,
+            scout: true,
+            scout_seconds: 30.0,
+            scout_sample_rate: 22050.0,
+            scout_candidates: 3,
+        }
     }
 }
 

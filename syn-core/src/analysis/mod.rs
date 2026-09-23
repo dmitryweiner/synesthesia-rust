@@ -2,3 +2,4 @@
 //! fractality metrics the scout ranks candidates with.
 
 pub mod fft;
+pub mod fractal;

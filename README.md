@@ -1,11 +1,11 @@
 # Synesthesia — console
 
-Sound from one point in a ~500-gene parameter space, steered from the
-keyboard: 👍 when you like where it is going, 👎 when you don't, and the
-search follows. A native port of the sound half of
-[../synesthesia](../synesthesia/), for a machine where the browser cannot
-keep up — see [PLAN.md](PLAN.md) for why, and for what the picture is
-waiting on.
+Sound and image from one point in a ~500-gene parameter space, steered from
+the keyboard: 👍 when you like where it is going, 👎 when you don't, and the
+search follows. A native port of [../synesthesia](../synesthesia/) for a
+machine where the browser cannot keep up: the sound in full, the picture in
+half-block characters in the terminal. [PLAN.md](PLAN.md) has why and the
+decisions; [GRAPHICS.md](GRAPHICS.md) the picture's plan and measurements.
 
 ```
 ┌ synesthesia — Bell spots · 2 steps ─────────────────────── ♪ ─┐
@@ -31,6 +31,8 @@ cargo run --release -- render --preset 0 --secs 30 --out point.wav
 cargo run --release -- render --preset 0 --secs 30 --score   # its fractality
 cargo run --release -- render --preset 0 --secs 20 --picture p.ppm   # its picture
 cargo run --release -- play --preset 7  # sound without the interface
+cargo run --release -- bench           # every preset: render speed, loudness, score
+taskset -c 6 ~/.cache/cargo-target/release/synesthesia bench --sim   # the picture's cost, one A76
 ./scripts/check.sh                      # fmt + clippy + tests, after every change
 ```
 
@@ -46,18 +48,21 @@ interface cheaper: 30 → 8 fps cuts what the terminal has to redraw from
 
 The picture — the web app's Gray–Scott field, in half-block characters —
 takes the spectrum's place above the text, or fills the window; `v` cycles
-spectrum → picture → full-screen picture, and the choice is kept. It costs the terminal
-about a third of a core at the default 8 frames a second (`viz_fps`; 4 costs
-a quarter) and its own thread 10–15% of a big core, which the kernel usually
-runs as ~50% of a little one. GRAPHICS.md has the measurements.
+spectrum → picture → full-screen picture, and the choice is kept. It costs
+the terminal about a third of a core at the default 8 frames a second
+(`viz_fps`; 4 costs a quarter) and its own thread 5–16% of a big core, which
+the kernel usually runs as ~50% of a little one. GRAPHICS.md has the
+measurements.
 
-Build into `./target`, not into `/tmp`: `/tmp` on this machine is a 2.9 GB
-tmpfs, so a `CARGO_TARGET_DIR` pointing there spends 2 GB of RAM on build
-artifacts and the machine starts swapping.
+Builds land in `~/.cache/cargo-target` (set once for every project in
+`~/.cargo/config.toml`), so the binaries are
+`~/.cache/cargo-target/release/synesthesia` and `…/release/examples/…`.
+Never point a build at `/tmp`: it is a 2.9 GB tmpfs here, and a build there
+spends 2 GB of RAM and sends the machine into swap.
 
 Keys: `space` sound · `l`/`d` 👍/👎 · `r` surprise · `u` undo · `s` keep this
-point · `p` the points list · `v` spectrum/picture · `i` what this point is · `e`
-write a `#s=` token · `?` help · `q` quit.
+point · `p` the points list · `v` spectrum/picture · `i` what this point is ·
+`e` write a `#s=` token · `?` help · `q` quit.
 
 ## Where things are kept
 
@@ -87,6 +92,14 @@ than against opinion:
   `analyzeSound`. The metric port agrees with it exactly on the same
   samples; the sound lands within ~1 dB on average.
 
+The picture has no reference samples — the browser's field is seeded by
+`Math.random()` — so it is checked by behaviour and by numbers instead: unit
+tests ported from the web app's (couplings, ripples, palettes) plus the
+invariants of the field (a fixed point, bounded at every slider's extreme,
+every preset alive after 10 s); `synesthesia bench --sim` for its cost;
+`scripts/term-cost.py` for what the terminal and X pay to show it; and a
+look side by side with the browser.
+
 Ranges, defaults, presets and the gene list are **dumped** from the web app
 (`assets/`, `scripts/dump-presets.mjs`), never re-typed — so the two cannot
 drift apart.
@@ -95,8 +108,10 @@ drift apart.
 
 ```
 syn-core/   the model: generators, modulation, FX, engine, features,
-            analysis, the point, the genome, the search, the scout. No I/O.
+            analysis, the point, the genome, the search, the scout, and the
+            picture (`sim/`, `visualizer.rs`). No I/O, no threads.
 syn-audio/  the sink and the render thread
-syn-tui/    the screen and the key map
-syn-app/    the binary: CLI, storage, the loop
+syn-tui/    the screen, the key map, the half-block picture widget
+syn-app/    the binary: CLI, storage, the loop, the picture thread
+scripts/    check.sh; the web-app dumps and parity; term-cost.py
 ```

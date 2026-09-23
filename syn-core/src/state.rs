@@ -154,8 +154,8 @@ pub struct VisualState {
     pub cards: BTreeMap<String, CardState>,
 }
 
-/// One point. `visual` is carried and mutated but not yet rendered — see the
-/// graphics backlog in PLAN.md.
+/// One point: the sound, the picture (`visual`, drawn by `crate::sim`), the
+/// LFOs routed onto both, and the sound → image couplings.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct AppState {
     pub v: u32,

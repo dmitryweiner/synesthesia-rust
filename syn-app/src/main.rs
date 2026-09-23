@@ -28,7 +28,7 @@ use syn_core::state::{presets, AppState};
 use syn_core::{render_offline, wav};
 
 const USAGE: &str = "\
-synesthesia — sound from one point in a large parameter space
+synesthesia — sound and image from one point in a large parameter space
 
 usage:
   synesthesia [options]             open the console interface

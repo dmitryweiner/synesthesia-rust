@@ -5,13 +5,14 @@ A **console application in Rust** that generates the sound of
 the same FX chain, the same LFO matrix, the same ~500-gene point, the same
 👍/👎 directed search — with the whole UI in the terminal.
 
-The picture is **not** in scope now and is **designed for** anyway: this
-machine has no GPU device at all (`/dev/dri` holds only `card0` from
-`sunxi-drm`, there is no `renderD128` and no PowerVR driver in Mesa), so
-every WebGL2 pass of the web app is rasterized by llvmpipe on the same CPU
-cores. See ../synesthesia/TODO.md for the measurements. When a working
-driver appears, the renderer plugs into an interface that exists from day
-one (decision 5).
+The picture was left out at first and designed for anyway: this machine has
+no GPU device at all (`/dev/dri` holds only `card0` from `sunxi-drm`, there
+is no `renderD128` and no PowerVR driver in Mesa), so every WebGL2 pass of
+the web app is rasterized by llvmpipe on the same CPU cores. See
+../synesthesia/TODO.md for the measurements. **Since 2026-09-23 it is drawn
+in the terminal** — the same field, on the CPU, at a terminal's resolution,
+in half-block characters (GRAPHICS.md). When a working GPU driver appears,
+a renderer plugs into the same `Visualizer` interface (decision 5).
 
 Docs, UI strings and code comments are in English — same rule as the sibling
 project, so the two read alike.
@@ -31,7 +32,8 @@ project, so the two read alike.
 
 1. **Scope: sound only, console only.** No windowing, no GUI toolkit, no
    audio plugin, no MIDI. One binary, `synesthesia`, that plays a point and
-   lets the user steer the search from the keyboard.
+   lets the user steer the search from the keyboard. *Amended 2026-09-23:*
+   the picture too, inside the console (GRAPHICS.md) — still no window.
 2. **The point is *the same* point.** `AppState` v1 (audio + visual + mod +
    coupling) is kept byte-compatible with the web app: same JSON shape, same
    gene order, same value ranges. A point file written here opens in the
@@ -43,10 +45,10 @@ project, so the two read alike.
    one-liner against the dev server), committed, and re-dumped only when the
    web app's presets change. They are never re-typed by hand and never edited
    in place.
-   - Visual genes stay in the genome and keep mutating even though nothing
-     renders them: otherwise points evolved here would be half-blind when
-     opened in the browser, and the search space would differ between the
-     two apps. The console shows them as text.
+   - Visual genes stay in the genome and keep mutating: otherwise points
+     evolved here would be half-blind when opened in the browser, and the
+     search space would differ between the two apps. They were only shown as
+     text at first; the terminal picture now renders them (GRAPHICS.md).
 3. **The FX chain is our own DSP, not a re-implementation of WebAudio.**
    Biquads (RBJ cookbook) for the filter and the formant bank, a comb with a
    fractional delay, chorus/flanger and phaser as delay/allpass stages driven
@@ -88,9 +90,10 @@ project, so the two read alike.
    the future renderer is a consumer and not a rewrite.** The engine
    publishes, at frame rate, exactly the features `src/audio/features.ts`
    publishes today — loudness, swell, brightness, low/mid/high, onset
-   envelope and discrete hits — with the same names and units. The TUI is the
-   first `Visualizer`; a GPU renderer will be the second. The bus is
-   therefore exercised from day one rather than designed on paper.
+   envelope and discrete hits — with the same names and units. The meters read
+   the bus from day one; the trait itself arrived with the terminal picture
+   (`syn_core::visualizer`, GRAPHICS.md V3), whose `Picture` is the first
+   `Visualizer`. A GPU renderer will be the second.
 6. **Realtime discipline.** The audio thread never allocates, never locks,
    never logs. Control → audio goes through a triple buffer of `EngineState`
    plus an SPSC command queue; audio → UI goes through an SPSC ring of
@@ -132,22 +135,23 @@ syn-core/     no I/O, no threads, deterministic — the whole model
   genome/     genes, codec, evolve (mutate/repair/lerp), explorer
   analysis/   FFT, spectral slope, Higuchi FD, box counting, fractal score
   features/   analyser emulation → AudioFeatures + OnsetDetector
-  sim/        visual params only, for now (the renderer joins it later)
+  sim/        the picture: Gray–Scott field, noise fields, advection,
+              couplings, display → RGB; `Picture` (GRAPHICS.md)
 syn-audio/    device (cpal → PipeWire/ALSA), realtime thread, block
               scheduler, offline render, WAV dump
-syn-tui/      ratatui/crossterm screens; implements Visualizer
-syn-app/      bin `synesthesia`: CLI, storage, wiring, clock
-syn-viz-*/    BACKLOG: gpu (wgpu) and cpu renderers; also Visualizer
+syn-tui/      ratatui/crossterm screens; the half-block picture widget
+syn-app/      bin `synesthesia`: CLI, storage, wiring, clock, picture thread
+syn-viz-gpu/  BACKLOG: a wgpu renderer; also a Visualizer
 ```
 
 ```
  control thread            audio thread (RT)             render threads
  ┌──────────┐  cmds/SPSC   ┌───────────────┐  features   ┌────────────┐
  │ TUI +    │ ───────────► │ generators →  │ ──ring────► │ Visualizer │
- │ explorer │ ◄─────────── │ FX → master   │             │ (TUI now,  │
+ │ explorer │ ◄─────────── │ FX → master   │             │ (terminal  │
  └──────────┘  point/state └───────────────┘             │  GPU later)│
         │ triple buffer                                  └────────────┘
-        └── scout (rayon, little cores) ── offline renders → scores
+        └── scout (own rayon pool, all cores but two) ── offline renders → scores
 ```
 
 Dependencies are kept to: `cpal`, `ratatui` + `crossterm`, `serde`/
@@ -173,8 +177,11 @@ convenience.
 - The meters and the spectrum are drawn from the **same feature frames** a
   GPU renderer will consume (decision 5) — the console is the first picture,
   not a placeholder with its own data path.
-- Redraw is capped at 30 fps and happens on the control thread; a slow
-  terminal must never be able to stall the sound.
+- Redraw is rate-limited (`ui_fps`, 8 by default: the terminal pays for
+  every frame) and happens on the control thread; a slow terminal must never
+  be able to stall the sound.
+- `v` swaps the spectrum for the picture, or gives the picture the whole
+  window (GRAPHICS.md).
 - Everything is keyboard-driven, no mouse. `--no-tui` plays a point and
   prints nothing, for scripting and for the bench.
 
@@ -201,6 +208,7 @@ convenience.
 6. **Scout** ✔ — rayon, full-quality renders (30 s at 22 kHz), a version
    check that drops what the last press made stale. Measured: 3 + 3
    candidates scored in 1.3–1.6 s.
+7. **The picture in the terminal** ✔ — GRAPHICS.md, phases V0–V4.
 
 ## Performance budget (thresholds, checked by the bench)
 
@@ -212,6 +220,7 @@ convenience.
 | scout, 3 + 3 candidates | < 3 s wall, full quality | ~15 s CPU, surrogate quality | 1.3–1.6 s at 30 s / 22 kHz |
 | startup → first sound | < 300 ms | seconds | not measured yet |
 | TUI redraw | < 2 ms | — | not measured yet |
+| the picture at 120×40, 8 fps | terminal ≤ 40% of a core, field ≤ 10% of an A76 | 1–14 fps | terminal 35%; field 5–16% of an A76 by the bench, ~50% of an A55 live (the scheduler's choice; GRAPHICS.md) |
 
 The first and third rows started as ≤ 5% and ≥ 20× — a guess, corrected by the
 first measurement, which is what this project does with guesses. The generators
@@ -229,17 +238,18 @@ for the golden test.
 ## Backlog — graphics
 
 **Trigger:** a real GPU render node exists (`/dev/dri/renderD128`) with a
-GLES/Vulkan driver. Until then a CPU renderer tops out around 14 fps at a
-512×288 grid and 720p output (measured C model in ../synesthesia/TODO.md), so
-it is worth building only as a deliberate fallback, not as the main path.
+GLES/Vulkan driver. A CPU renderer at window size tops out around 14 fps at
+a 512×288 grid and 720p output (measured C model in ../synesthesia/TODO.md);
+the CPU fallback this section once planned exists instead at a terminal's
+size — `syn_core::sim`, GRAPHICS.md — and carries the optimizations
+../synesthesia/TODO.md wrote down (half-resolution, cached, amortized noise
+fields; output decoupled from the grid; a vectorized kernel).
 
 - `syn-viz-gpu` on `wgpu`: port the seven passes (seed, paramfield, velocity,
-  react, advect, inject, display) from `../synesthesia/src/sim/shaders/`.
-- `syn-viz-cpu` as the fallback, carrying the optimizations already written
-  down in ../synesthesia/TODO.md: cached/quarter-resolution noise fields,
-  output decoupled from screen size, NEON + rayon kernels.
-- Both implement `Visualizer` and read the feature bus, so nothing in the
-  audio path changes when they land.
+  react, advect, inject, display) from `../synesthesia/src/sim/shaders/`,
+  with `syn_core::sim` as the reference it can be tested against.
+- It implements `Visualizer` and reads the feature bus, so nothing in the
+  audio path changes when it lands.
 - Windowing decision deferred with them (DRM/KMS on a free VT vs a plain
   window under X) — deliberately *not* fixed now, because `/dev/fb0` under a
   running X server is a conflict, and the present path was measured to be

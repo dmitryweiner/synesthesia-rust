@@ -26,8 +26,6 @@ pub struct SliderDef {
     pub exp: bool,
 }
 
-/// A visual card (the image side). Carried through the point and mutated by
-/// evolution even though nothing renders it yet — PLAN.md decision 2.
 /// Vowel formants (F1, F2, F3 in Hz) and their relative amplitudes, in the
 /// order A E I O U — the Vowel slider morphs between them.
 #[derive(Clone, Copy, Debug, Deserialize)]
@@ -50,6 +48,8 @@ pub struct SelectDef {
     pub options: Vec<SelectOption>,
 }
 
+/// A visual card (the image side), carried through the point, mutated by
+/// evolution (PLAN.md decision 2) and drawn by `crate::sim`.
 #[derive(Clone, Debug, Deserialize)]
 pub struct CardDef {
     pub id: String,

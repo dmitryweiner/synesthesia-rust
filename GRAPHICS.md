@@ -281,11 +281,10 @@ every 10 s:
 the scout's own status line cannot be read back from the tty, since ratatui
 only rewrites the cells that changed.)
 
-**V4. Side by side.** Every preset in the browser (lowest rung) and here,
-by eye: the same pattern family, the same palette, the same response to
-onsets and swells. Findings go into this file, as PLAN.md decision 3 did for
-the sound. Then PLAN.md: decision 1 gains "…and a picture in the terminal",
-the backlog points here.
+**V4. Side by side ✔** — the presets in the browser and here, compared by
+eye by the user on 2026-09-23: close enough, nothing to fix. PLAN.md now
+says the picture is in scope (decision 1), points its graphics backlog
+here, and lists this as phase 7.
 
 ## Not now
 

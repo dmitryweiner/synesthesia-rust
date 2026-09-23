@@ -37,6 +37,12 @@ Sound goes out through `pw-cat`, or `aplay` if PipeWire is not there; set
 `audio_command` in the config to use something else. `--no-sound` renders
 into nothing at the right pace, for measuring.
 
+The screen redraws `ui_fps` times a second (8 by default). That number is
+paid for outside this process — the terminal emulator repaints its window and
+X composites it, both in software here — so it is the one knob that makes the
+interface cheaper: 30 → 8 fps cuts what the terminal has to redraw from
+6.4 KB/s to 2.1 KB/s. Key presses always redraw at once, whatever it is set to.
+
 Build into `./target`, not into `/tmp`: `/tmp` on this machine is a 2.9 GB
 tmpfs, so a `CARGO_TARGET_DIR` pointing there spends 2 GB of RAM on build
 artifacts and the machine starts swapping.
@@ -49,7 +55,7 @@ token · `?` help · `q` quit.
 
 | path | what |
 |---|---|
-| `~/.config/synesthesia/config.toml` | sample rate, audio command, latency, scout settings |
+| `~/.config/synesthesia/config.toml` | sample rate, audio command, latency, scout settings, `ui_fps` |
 | `~/.local/share/synesthesia/last-point.json` | the point you were on |
 | `~/.local/share/synesthesia/points.json` | the points you kept |
 

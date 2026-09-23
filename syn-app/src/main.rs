@@ -469,31 +469,61 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
 
     let mut screen = Screen::open().map_err(|e| format!("terminal: {e}"))?;
     let mut frame = Frame::default();
+    // Drawing is what the interface actually costs: the terminal emulator
+    // repaints the whole window for every redraw, and on a machine with no GPU
+    // driver that repaint is software. So redraws are rate-limited, while keys
+    // are polled far more often than that and always redraw at once.
+    let redraw_every = Duration::from_secs_f64(1.0 / config.ui_fps.clamp(1.0, 60.0));
+    let mut last_draw = Instant::now() - redraw_every;
+    let mut dirty = true;
+    // A key press redraws at once: the rate limit is there to slow the
+    // animation down, not to make typing feel sticky.
+    let mut pressed = false;
     loop {
         if let Some(f) = s.player.latest_frame() {
             frame = f;
+            dirty = true;
         }
-        s.tick_morph();
+        if s.tick_morph() {
+            dirty = true;
+        }
         s.tick_scout();
 
-        let title = s.name();
-        let names: Vec<String> = s.points.iter().map(|p| p.name.clone()).collect();
-        let view = View {
-            name: &title,
-            state: &s.playing,
-            frame,
-            muted: s.muted,
-            status: &s.status,
-            show_help: s.show_help,
-            points: &names,
-            points_open: s.points_open,
-            selected: s.selected,
-        };
-        screen.terminal.draw(|f| draw(f, &view)).map_err(|e| format!("draw: {e}"))?;
+        let now = Instant::now();
+        let since_draw = now.duration_since(last_draw);
+        if dirty && (since_draw >= redraw_every || pressed) {
+            let title = s.name();
+            // The names are only read when the panel is open; cloning them
+            // every redraw would allocate for nothing.
+            let names: Vec<String> =
+                if s.points_open { s.points.iter().map(|p| p.name.clone()).collect() } else { Vec::new() };
+            let view = View {
+                name: &title,
+                state: &s.playing,
+                frame,
+                muted: s.muted,
+                status: &s.status,
+                show_help: s.show_help,
+                points: &names,
+                points_open: s.points_open,
+                selected: s.selected,
+            };
+            screen.terminal.draw(|f| draw(f, &view)).map_err(|e| format!("draw: {e}"))?;
+            last_draw = now;
+            dirty = false;
+            pressed = false;
+        }
 
-        let Some(action) = poll_action(Duration::from_millis(33)).map_err(|e| format!("input: {e}"))? else {
+        // Wait for a key until the next redraw is due (never longer than a
+        // moment, so Ctrl-C and q feel immediate).
+        let wait = redraw_every
+            .saturating_sub(since_draw)
+            .clamp(Duration::from_millis(5), Duration::from_millis(40));
+        let Some(action) = poll_action(wait).map_err(|e| format!("input: {e}"))? else {
             continue;
         };
+        dirty = true;
+        pressed = true;
         if s.show_help && action != Action::Help {
             s.show_help = false;
         }
@@ -640,7 +670,10 @@ fn tui(name: &str, state: AppState, a: &Args) -> Result<(), String> {
 /// Renders every preset and reports what it cost and what it scored — the
 /// bench this project judges changes by (PLAN.md decision 10).
 fn bench(a: &Args) -> Result<(), String> {
-    println!("{:<20} {:>10} {:>9} {:>8} {:>7} {:>7}", "preset", "x realtime", "rms", "peak", "score", "boxDim");
+    println!(
+        "{:<20} {:>10} {:>9} {:>8} {:>7} {:>7}",
+        "preset", "x realtime", "rms", "peak", "score", "boxDim"
+    );
     let (mut slowest, mut slowest_name) = (f64::INFINITY, String::new());
     for p in presets() {
         let started = std::time::Instant::now();
@@ -649,10 +682,7 @@ fn bench(a: &Args) -> Result<(), String> {
         let m = analyze_sound(&x, a.sr);
         let peak = x.iter().fold(0.0f32, |acc, v| acc.max(v.abs()));
         let rms = (x.iter().map(|v| f64::from(*v) * f64::from(*v)).sum::<f64>() / x.len() as f64).sqrt();
-        println!(
-            "{:<20} {speed:>10.1} {rms:>9.4} {peak:>8.3} {:>7.2} {:>7.2}",
-            p.name, m.score, m.box_dim
-        );
+        println!("{:<20} {speed:>10.1} {rms:>9.4} {peak:>8.3} {:>7.2} {:>7.2}", p.name, m.score, m.box_dim);
         if speed < slowest {
             slowest = speed;
             slowest_name = p.name.clone();

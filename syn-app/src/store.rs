@@ -47,6 +47,12 @@ pub struct Config {
     pub scout_sample_rate: f64,
     /// Candidates per direction.
     pub scout_candidates: usize,
+    /// Screen redraws per second. Every one of them is paid for outside this
+    /// process — the terminal emulator repaints its window and X composites it,
+    /// both in software on this machine, which is where the cycles go. Eight is
+    /// enough for meters that breathe; raise it if the spectrum looks choppy.
+    /// Key presses always redraw at once, whatever this is.
+    pub ui_fps: f64,
 }
 
 impl Default for Config {
@@ -59,6 +65,7 @@ impl Default for Config {
             scout_seconds: 30.0,
             scout_sample_rate: 22050.0,
             scout_candidates: 3,
+            ui_fps: 8.0,
         }
     }
 }
@@ -159,6 +166,7 @@ mod tests {
         let partial: Config = toml::from_str("sample_rate = 22050.0").unwrap();
         assert_eq!(partial.sample_rate, 22050.0);
         assert_eq!(partial.latency_frames, c.latency_frames);
+        assert_eq!(partial.ui_fps, c.ui_fps);
     }
 
     #[test]

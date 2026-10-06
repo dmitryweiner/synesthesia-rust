@@ -1,11 +1,16 @@
 [workspace]
 resolver = "2"
-members = ["syn-core", "syn-audio", "syn-tui", "syn-app"]
+members = ["syn-audio", "syn-tui", "syn-app"]
 
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
-license = "MIT"
+license = "GPL-3.0-only"
+
+[workspace.dependencies]
+# The model is synesthesia-core's, pinned by revision like the web and Android
+# apps (PLAN.md decision 11). Bump `rev` on purpose and run scripts/check.sh.
+syn-core = { git = "https://github.com/dmitryweiner/synesthesia-core", rev = "bcd68a30d6f530ae83847b3f7b9d2eb3a7bd1077" }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
@@ -15,7 +20,7 @@ opt-level = 3
 lto = "thin"
 codegen-units = 1
 
-# The model's tests run whole simulations (golden takes, Gray–Scott presets);
-# unoptimized, they would dominate `scripts/check.sh`.
+# The model runs whole simulations in this crate's tests and the debug binary;
+# unoptimized it would dominate `scripts/check.sh`.
 [profile.dev.package.syn-core]
 opt-level = 1

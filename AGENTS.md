@@ -28,13 +28,12 @@ taskset -c 6 ~/.cache/cargo-target/release/synesthesia bench --sim
                                      # the picture: ms/step, ns/cell, ms/draw, % of ONE A76
 cargo run --release -- render --preset N --secs 20 --picture p.ppm [--size WxH]
                                      # the picture driven by the point's own offline sound
-scripts/picture-sheet.py out.png     # all 12 presets' pictures on one PNG — then Read it
+scripts/picture-sheet.py out.png     # every preset's picture on one PNG — then Read it
 scripts/term-cost.py idle app:spectrum app:panel app:full [FPS:COLOR:BITS:BREATHE]
                                      # CPU of the terminal, Xorg, xfwm4, the app and its
                                      # picture thread, in a real 120x40 xfce4-terminal window;
                                      # SHOT=dir leaves screenshots (Read them)
 scripts/soak.py --keys ldldrldldldl  # xruns with real sound, from PipeWire's ERR counter
-node scripts/parity.mjs              # loudness + fractality against the browser (needs the web app)
 ```
 
 Binaries are in **`~/.cache/cargo-target`** (`build.target-dir` in
@@ -108,8 +107,8 @@ Corollaries:
 - **Y grows down here, up in the web's textures.** Positive drift is "down"
   as the slider says (the web negates it); the relief is computed in Y-up
   terms so the light falls from the same side of the screen. Tests pin both.
-- **Unoptimized tests are 4× slower** — `syn-core` is built at
-  `opt-level = 1` in the dev profile for its whole-simulation tests.
+- **Unoptimized runs are 4× slower** — `syn-core` (the dependency) is
+  built at `opt-level = 1` in the dev profile.
 - **`unsafe_code = "forbid"` and "a dependency is a decision"**: no thread
   affinity or priority calls. The scout was fixed with a smaller rayon pool
   instead; pinning the picture thread was left undone for this reason.
@@ -118,6 +117,11 @@ Corollaries:
   (`picture-sheet.py` next to the browser).
 
 ## Module map
+
+The model is synesthesia-core's `syn-core`, a git dependency pinned by
+`rev` in the workspace Cargo.toml (PLAN.md decision 11). Change it there
+(its checks, its skills), push, bump `rev` here, run `scripts/check.sh`.
+The `syn-core/…` paths below are in that repository.
 
 ```
 syn-core/src/dsp/         21 generators (bit-exact with the TS), gate, mulberry32

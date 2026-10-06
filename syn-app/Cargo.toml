@@ -10,7 +10,7 @@ name = "synesthesia"
 path = "src/main.rs"
 
 [dependencies]
-syn-core = { path = "../syn-core" }
+syn-core = { workspace = true }
 syn-audio = { path = "../syn-audio" }
 syn-tui = { path = "../syn-tui" }
 serde_json = "1"

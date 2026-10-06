@@ -26,7 +26,7 @@ decisions; [GRAPHICS.md](GRAPHICS.md) the picture's plan and measurements.
 ```bash
 cargo run --release                     # the interface, on the last point
 cargo run --release -- --preset 3       # …on a built-in preset
-cargo run --release -- render --list    # the twelve presets
+cargo run --release -- render --list    # the built-in presets (15)
 cargo run --release -- render --preset 0 --secs 30 --out point.wav
 cargo run --release -- render --preset 0 --secs 30 --score   # its fractality
 cargo run --release -- render --preset 0 --secs 20 --picture p.ppm   # its picture
@@ -77,42 +77,29 @@ Points are the web app's own JSON: a file written here opens there, and a
 
 ## How it is checked
 
-The sound is a port, so the tests compare it against the original rather
-than against opinion:
+The model — the sound, the genome and the search, the picture, the presets
+— is [synesthesia-core](https://github.com/dmitryweiner/synesthesia-core),
+the same Rust crate the web app (as wasm) and the Android app run, pinned
+here by revision in `Cargo.toml`. It carries the checks that used to live
+here: the 21 generators diffed against the TypeScript's golden takes, the
+genome against the web app's, every preset rendered, the picture's
+invariants, and its own `syn-bench`.
 
-- **The 21 generators are diffed sample by sample** against 63 reference
-  takes rendered by the TypeScript (`golden/`, made by
-  `scripts/dump-golden.mjs`). All 63 match within 1e-6.
-- **The genome is the same genome**: every built-in preset, encoded here and
-  in the web app, agrees on all 237 genes to 1.1e-16
-  (`assets/genomes.json`, `syn-core/tests/genome.rs`).
-- **The FX chain is our own DSP**, so it is judged on behaviour:
-  `scripts/parity.mjs` renders the twelve presets in both and compares
-  loudness and fractality, scoring both with the web app's own
-  `analyzeSound`. The metric port agrees with it exactly on the same
-  samples; the sound lands within ~1 dB on average.
-
-The picture has no reference samples — the browser's field is seeded by
-`Math.random()` — so it is checked by behaviour and by numbers instead: unit
-tests ported from the web app's (couplings, ripples, palettes) plus the
-invariants of the field (a fixed point, bounded at every slider's extreme,
-every preset alive after 10 s); `synesthesia bench --sim` for its cost;
-`scripts/term-cost.py` for what the terminal and X pay to show it; and a
-look side by side with the browser.
-
-Ranges, defaults, presets and the gene list are **dumped** from the web app
-(`assets/`, `scripts/dump-presets.mjs`), never re-typed — so the two cannot
-drift apart.
+This repository checks what is its own: the sink and the render thread,
+the screen and its keys, the files (`store.rs`: a point file from an older
+build still loads complete), `synesthesia bench` and `bench --sim` for the
+cost on this machine, `scripts/term-cost.py` for what the terminal and X
+pay, and `scripts/soak.py` for xruns.
 
 ## Layout
 
 ```
-syn-core/   the model: generators, modulation, FX, engine, features,
-            analysis, the point, the genome, the search, the scout, and the
-            picture (`sim/`, `visualizer.rs`). No I/O, no threads.
+(syn-core)  the model, from synesthesia-core (pinned in Cargo.toml):
+            generators, modulation, FX, engine, features, analysis, the
+            point, the genome, the search, the scout, the picture.
 syn-audio/  the sink and the render thread
 syn-tui/    the screen, the key map, the half-block picture widget
 syn-app/    the binary: CLI, storage, the loop, the picture thread
-scripts/    check.sh; the web-app dumps and parity; term-cost.py, soak.py,
+scripts/    check.sh; term-cost.py, soak.py,
             picture-sheet.py (see AGENTS.md)
 ```

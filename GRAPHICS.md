@@ -1,5 +1,8 @@
 # Graphics in the terminal — plan
 
+(Since PLAN.md decision 11, `syn-core` — `sim/`, `visualizer.rs` — lives in
+synesthesia-core; the paths below are there.)
+
 The picture of the web app, drawn in the console: the same Gray–Scott field,
 the same four visual cards, the same sound → image couplings, rasterized on
 the CPU at the resolution a terminal has and shown in half-block characters.

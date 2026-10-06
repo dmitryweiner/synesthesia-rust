@@ -123,7 +123,33 @@ project, so the two read alike.
     checked-in bench, not by an impression. Thresholds are stated as
     behaviour, so a change that breaks the feel fails a test.
 
+11. **The model is synesthesia-core's (2026-10-06).** `syn-core` was born
+    here and moved to [../synesthesia-core](../synesthesia-core/) with its
+    history; the web app and the Android app run on it, and so does this
+    one now: `syn-core` is a git dependency pinned by revision in the
+    workspace `Cargo.toml`, like Android's `core/rust/Cargo.toml`. This
+    repository's copy, `assets/`, `golden/` and the scripts that dumped
+    them from the TypeScript (`dump-presets.mjs`, `dump-golden.mjs`) and
+    compared against it (`parity.mjs`) are gone — the TypeScript model no
+    longer exists; the core's tests hold what they checked.
+    - Model changes (sound, presets, genome, picture) are made in the core
+      first, pushed, then the `rev` bumped here and `scripts/check.sh` run.
+    - What the console got with it: 15 presets instead of 12, the
+      generators made cheaper for Android (core C12), the tanpura and the
+      singing bowl, the delay's shimmer, and the point's name written as
+      `preset_name` (read either way).
+    - Point files are read the way every app reads them, through
+      `syn_core::point::sanitize`: a file from before (no tanpura, no bowl,
+      `presetName`) loads complete, and an unreadable `points.json` is
+      left alone instead of being saved over (`store.rs` tests).
+    - The bench numbers in this file (× realtime, the picture's cost, xruns)
+      were measured on the console's own copy; re-measure on the device
+      before trusting them for the new core.
+
 ## Architecture
+
+(Since decision 11 the `syn-core` part below is synesthesia-core's; the
+layout is kept as the description.)
 
 ```
 syn-core/     no I/O, no threads, deterministic — the whole model
@@ -263,5 +289,5 @@ fields; output decoupled from the grid; a vectorized kernel).
   after minutes), and its `tests/continuity.test.ts` is the port target.
 - Never change the `AppState` shape or the gene order: point files and the
   web app depend on both.
-- Never hand-edit `assets/presets.json` — re-dump it from the web app.
+- Never patch or vendor the model here: change synesthesia-core, bump `rev`.
 - Don't tune by ear alone: the numbers come first, the listening pass second.

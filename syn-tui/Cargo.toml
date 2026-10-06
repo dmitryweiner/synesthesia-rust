@@ -6,7 +6,7 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
-syn-core = { path = "../syn-core" }
+syn-core = { workspace = true }
 syn-audio = { path = "../syn-audio" }
 ratatui = "0.29"
 crossterm = "0.28"

@@ -17,18 +17,17 @@ Run only the rungs a change can break, cheapest first. Binaries live in
 - `fmt` failing is not an error to argue with: run `cargo fmt`, then
   re-read any file you are about to edit again (it reflows long lines, and
   edits anchored on the old text stop matching).
-- `syn-core` tests run whole simulations and golden renders; they are built
-  at `opt-level = 1` in dev. If they suddenly take 15 s, that setting was lost.
-- Golden-take failures (`syn-core/tests/golden.rs`) mean a generator stopped
-  being bit-exact with the TypeScript — never loosen the tolerance; find the
-  changed scale, phase accumulator or RNG call.
+- The model (`syn-core`) is synesthesia-core's, pinned by `rev` in
+  Cargo.toml: its own checks (`../synesthesia-core/scripts/check.sh`,
+  golden takes, presets, the picture's invariants) run there. A change to
+  the sound or the picture is made there first; here, bump `rev` and run
+  the rungs below on this machine.
 
 ## 2. The sound changed (dsp/, fx/, engine, modmatrix, features)
 
 ```bash
 cargo run --release -- bench                     # × realtime per preset; slowest must stay ≥ 8×
 cargo run --release -- render --preset 0 --secs 30 --score
-node scripts/parity.mjs                          # vs the browser: ±3 dB RMS, fractality band (needs ../synesthesia running)
 ```
 
 ## 3. The picture changed (syn-core/src/sim/, visualizer.rs)

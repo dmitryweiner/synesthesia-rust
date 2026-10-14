@@ -7,8 +7,10 @@ Synesthesia-rs: a native console port of [../synesthesia](../synesthesia/) —
 one point in a ~500-gene space makes sound (21 formula generators, our own FX
 chain) and a picture (Gray–Scott reaction-diffusion, drawn in half-block
 characters), and 👍/👎 steer the search. Decisions agreed with the user live
-in **PLAN.md** (sound, architecture, budget) and **GRAPHICS.md** (the
-picture) — read them before changing behaviour. README.md is the
+in **PLAN.md** (sound, architecture, budget), **GRAPHICS.md** (the
+picture) and **PLAN-SAMPLES-SCRIPTS.md** (recorded samples, pattern
+scripts, and the move onto synesthesia-core) — read them before changing
+behaviour. README.md is the
 human-facing spec. Docs, UI strings and code comments are in English; the
 user talks to agents in Russian.
 

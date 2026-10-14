@@ -70,6 +70,13 @@ thing changed at a time (`--viz spectrum`, `--keys ''`, `--scout false`,
 `--scout-threads N`) before blaming anything: that is how the scout, not
 the picture, was found to be the cause.
 
+No device at hand (macOS, no PipeWire): `scripts/soak.py --null --keys
+ldldrldldldl` — no sound, no window; the null sink models a 1024-frame
+buffer and counts underruns. Single ones happen (1–3 a run, before and
+after decision 12 alike, PLAN.md), so compare against a control build
+(`--bin`, a worktree of the previous commit) over three runs each. It says
+whether the audio thread keeps up on this machine, not the device's xruns.
+
 ## 6. Commit
 
 Milestone granularity, a message that carries the numbers, the attribution

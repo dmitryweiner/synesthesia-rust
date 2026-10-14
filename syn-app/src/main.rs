@@ -287,7 +287,7 @@ fn start_output(sr: f64, state: &AppState, sink: Box<dyn Sink>) -> Output {
 /// second — the sound path of the interface, without the interface.
 fn play(name: &str, state: &AppState, a: &Args) -> Result<(), String> {
     let sink: Box<dyn Sink> = if a.no_sound {
-        Box::<NullSink>::default()
+        Box::new(NullSink::new(a.sr))
     } else {
         Box::new(PipeSink::open(a.sr as u32, 1, 1024).map_err(|e| format!("no audio output: {e}"))?)
     };

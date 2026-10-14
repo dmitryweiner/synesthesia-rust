@@ -106,17 +106,45 @@ impl Drop for PipeSink {
     }
 }
 
-/// Throws the samples away, but at the right pace — for `--no-sound` and for
-/// tests. Without the pacing the render loop would free-run and burn a core.
+/// Throws the samples away, but at the right pace — for `--no-sound`, for
+/// tests, and for the soak on a machine without PipeWire (`soak.py --null`).
+///
+/// It is a model of a device: a buffer of [`NULL_BUFFER_FRAMES`] (the
+/// config's default latency) drained in real time. A write blocks while the
+/// buffer is fuller than that, which paces the render loop as a device would;
+/// a write that finds it already empty is an **underrun** — the render thread
+/// fell behind real time by more than the buffer, which is what an xrun is.
+/// The count is printed when the sink goes away.
 pub struct NullSink {
     name: String,
     sample_rate: f64,
-    next: Option<std::time::Instant>,
+    buffer: std::time::Duration,
+    /// When the audio written so far runs out; `None` before the first write.
+    drained_at: Option<std::time::Instant>,
+    started: Option<std::time::Instant>,
+    underruns: u64,
+    longest_gap: std::time::Duration,
 }
+
+/// The buffer a [`NullSink`] models, in frames — `latency_frames`' default.
+pub const NULL_BUFFER_FRAMES: u32 = 1024;
 
 impl NullSink {
     pub fn new(sample_rate: f64) -> Self {
-        Self { name: format!("null ({sample_rate:.0} Hz)"), sample_rate, next: None }
+        Self {
+            name: format!("null ({sample_rate:.0} Hz)"),
+            sample_rate,
+            buffer: std::time::Duration::from_secs_f64(f64::from(NULL_BUFFER_FRAMES) / sample_rate),
+            drained_at: None,
+            started: None,
+            underruns: 0,
+            longest_gap: std::time::Duration::ZERO,
+        }
+    }
+
+    /// Times the buffer ran dry so far.
+    pub fn underruns(&self) -> u64 {
+        self.underruns
     }
 }
 
@@ -129,17 +157,75 @@ impl Default for NullSink {
 impl Sink for NullSink {
     fn write(&mut self, block: &[f32]) -> std::io::Result<()> {
         let now = std::time::Instant::now();
-        let deadline = self.next.unwrap_or(now);
-        if deadline > now {
-            std::thread::sleep(deadline - now);
-        }
+        self.started.get_or_insert(now);
         let span = std::time::Duration::from_secs_f64(block.len() as f64 / self.sample_rate);
-        // Never let the deadline fall behind by more than one block.
-        self.next = Some(deadline.max(now - span) + span);
+        let from = match self.drained_at {
+            Some(t) if t < now => {
+                self.underruns += 1;
+                self.longest_gap = self.longest_gap.max(now - t);
+                now
+            }
+            Some(t) => t,
+            None => now,
+        };
+        let drained_at = from + span;
+        self.drained_at = Some(drained_at);
+        // Block while more than the buffer is queued, as a full device does.
+        let wake = drained_at.checked_sub(self.buffer).unwrap_or(now);
+        if wake > now {
+            std::thread::sleep(wake - now);
+        }
         Ok(())
     }
 
     fn name(&self) -> &str {
         &self.name
+    }
+}
+
+impl Drop for NullSink {
+    fn drop(&mut self) {
+        if let Some(t0) = self.started {
+            eprintln!(
+                "null sink: {} underruns (longest gap {:.1} ms) in {:.1} s",
+                self.underruns,
+                self.longest_gap.as_secs_f64() * 1e3,
+                t0.elapsed().as_secs_f64()
+            );
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::time::{Duration, Instant};
+
+    #[test]
+    fn a_writer_that_keeps_up_has_no_underruns_and_is_paced() {
+        let mut sink = NullSink::new(48000.0);
+        let block = vec![0.0f32; 512];
+        let t0 = Instant::now();
+        for _ in 0..50 {
+            sink.write(&block).unwrap();
+        }
+        // 50 × 512 frames = 533 ms of audio, minus the buffer still queued.
+        let took = t0.elapsed().as_secs_f64();
+        assert!(took > 0.45 && took < 0.6, "{took}");
+        assert_eq!(sink.underruns(), 0);
+    }
+
+    #[test]
+    fn a_writer_late_by_more_than_the_buffer_is_an_underrun() {
+        let mut sink = NullSink::new(48000.0);
+        let block = vec![0.0f32; 512];
+        for _ in 0..10 {
+            sink.write(&block).unwrap();
+        }
+        // The buffer holds ~21–32 ms; stalling 80 ms empties it.
+        std::thread::sleep(Duration::from_millis(80));
+        sink.write(&block).unwrap();
+        sink.write(&block).unwrap();
+        assert_eq!(sink.underruns(), 1);
     }
 }

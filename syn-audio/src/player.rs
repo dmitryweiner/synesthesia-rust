@@ -1,171 +1,87 @@
-//! The render loop on its own thread.
+//! The audio thread: pulls PCM from the core's player and writes it to a sink.
 //!
-//! The control side never touches the engine: it sends commands and reads
-//! frames, both over bounded channels (PLAN.md decision 6). Points that the
-//! audio thread replaces are handed back so they are dropped on the control
-//! thread instead of between two blocks.
+//! What the sound *is* — commands between control and audio, whole-block
+//! rendering, fades, the feature frames — is synesthesia-core's `syn-player`,
+//! the same on every platform. What is left here is the console's device side
+//! (PLAN.md decision 6): one thread, a blocking sink that paces it, and a
+//! stop that fades out first so it never clicks.
 
-use std::sync::mpsc::{sync_channel, Receiver, SyncSender, TrySendError};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 use std::thread::JoinHandle;
 
-use syn_core::engine::SPECTRUM_BANDS;
-use syn_core::state::AppState;
-use syn_core::{AudioFeatures, Engine, BLOCK};
+use syn_core::BLOCK;
+use syn_player::Player;
 
 use crate::sink::Sink;
 
 /// How many blocks go into one write to the device.
 const BLOCKS_PER_WRITE: usize = 4;
-/// How often a frame is published, in blocks (~21 ms at 48 kHz).
-const FRAME_EVERY: usize = 8;
+/// How long a stop waits for the fade out before giving up, in writes: the
+/// fade is 80 ms, so ~10 writes at 48 kHz; this is far more than that.
+const STOP_WRITES: usize = 256;
 
-pub enum Command {
-    /// Glide to a new point (the genome morph sends these continuously).
-    SetState(Box<AppState>),
-    /// Hard switch: drop the tails and start the new point cleanly.
-    SwitchTo(Box<AppState>),
-    Stop,
-}
-
-/// What the UI gets to draw, published from the audio thread — the feature bus
-/// of PLAN.md decision 5. A renderer, when there is one, reads the same frame.
-#[derive(Clone, Copy, Debug)]
-pub struct Frame {
-    /// Engine time in seconds — the LFO clock.
-    pub time: f64,
-    pub peak: f32,
-    pub rms: f32,
-    pub limiter_db: f32,
-    pub features: AudioFeatures,
-    /// Log-spaced spectrum, 0..255 per band.
-    pub spectrum: [u8; SPECTRUM_BANDS],
-    /// Onset hits since the engine started.
-    pub hits: u64,
-}
-
-impl Default for Frame {
-    fn default() -> Self {
-        Self {
-            time: 0.0,
-            peak: 0.0,
-            rms: 0.0,
-            limiter_db: 0.0,
-            features: AudioFeatures::default(),
-            spectrum: [0; SPECTRUM_BANDS],
-            hits: 0,
-        }
-    }
-}
-
-pub struct Player {
-    commands: SyncSender<Command>,
-    frames: Receiver<Frame>,
-    retired: Receiver<Box<AppState>>,
+/// The thread that plays `player` into a sink, until stopped.
+pub struct Output {
+    player: Arc<Player>,
+    stop: Arc<AtomicBool>,
     handle: Option<JoinHandle<Result<(), String>>>,
-    sample_rate: f64,
     sink_name: String,
 }
 
-impl Player {
-    /// Starts rendering `state` into `sink` at once.
-    pub fn start(sample_rate: f64, state: &AppState, mut sink: Box<dyn Sink>) -> Self {
-        let (tx_cmd, rx_cmd) = sync_channel::<Command>(64);
-        let (tx_frame, rx_frame) = sync_channel::<Frame>(8);
-        let (tx_retired, rx_retired) = sync_channel::<Box<AppState>>(64);
+impl Output {
+    /// Starts writing `player` into `sink` at once. The player stays silent
+    /// until it is faded in.
+    pub fn start(player: Arc<Player>, mut sink: Box<dyn Sink>) -> Self {
         let sink_name = sink.name().to_string();
-
-        let seed = state_seed(state);
-        let mut engine = Engine::new(sample_rate, state, seed);
-        let handle = std::thread::Builder::new()
-            .name("syn-audio".into())
-            .spawn(move || -> Result<(), String> {
-                let mut buf = vec![0.0f32; BLOCK * BLOCKS_PER_WRITE];
-                let mut since_frame = 0usize;
-                loop {
-                    for chunk in buf.chunks_mut(BLOCK) {
-                        engine.render(chunk);
+        let stop = Arc::new(AtomicBool::new(false));
+        let handle = {
+            let (player, stop) = (Arc::clone(&player), Arc::clone(&stop));
+            std::thread::Builder::new()
+                .name("syn-audio".into())
+                .spawn(move || -> Result<(), String> {
+                    let mut buf = Vec::with_capacity(BLOCK * BLOCKS_PER_WRITE);
+                    let mut write = |buf: &mut Vec<f32>| {
+                        player.render_into(BLOCK * BLOCKS_PER_WRITE, buf);
+                        sink.write(buf).map_err(|e| format!("audio device: {e}"))
+                    };
+                    while !stop.load(Ordering::Relaxed) {
+                        write(&mut buf)?;
                     }
-                    sink.write(&buf).map_err(|e| format!("audio device: {e}"))?;
-
-                    since_frame += BLOCKS_PER_WRITE;
-                    if since_frame >= FRAME_EVERY {
-                        since_frame = 0;
-                        let frame = measure(&buf, &engine);
-                        // A UI that fell behind loses frames, never the sound.
-                        match tx_frame.try_send(frame) {
-                            Ok(()) | Err(TrySendError::Full(_)) => {}
-                            Err(TrySendError::Disconnected(_)) => return Ok(()),
+                    player.fade_out();
+                    for _ in 0..STOP_WRITES {
+                        if player.is_silent() {
+                            break;
                         }
+                        write(&mut buf)?;
                     }
-
-                    while let Ok(cmd) = rx_cmd.try_recv() {
-                        match cmd {
-                            Command::SetState(s) => {
-                                engine.set_state(&s);
-                                let _ = tx_retired.try_send(s);
-                            }
-                            Command::SwitchTo(s) => {
-                                engine.switch_to(&s);
-                                let _ = tx_retired.try_send(s);
-                            }
-                            Command::Stop => return Ok(()),
-                        }
-                    }
-                }
-            })
-            .expect("spawn audio thread");
-
-        Player {
-            commands: tx_cmd,
-            frames: rx_frame,
-            retired: rx_retired,
-            handle: Some(handle),
-            sample_rate,
-            sink_name,
-        }
+                    Ok(())
+                })
+                .expect("spawn audio thread")
+        };
+        Output { player, stop, handle: Some(handle), sink_name }
     }
 
-    pub fn sample_rate(&self) -> f64 {
-        self.sample_rate
+    pub fn player(&self) -> &Player {
+        &self.player
+    }
+
+    /// False once the thread has ended — the device went away.
+    pub fn is_running(&self) -> bool {
+        self.handle.as_ref().is_some_and(|h| !h.is_finished())
     }
 
     pub fn sink_name(&self) -> &str {
         &self.sink_name
     }
 
-    /// Glide to a new point.
-    pub fn set_state(&self, state: AppState) {
-        self.send(Command::SetState(Box::new(state)));
-    }
-
-    /// Hard switch to a new point.
-    pub fn switch_to(&self, state: AppState) {
-        self.send(Command::SwitchTo(Box::new(state)));
-    }
-
-    fn send(&self, cmd: Command) {
-        let _ = self.commands.try_send(cmd);
-        // Free what the audio thread handed back, here rather than there.
-        while self.retired.try_recv().is_ok() {}
-    }
-
-    /// The latest frame, if the audio thread published one since the last call.
-    pub fn latest_frame(&self) -> Option<Frame> {
-        let mut last = None;
-        while let Ok(f) = self.frames.try_recv() {
-            last = Some(f);
-        }
-        last
-    }
-
-    /// Blocks until a frame arrives or the thread is gone.
-    pub fn wait_frame(&self) -> Option<Frame> {
-        self.frames.recv().ok()
-    }
-
-    /// Stops the thread and reports how it ended.
+    /// Fades out, stops the thread and reports how it ended.
     pub fn stop(mut self) -> Result<(), String> {
-        let _ = self.commands.try_send(Command::Stop);
+        self.finish()
+    }
+
+    fn finish(&mut self) -> Result<(), String> {
+        self.stop.store(true, Ordering::Relaxed);
         match self.handle.take() {
             Some(h) => h.join().unwrap_or_else(|_| Err("audio thread panicked".into())),
             None => Ok(()),
@@ -173,80 +89,71 @@ impl Player {
     }
 }
 
-impl Drop for Player {
+impl Drop for Output {
     fn drop(&mut self) {
-        let _ = self.commands.try_send(Command::Stop);
-        if let Some(h) = self.handle.take() {
-            let _ = h.join();
-        }
+        let _ = self.finish();
     }
-}
-
-fn measure(buf: &[f32], engine: &Engine) -> Frame {
-    let mut peak = 0.0f32;
-    let mut sum = 0.0f64;
-    for s in buf {
-        peak = peak.max(s.abs());
-        sum += f64::from(*s) * f64::from(*s);
-    }
-    Frame {
-        time: engine.time(),
-        peak,
-        rms: (sum / buf.len() as f64).sqrt() as f32,
-        limiter_db: engine.limiter_reduction_db() as f32,
-        features: engine.features(),
-        spectrum: *engine.spectrum(),
-        hits: engine.hits(),
-    }
-}
-
-/// A point always sounds the same on the noisy generators from run to run,
-/// without a global seed: the seed is the point itself.
-fn state_seed(state: &AppState) -> u32 {
-    let json = serde_json::to_string(state).unwrap_or_default();
-    let mut h: u32 = 2_166_136_261;
-    for b in json.as_bytes() {
-        h ^= u32::from(*b);
-        h = h.wrapping_mul(16_777_619);
-    }
-    h
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::sink::NullSink;
+    use std::sync::Mutex;
     use syn_core::state::presets;
 
-    #[test]
-    fn it_renders_and_publishes_frames() {
-        let state = presets()[0].state.clone();
-        let player = Player::start(22050.0, &state, Box::new(NullSink::new(22050.0)));
-        let mut seen = 0;
-        for _ in 0..50 {
-            if let Some(f) = player.latest_frame() {
-                if f.time > 0.0 && f.rms > 0.0 {
-                    seen += 1;
-                }
-            }
-            std::thread::sleep(std::time::Duration::from_millis(10));
-            if seen > 3 {
-                break;
-            }
-        }
-        assert!(seen > 3, "no frames from the audio thread");
-        player.stop().expect("clean stop");
+    const SR: f64 = 22050.0;
+
+    fn output(sink: Box<dyn Sink>) -> Output {
+        let player = Arc::new(Player::new(SR, &presets()[0].state));
+        player.fade_in();
+        Output::start(player, sink)
     }
 
     #[test]
-    fn switching_points_keeps_it_running() {
-        let a = presets()[0].state.clone();
-        let b = presets()[5].state.clone();
-        let player = Player::start(22050.0, &a, Box::new(NullSink::new(22050.0)));
-        player.wait_frame();
-        player.switch_to(b);
-        player.set_state(presets()[5].state.clone());
-        assert!(player.wait_frame().is_some());
-        player.stop().expect("clean stop");
+    fn it_plays_and_the_player_publishes_frames() {
+        let out = output(Box::new(NullSink::new(SR)));
+        let mut seen = 0;
+        for _ in 0..100 {
+            if out.player().latest_frame().is_some_and(|f| f.time > 0.0 && f.rms > 0.0) {
+                seen += 1;
+                if seen > 3 {
+                    break;
+                }
+            }
+            std::thread::sleep(std::time::Duration::from_millis(10));
+        }
+        assert!(seen > 3, "no frames from the audio thread");
+        out.player().switch_to(presets()[5].state.clone());
+        out.stop().expect("clean stop");
+    }
+
+    /// Keeps what it was given, unpaced, so a test sees every sample.
+    struct Tape(Arc<Mutex<Vec<f32>>>);
+
+    impl Sink for Tape {
+        fn write(&mut self, block: &[f32]) -> std::io::Result<()> {
+            self.0.lock().unwrap().extend_from_slice(block);
+            std::thread::sleep(std::time::Duration::from_millis(1));
+            Ok(())
+        }
+        fn name(&self) -> &str {
+            "tape"
+        }
+    }
+
+    #[test]
+    fn a_stop_fades_out_instead_of_cutting_the_sound() {
+        let tape = Arc::new(Mutex::new(Vec::new()));
+        let out = output(Box::new(Tape(Arc::clone(&tape))));
+        while tape.lock().unwrap().len() < SR as usize {
+            std::thread::sleep(std::time::Duration::from_millis(5));
+        }
+        out.stop().expect("clean stop");
+        let x = tape.lock().unwrap();
+        let tail = &x[x.len() - BLOCK..];
+        assert!(tail.iter().all(|v| *v == 0.0), "it ends in silence");
+        let peak = x[x.len() / 2..].iter().fold(0.0f32, |m, v| m.max(v.abs()));
+        assert!(peak > 1e-3, "and it was playing before that");
     }
 }

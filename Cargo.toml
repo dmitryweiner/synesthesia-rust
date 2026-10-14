@@ -10,7 +10,12 @@ license = "GPL-3.0-only"
 [workspace.dependencies]
 # The model is synesthesia-core's, pinned by revision like the web and Android
 # apps (PLAN.md decision 11). Bump `rev` on purpose and run scripts/check.sh.
-syn-core = { git = "https://github.com/dmitryweiner/synesthesia-core", rev = "bcd68a30d6f530ae83847b3f7b9d2eb3a7bd1077" }
+# syn-player is the render side and syn-session the control logic every app
+# shares (decision 12); all three come from the same revision.
+syn-core = { git = "https://github.com/dmitryweiner/synesthesia-core", rev = "a0d2cc047176a6f94806946b46a74509ac90d181" }
+syn-player = { git = "https://github.com/dmitryweiner/synesthesia-core", rev = "a0d2cc047176a6f94806946b46a74509ac90d181" }
+syn-session = { git = "https://github.com/dmitryweiner/synesthesia-core", rev = "a0d2cc047176a6f94806946b46a74509ac90d181" }
+
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
@@ -23,4 +28,6 @@ codegen-units = 1
 # The model runs whole simulations in this crate's tests and the debug binary;
 # unoptimized it would dominate `scripts/check.sh`.
 [profile.dev.package.syn-core]
+opt-level = 1
+[profile.dev.package.syn-session]
 opt-level = 1

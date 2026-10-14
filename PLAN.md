@@ -141,10 +141,40 @@ project, so the two read alike.
     - Point files are read the way every app reads them, through
       `syn_core::point::sanitize`: a file from before (no tanpura, no bowl,
       `presetName`) loads complete, and an unreadable `points.json` is
-      left alone instead of being saved over (`store.rs` tests).
+      left alone instead of being saved over (since decision 12 this is
+      `syn_session::points`, tested in the core).
     - The bench numbers in this file (× realtime, the picture's cost, xruns)
       were measured on the console's own copy; re-measure on the device
       before trusting them for the new core.
+
+12. **What a press does is synesthesia-core's too (2026-10-14).** The
+    console wrote its session by hand in `syn-app/main.rs` — the explorer
+    calls, the morph, the scout's timing and pool, the status line — and its
+    render loop in `syn-audio`; the core has had both since, moved there
+    from this code for Android and the web: `syn-session` and `syn-player`.
+    The console now runs on them, like the other apps:
+    - `syn-app` holds a `syn_session::Session` on a monotonic clock and
+      carries out its effects (`SetPoint`/`SwitchTo` → player and picture,
+      `Reseed`, `SaveLastPoint`, `StartScout` on a `ScoutPool` of cores−2,
+      `Status` → the status line and `$SYN_LOG`).
+    - `syn-audio` is the device side only: a thread that pulls
+      `syn_player::Player::render_into` into the `Sink`. The player fades in
+      at the start and the thread fades out before it stops, so neither
+      clicks.
+    - Mute is the session's ⏸: the sound fades out and the scout stops,
+      since nobody is listening; back on, it starts where the search is.
+    - The kept points are `syn_session::points::Points` (read through
+      `sanitize`, the rule that was `store.rs`'s, now the core's); `s` keeps
+      under the name it offers — "Point N", or a point of your own over
+      itself — where the console said "<name> #N".
+    - What changed for the ear: the web app's feel — an ease-in-out morph,
+      a quicker undo (0.8 s), a press mid-morph starting from what is
+      audible, 🎲 never landing on the preset it is sitting on, and the web
+      app's status lines. The scout's settings stay the console's (30 s at
+      22 kHz, config.toml).
+    - Not re-measured yet: `soak.py` and `term-cost.py` (verify rungs 4–5)
+      need the device; run them there before trusting the xrun numbers for
+      this loop.
 
 ## Architecture
 
@@ -163,8 +193,9 @@ syn-core/     no I/O, no threads, deterministic — the whole model
   features/   analyser emulation → AudioFeatures + OnsetDetector
   sim/        the picture: Gray–Scott field, noise fields, advection,
               couplings, display → RGB; `Picture` (GRAPHICS.md)
-syn-audio/    device (cpal → PipeWire/ALSA), realtime thread, block
-              scheduler, offline render, WAV dump
+syn-player/   (core, decision 12) commands, whole blocks, fades, frames
+syn-session/  (core, decision 12) the session: search, morph, scout, points
+syn-audio/    device (pw-cat/aplay pipe), the thread that plays the player
 syn-tui/      ratatui/crossterm screens; the half-block picture widget
 syn-app/      bin `synesthesia`: CLI, storage, wiring, clock, picture thread
 syn-viz-gpu/  BACKLOG: a wgpu renderer; also a Visualizer

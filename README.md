@@ -16,7 +16,7 @@ decisions; [GRAPHICS.md](GRAPHICS.md) the picture's plan and measurements.
 │ lfo 1    77.0s triangle █████····· → logistic.r, reaction.feed│
 │ fx  filter·chorus·reverb·limiter   master 0.75   42s          │
 ├───────────────────────────────────────────────────────────────┤
-│ more of this · best of 3 scouted (fractality 0.72)            │
+│ 👍 continuing this way · step 2 · spread 0.10 · scouted: best…│
 │ [space] sound  [l] like  [d] dislike  [r] surprise  [q] quit  │
 └───────────────────────────────────────────────────────────────┘
 ```
@@ -61,7 +61,7 @@ Never point a build at `/tmp`: it is a 2.9 GB tmpfs here, and a build there
 spends 2 GB of RAM and sends the machine into swap.
 
 Keys: `space` sound · `l`/`d` 👍/👎 · `r` surprise · `u` undo · `s` keep this
-point · `p` the points list · `v` spectrum/picture · `i` what this point is ·
+point (as "Point N"; a point of your own is kept over itself) · `p` the points list · `v` spectrum/picture · `i` what this point is ·
 `e` write a `#s=` token · `?` help · `q` quit.
 
 ## Where things are kept
@@ -97,7 +97,11 @@ pay, and `scripts/soak.py` for xruns.
 (syn-core)  the model, from synesthesia-core (pinned in Cargo.toml):
             generators, modulation, FX, engine, features, analysis, the
             point, the genome, the search, the scout, the picture.
-syn-audio/  the sink and the render thread
+(syn-player, syn-session)  also synesthesia-core's: the render side
+            (commands, fades, feature frames) and what a press does
+            (the explorer, the morph, the scout's timing, the status
+            line, the kept points and their names).
+syn-audio/  the sink and the thread that plays the player into it
 syn-tui/    the screen, the key map, the half-block picture widget
 syn-app/    the binary: CLI, storage, the loop, the picture thread
 scripts/    check.sh; term-cost.py, soak.py,

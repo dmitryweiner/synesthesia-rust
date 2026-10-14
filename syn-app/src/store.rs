@@ -13,6 +13,7 @@ use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 use syn_core::state::AppState;
+use syn_session::points::Points;
 
 const APP: &str = "synesthesia";
 
@@ -90,22 +91,6 @@ impl Default for Config {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct NamedPoint {
-    pub name: String,
-    #[serde(deserialize_with = "sanitized")]
-    pub state: AppState,
-}
-
-/// A point from a file, read the way every app reads one (synesthesia-core's
-/// `point::sanitize`): fields a newer model added get their defaults, values
-/// are clamped, either spelling of the name is taken. Strict serde would
-/// leave a file from an older build incomplete (no tanpura, no bowl).
-fn sanitized<'de, D: serde::Deserializer<'de>>(d: D) -> Result<AppState, D::Error> {
-    let raw = serde_json::Value::deserialize(d)?;
-    syn_core::point::sanitize(&raw).ok_or_else(|| serde::de::Error::custom("not a point"))
-}
-
 fn read_to_string(path: &std::path::Path) -> Option<String> {
     std::fs::read_to_string(path).ok()
 }
@@ -148,40 +133,37 @@ pub fn save_last_point(state: &AppState) -> Result<(), String> {
     write_atomic(&data_dir().join("last-point.json"), &text)
 }
 
-pub fn load_points() -> Vec<NamedPoint> {
-    read_points().unwrap_or_default()
-}
-
-/// The kept points, an entry that is not a point skipped; an error when the
-/// file is there but is not a list at all — then it must not be overwritten.
-fn read_points() -> Result<Vec<NamedPoint>, String> {
-    let Some(raw) = read_to_string(&data_dir().join("points.json")) else {
-        return Ok(Vec::new());
-    };
-    parse_points(&raw)
-}
-
-fn parse_points(raw: &str) -> Result<Vec<NamedPoint>, String> {
-    let entries: Vec<serde_json::Value> = serde_json::from_str(raw)
-        .map_err(|e| format!("points.json is not a list of points ({e}); left as it is"))?;
-    Ok(entries.into_iter().filter_map(|e| serde_json::from_value(e).ok()).collect())
-}
-
-pub fn save_points(points: &[NamedPoint]) -> Result<(), String> {
-    let text = serde_json::to_string_pretty(points).map_err(|e| e.to_string())?;
-    write_atomic(&data_dir().join("points.json"), &text)
-}
-
-/// Keeps a point under `name`, replacing one of the same name.
-pub fn keep_point(name: &str, state: &AppState) -> Result<usize, String> {
-    let mut points = read_points()?;
-    let entry = NamedPoint { name: name.to_string(), state: state.clone() };
-    match points.iter().position(|p| p.name == name) {
-        Some(i) => points[i] = entry,
-        None => points.push(entry),
+/// The kept points (synesthesia-core's `Points`: its naming rules, and every
+/// entry read through its `sanitize`). An error when the file is there but is
+/// not a list of points — then it must not be overwritten.
+pub fn load_points() -> Result<Points, String> {
+    match read_to_string(&data_dir().join("points.json")) {
+        Some(raw) => Points::parse(&raw).map_err(|e| format!("points.json: {e}; left as it is")),
+        None => Ok(Points::new()),
     }
+}
+
+pub fn save_points(points: &Points) -> Result<(), String> {
+    write_atomic(&data_dir().join("points.json"), &points.to_json())
+}
+
+/// Keeps a point under `name`, replacing one of the same name, in the file as
+/// it is now (another instance may have kept one since).
+pub fn keep_point(name: &str, state: &AppState) -> Result<Points, String> {
+    let mut points = load_points()?;
+    points.keep(name, state);
     save_points(&points)?;
-    Ok(points.len())
+    Ok(points)
+}
+
+/// Forgets the point kept under `name`, in the file as it is now.
+pub fn forget_point(name: &str) -> Result<Points, String> {
+    let mut points = load_points()?;
+    if let Some(i) = points.names().iter().position(|n| *n == name) {
+        points.remove(i);
+        save_points(&points)?;
+    }
+    Ok(points)
 }
 
 #[cfg(test)]
@@ -197,33 +179,6 @@ mod tests {
         let text = serde_json::to_string(state).unwrap();
         let back: AppState = serde_json::from_str(&text).unwrap();
         assert_eq!(&back, state);
-    }
-
-    /// Files written before the model came from synesthesia-core: no
-    /// `delayShimmer`, no tanpura or bowl, the name spelled either way. They
-    /// must load with every value they had — `load_points` falls back to an
-    /// empty list on a parse error, and the next keep would overwrite the file.
-    #[test]
-    fn a_point_file_from_the_consoles_own_core_still_loads() {
-        let mut old = serde_json::to_value(&presets()[0].state).unwrap();
-        old["audio"]["fx"].as_object_mut().unwrap().remove("delayShimmer");
-        let formulas = old["audio"]["formulas"].as_object_mut().unwrap();
-        formulas.remove("tanpura");
-        formulas.remove("bowl");
-        for key in ["preset_name", "presetName"] {
-            let mut file = old.clone();
-            let name = file.as_object_mut().unwrap().remove("preset_name").unwrap();
-            file[key] = name;
-            let list = serde_json::json!([{ "name": "kept", "state": file }, { "name": "junk", "state": 5 }]);
-            let back = parse_points(&list.to_string()).unwrap();
-            assert_eq!(back.len(), 1, "an entry that is not a point is skipped, not the whole file");
-            assert_eq!(back[0].state.preset_name.as_deref(), Some("Fractal garden"), "{key}");
-            assert_eq!(back[0].state, presets()[0].state, "{key}");
-        }
-        assert!(
-            parse_points("{not json").is_err(),
-            "an unreadable file is an error, never an empty list to save over"
-        );
     }
 
     #[test]

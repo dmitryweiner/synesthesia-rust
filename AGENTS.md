@@ -11,8 +11,8 @@ in **PLAN.md** (sound, architecture, budget) and **GRAPHICS.md** (the
 picture) — read them before changing behaviour. The model itself has moved:
 [synesthesia-core](https://github.com/dmitryweiner/synesthesia-core) is the
 specification since 2026-10-05 (`syn-core`, `assets/`, `golden/` went there
-with their history), and this app is meant to depend on it by revision —
-it still carries its own copy, and moving onto the core is its next step.
+with their history), and this app depends on it by `rev` in the workspace
+`Cargo.toml` (PLAN.md decision 11).
 Changes to the model (its PLAN-SAMPLES-SCRIPTS.md: recorded samples and
 pattern scripts) are decided and made there; here only what the console
 does with them. README.md is the
@@ -139,11 +139,16 @@ syn-core/src/sim/         the picture: noise, field (Gray–Scott kernel + seed 
                           coupling, display (→ RGB), frame (per-frame params
                           as the web loop derives them), picture (`Picture`)
 syn-core/src/visualizer.rs  the Visualizer trait + VizInput
-syn-audio/                the sink (pw-cat/aplay pipe) and the render thread
+(core) syn-player         Player: commands, whole blocks, fades, frames
+(core) syn-session        Session (search, morph, scout timing, status),
+                          ScoutPool, points::Points (PLAN.md decision 12)
+syn-audio/                the sink (pw-cat/aplay pipe) and the thread that
+                          plays the core's Player into it
 syn-tui/src/app.rs        the screen, keys, VizMode (spectrum/panel/full)
 syn-tui/src/field.rs      the half-block widget, truecolor / xterm-256
 syn-tui/examples/field_probe.rs  the terminal-cost probe
-syn-app/src/main.rs       CLI, the loop, bench, render --picture, scout pool
+syn-app/src/main.rs       CLI, the loop that carries out the Session's
+                          effects, bench, render --picture
 syn-app/src/picture.rs    the picture thread (sim_hz clock, viz_fps draws)
-syn-app/src/store.rs      config.toml, last point, kept points
+syn-app/src/store.rs      config.toml, last point, the points file
 ```

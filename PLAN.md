@@ -172,9 +172,21 @@ project, so the two read alike.
       audible, 🎲 never landing on the preset it is sitting on, and the web
       app's status lines. The scout's settings stay the console's (30 s at
       22 kHz, config.toml).
-    - Not re-measured yet: `soak.py` and `term-cost.py` (verify rungs 4–5)
-      need the device; run them there before trusting the xrun numbers for
-      this loop.
+    - The soak, on an M1 Max with no PipeWire (`soak.py --null`: a
+      1024-frame device buffer modelled in the null sink, underruns
+      counted; 130 s, `ldldrldldldl`), against a control — the code before
+      this decision with the same sink (2026-10-14):
+
+      | build | panel | full |
+      |---|---|---|
+      | before (e7c455f) | 1 · 1 · 0 | 2 · 1 · 1 |
+      | on syn-session / syn-player | 0 · 0 · 0 | 1 · 0 · 3 |
+
+      plus 0 for the new build with no presses and 0 with no scout. Single
+      gaps of 1–35 ms, as often before as after: no regression from the
+      move on this machine. What it does not say: anything about the
+      device's xruns (A55s, PipeWire, the terminal) — `soak.py` and
+      `term-cost.py` (verify rungs 4–5) still want a run there.
 
 ## Architecture
 
